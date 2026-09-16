@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment & Local Config
+.env
+*.local
+
+# Audit Logs (keep directory)
+logs/*.jsonl
+!logs/.gitkeep
+
+# IDE & OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
