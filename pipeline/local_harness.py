@@ -2589,7 +2589,6 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       const s2 = document.getElementById('step2Box');
       const s3 = document.getElementById('step3Box');
       const s4 = document.getElementById('step4Box');
-
       const s1Status = document.getElementById('step1Status');
       const s2Status = document.getElementById('step2Status');
       const s3Status = document.getElementById('step3Status');
@@ -2599,37 +2598,39 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       const baseActive = "p-3 rounded-xl border border-lark-blue bg-blue-50/60 dark:bg-blue-950/30 text-lark-blue font-semibold transition";
       const baseCleared = "p-3 rounded-xl border border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/20 text-apple-green font-semibold transition";
 
-      s1.className = baseInactive;
-      s2.className = baseInactive;
-      s3.className = baseInactive;
-      s4.className = baseInactive;
+      if (s1 && s2 && s3 && s4) {
+        s1.className = baseInactive;
+        s2.className = baseInactive;
+        s3.className = baseInactive;
+        s4.className = baseInactive;
 
-      if (d.ai_flags_count > 0 && d.flags_summary && d.flags_summary.includes("FLAG_ACCOUNTABILITY_NOTED")) {
-        s1.className = "p-3 rounded-xl border border-red-500/30 bg-red-50/50 dark:bg-red-950/20 text-apple-red font-semibold transition";
-        s1Status.textContent = "IT Hold";
-      } else {
-        s1.className = baseCleared;
-        s1Status.textContent = "Cleared ✓";
-      }
-
-      if (step >= 2) {
-        if (d.flags_summary && d.flags_summary.includes("FLAG_AMOUNT_MISMATCH")) {
-          s2.className = "p-3 rounded-xl border border-red-500/30 bg-red-50/50 dark:bg-red-950/20 text-apple-red font-semibold transition";
-          s2Status.textContent = "Disparity";
+        if (d.ai_flags_count > 0 && d.flags_summary && d.flags_summary.includes("FLAG_ACCOUNTABILITY_NOTED")) {
+          s1.className = "p-3 rounded-xl border border-red-500/30 bg-red-50/50 dark:bg-red-950/20 text-apple-red font-semibold transition";
+          if (s1Status) s1Status.textContent = "IT Hold";
         } else {
-          s2.className = step > 2 ? baseCleared : baseActive;
-          s2Status.textContent = step > 2 ? "Audited ✓" : "In Review";
+          s1.className = baseCleared;
+          if (s1Status) s1Status.textContent = "Cleared ✓";
         }
-      }
 
-      if (step >= 3) {
-        s3.className = step > 3 ? baseCleared : baseActive;
-        s3Status.textContent = step > 3 ? "Signed ✓" : "Reviewing";
-      }
+        if (step >= 2) {
+          if (d.flags_summary && d.flags_summary.includes("FLAG_AMOUNT_MISMATCH")) {
+            s2.className = "p-3 rounded-xl border border-red-500/30 bg-red-50/50 dark:bg-red-950/20 text-apple-red font-semibold transition";
+            if (s2Status) s2Status.textContent = "Disparity";
+          } else {
+            s2.className = step > 2 ? baseCleared : baseActive;
+            if (s2Status) s2Status.textContent = step > 2 ? "Audited ✓" : "In Review";
+          }
+        }
 
-      if (step >= 4) {
-        s4.className = d.overall_status === 'APPROVED' ? baseCleared : baseActive;
-        s4Status.textContent = d.overall_status === 'APPROVED' ? "Released ✓" : "Disbursement";
+        if (step >= 3) {
+          s3.className = step > 3 ? baseCleared : baseActive;
+          if (s3Status) s3Status.textContent = step > 3 ? "Signed ✓" : "Reviewing";
+        }
+
+        if (step >= 4) {
+          s4.className = d.overall_status === 'APPROVED' ? baseCleared : baseActive;
+          if (s4Status) s4Status.textContent = d.overall_status === 'APPROVED' ? "Released ✓" : "Disbursement";
+        }
       }
     }
 
