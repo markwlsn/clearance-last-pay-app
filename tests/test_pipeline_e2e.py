@@ -133,3 +133,5 @@ def test_web_harness_endpoints(client):
     html_resp = client.get("/")
     assert html_resp.status_code == 200
     assert "Clearance &amp; Last Pay" in html_resp.text or "Clearance & Last Pay" in html_resp.text
+
+# progressive refinement step

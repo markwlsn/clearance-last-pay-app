@@ -79,6 +79,35 @@ class EscalateRequest(BaseModel):
     hours_idle: int
 
 
+class NodeSignRequest(BaseModel):
+    dossier_id: str
+    node_key: str  # "IT", "ADMIN", "FINANCE", "HR"
+    approver_name: str
+    role: str
+    action: str = "CLEARED"  # "CLEARED", "FLAGGED"
+    notes: str = ""
+
+
+class TimeoutForwardRequest(BaseModel):
+    dossier_id: str
+    current_role: str
+    timeout_hours: int = 48
+    new_assignee: str = "Carlo Mendoza (Designated OIC / Peer Lead)"
+
+
+class SplitEscrowRequest(BaseModel):
+    dossier_id: str
+    undisputed_amount: float
+    escrow_amount: float
+    escrow_reason: str
+    approver_name: str
+    role: str = "FINANCE_APPROVER"
+
+
+class RoutingModeRequest(BaseModel):
+    mode: str  # "PARALLEL" or "SEQUENTIAL"
+
+
 class SubmissionPayload(BaseModel):
     department: str
     employee_name: str
@@ -121,6 +150,15 @@ app.state.dossiers = [
         "sample_type": "CLEARANCE_SHEET",
         "ai_flags_count": 2,
         "flags_summary": ["FLAG_MISSING_FIELD", "FLAG_ACCOUNTABILITY_NOTED"],
+        "routing_mode": "PARALLEL",
+        "assigned_signer": "Alex Tan (IT Clearance Lead)",
+        "nodes": {
+            "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "FLAGGED", "summary": "Unreturned ThinkPad S/N 20WM-0045PH"},
+            "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Locker #24 & Parking Tag Cleared"},
+            "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "CLEARED", "summary": "No cash advances outstanding"},
+            "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "LOCKED", "summary": "Awaiting IT hardware clearance"}
+        },
+        "escrow_details": None,
         "docs": [
             {"title": "Clearance Sign-Off Sheet", "file": "clearance_missing_it.pdf", "type": "CLEARANCE_SHEET", "has_flags": True},
             {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
@@ -149,6 +187,21 @@ app.state.dossiers = [
         "sample_type": "QUIT_CLAIM",
         "ai_flags_count": 2,
         "flags_summary": ["FLAG_AMOUNT_MISMATCH", "FLAG_SIGNATURE_ABSENT"],
+        "routing_mode": "PARALLEL",
+        "assigned_signer": "Roberto Ong (Finance & Payroll Lead)",
+        "nodes": {
+            "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "CLEARED", "summary": "ThinkPad & IAM access revoked"},
+            "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Store keys surrendered"},
+            "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "FLAGGED", "summary": "₱3,500 Quitclaim vs Payroll Ledger disparity"},
+            "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "LOCKED", "summary": "Awaiting Finance audit resolution"}
+        },
+        "escrow_details": {
+            "undisputed_amount": 48500.0,
+            "escrow_amount": 3500.0,
+            "reason": "Disputed adapter deduction: Quitclaim stated amount (₱52,000) vs Computed Final Pay (₱48,500)",
+            "status": "PENDING",
+            "active": False
+        },
         "docs": [
             {"title": "Quit Claim & Waiver", "file": "quit_claim_mismatch.pdf", "type": "QUIT_CLAIM", "has_flags": True},
             {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
@@ -177,6 +230,15 @@ app.state.dossiers = [
         "sample_type": "BANK_ENROLLMENT",
         "ai_flags_count": 1,
         "flags_summary": ["FLAG_FORMAT_MISMATCH"],
+        "routing_mode": "PARALLEL",
+        "assigned_signer": "Roberto Ong (Finance & Payroll Lead)",
+        "nodes": {
+            "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "CLEARED", "summary": "No IT assets issued"},
+            "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Safety gear & uniform returned"},
+            "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "FLAGGED", "summary": "Truncated bank account number (091712)"},
+            "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "LOCKED", "summary": "Awaiting bank proof update"}
+        },
+        "escrow_details": None,
         "docs": [
             {"title": "Bank / E-Wallet Proof", "file": "bank_bad_format.png", "type": "BANK_ENROLLMENT", "has_flags": True},
             {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
@@ -205,6 +267,15 @@ app.state.dossiers = [
         "sample_type": "CLEARANCE_SHEET",
         "ai_flags_count": 0,
         "flags_summary": [],
+        "routing_mode": "PARALLEL",
+        "assigned_signer": "Grace Diaz (HR Operations Manager)",
+        "nodes": {
+            "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "CLEARED", "summary": "POS login revoked"},
+            "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Store key returned"},
+            "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "CLEARED", "summary": "Final computation balanced"},
+            "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "CLEARED", "summary": "COE issued, final pay release ready"}
+        },
+        "escrow_details": None,
         "docs": [
             {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
             {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
