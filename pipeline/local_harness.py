@@ -1602,6 +1602,71 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       </div>
     </section>
 
+    <!-- Apple Split Escrow Modal Dialog -->
+    <div id="splitEscrowModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark max-w-lg w-full rounded-3xl p-6 border border-black/[0.08] dark:border-white/[0.1] shadow-2xl space-y-5">
+        <div class="flex items-center justify-between pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-2xl bg-amber-500/15 text-apple-amber flex items-center justify-center text-base shadow-sm">
+              <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-neutral-900 dark:text-white">Split Clearance & Escrow Disbursement</h3>
+              <p class="text-[11px] text-neutral-400">DOLE Labor Advisory #06 Compliance Safeguard</p>
+            </div>
+          </div>
+          <button onclick="closeSplitEscrowModal()" class="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 hover:text-neutral-700 dark:hover:text-white flex items-center justify-center transition">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-neutral-700 dark:text-neutral-300 space-y-1">
+          <div class="font-bold text-apple-green flex items-center space-x-1.5">
+            <i class="fa-solid fa-shield-check"></i>
+            <span>Zero-Dispute Final Pay Protocol</span>
+          </div>
+          <p class="text-[11px] text-neutral-600 dark:text-neutral-400">
+            Releases undisputed livelihood earnings to the employee immediately. Isolates the disputed variance into a 7-day Lark arbitration escrow window.
+          </p>
+        </div>
+
+        <div class="space-y-2.5 text-xs">
+          <div class="flex items-center justify-between p-3 rounded-xl bg-neutral-100/80 dark:bg-neutral-800/80 border border-black/[0.04]">
+            <div>
+              <div class="font-bold text-neutral-800 dark:text-neutral-200">Undisputed Net Pay (Disburse Now)</div>
+              <div class="text-[10px] text-neutral-400">Direct credit to employee verified account</div>
+            </div>
+            <div class="font-mono text-base font-bold text-apple-green" id="splitModalUndisputed">₱48,500.00</div>
+          </div>
+
+          <div class="flex items-center justify-between p-3 rounded-xl bg-neutral-100/80 dark:bg-neutral-800/80 border border-black/[0.04]">
+            <div>
+              <div class="font-bold text-neutral-800 dark:text-neutral-200">Disputed Hold Amount (Escrowed)</div>
+              <div class="text-[10px] text-apple-red">Held in payroll escrow pending Lark Huddle</div>
+            </div>
+            <div class="font-mono text-base font-bold text-apple-red" id="splitModalEscrow">₱3,500.00</div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-black/[0.04] space-y-1">
+            <span class="text-[10px] font-bold text-neutral-400 uppercase">Reason for Escrow Hold</span>
+            <div class="text-[11px] text-neutral-700 dark:text-neutral-300 font-medium" id="splitModalReason">
+              Disputed Quit Claim stated amount (₱52,000.00) vs Computed Final Pay (₱48,500.00)
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end space-x-2.5">
+          <button onclick="closeSplitEscrowModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+            Cancel
+          </button>
+          <button onclick="confirmSplitEscrowDisbursement()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-md transition active:scale-95 flex items-center space-x-1.5">
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+            <span>Execute Split Disbursement</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <script>
@@ -1955,6 +2020,178 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       }
     }
 
+    let currentRoutingMode = 'PARALLEL';
+
+    async function setRoutingMode(mode) {
+      currentRoutingMode = mode;
+      const btnParallel = document.getElementById('modeParallelBtn');
+      const btnSequential = document.getElementById('modeSequentialBtn');
+      const parallelContainer = document.getElementById('parallelMatrixContainer');
+      const seqContainer = document.getElementById('sequentialPipelineContainer');
+      const pill = document.getElementById('parallelBadgePill');
+
+      const activeBtnClass = "px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition flex items-center space-x-1";
+      const inactiveBtnClass = "px-2.5 py-1 rounded-lg text-[10px] font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1";
+
+      if (mode === 'PARALLEL') {
+        if (btnParallel) btnParallel.className = activeBtnClass;
+        if (btnSequential) btnSequential.className = inactiveBtnClass;
+        if (parallelContainer) parallelContainer.classList.remove('hidden');
+        if (seqContainer) seqContainer.classList.add('hidden');
+        if (pill) {
+          pill.textContent = 'concurrent';
+          pill.className = 'text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-apple-green font-mono lowercase';
+        }
+        showDynamicToast("Parallel Routing Active", "IT, Admin, and Finance evaluate simultaneously. Turnaround: 4.2d.", "info");
+      } else {
+        if (btnParallel) btnParallel.className = inactiveBtnClass;
+        if (btnSequential) btnSequential.className = activeBtnClass;
+        if (parallelContainer) parallelContainer.classList.add('hidden');
+        if (seqContainer) {
+          seqContainer.classList.remove('hidden');
+          seqContainer.classList.add('grid');
+        }
+        if (pill) {
+          pill.textContent = 'sequential queue';
+          pill.className = 'text-[9px] px-2 py-0.5 rounded-full bg-amber-500/10 text-apple-amber font-mono lowercase';
+        }
+        showDynamicToast("Sequential Routing Active", "Traditional linear queue where each step blocks the next (14d).", "info");
+      }
+
+      try {
+        await fetch('/api/approvals/toggle-routing-mode', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ mode: mode })
+        });
+      } catch (err) {}
+
+      if (activeDossier) {
+        updateProgressPipeline(activeDossier);
+      }
+    }
+
+    async function signParallelNode(nodeKey) {
+      if (!activeDossier) return;
+      const signerName = currentApproverRole === 'IT_APPROVER' ? 'Alex Tan (IT Lead)' :
+                         currentApproverRole === 'FINANCE_APPROVER' ? 'Roberto Ong (Finance Lead)' :
+                         currentApproverRole === 'HR_APPROVER' ? 'Grace Diaz (HR Operations)' : 'Elena Cruz (Facilities Admin)';
+      try {
+        const res = await fetch('/api/approvals/node-sign', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            dossier_id: activeDossier.dossier_id,
+            node_key: nodeKey,
+            approver_name: signerName,
+            role: currentApproverRole,
+            action: "CLEARED",
+            notes: `Signed off in Parallel Mode via Approver Review Desk`
+          })
+        });
+        const data = await res.json();
+        if (data.status === 'SUCCESS') {
+          activeDossier.nodes = data.dossier.nodes;
+          activeDossier.overall_status = data.dossier.overall_status;
+          activeDossier.stage_step = data.dossier.stage_step;
+          showDynamicToast(`${nodeKey} Node Cleared!`, `Signed by ${signerName}. ${data.all_dept_cleared ? 'All 3 parallel nodes cleared! HR unlocked.' : ''}`, "success");
+          updateProgressPipeline(activeDossier);
+          renderQueue();
+        }
+      } catch (err) {
+        showDynamicToast("Node Sign Failed", err.message, "error");
+      }
+    }
+
+    async function simulateSlaTimeoutForward() {
+      if (!activeDossier) return;
+      const oicAssignee = "Carlo Mendoza (Designated OIC / Peer Lead)";
+      try {
+        const res = await fetch('/api/approvals/simulate-timeout-forward', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            dossier_id: activeDossier.dossier_id,
+            current_role: currentApproverRole,
+            timeout_hours: 48,
+            new_assignee: oicAssignee
+          })
+        });
+        const data = await res.json();
+        activeDossier.assigned_signer = data.new_assignee;
+        activeDossier.sla_auto_forwarded = true;
+        showDynamicToast("SLA Breach Prevented", `48h timeout reached. Auto-forwarded to ${data.new_assignee}.`, "info");
+        const urgencyTag = document.getElementById('apprUrgencyTag');
+        if (urgencyTag) {
+          urgencyTag.textContent = 'Auto-Forwarded to OIC';
+          urgencyTag.className = 'text-apple-purple font-mono font-bold px-1.5 py-0.2 rounded bg-purple-500/10';
+        }
+        renderQueue();
+      } catch (err) {
+        showDynamicToast("Auto-Forward Failed", err.message, "error");
+      }
+    }
+
+    function openSplitEscrowModal() {
+      if (!activeDossier) return;
+      const modal = document.getElementById('splitEscrowModal');
+      const undisp = document.getElementById('splitModalUndisputed');
+      const escrow = document.getElementById('splitModalEscrow');
+      const reason = document.getElementById('splitModalReason');
+
+      if (activeDossier.escrow_details) {
+        undisp.textContent = `₱${Number(activeDossier.escrow_details.undisputed_amount).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        escrow.textContent = `₱${Number(activeDossier.escrow_details.escrow_amount).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        reason.textContent = activeDossier.escrow_details.reason;
+      } else {
+        undisp.textContent = '₱48,500.00';
+        escrow.textContent = '₱3,500.00';
+        reason.textContent = 'Disputed Quit Claim stated amount (₱52,000.00) vs Computed Final Pay (₱48,500.00)';
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeSplitEscrowModal() {
+      const modal = document.getElementById('splitEscrowModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function confirmSplitEscrowDisbursement() {
+      if (!activeDossier) return;
+      const signerName = currentApproverRole === 'FINANCE_APPROVER' ? 'Roberto Ong (Finance Lead)' : 'Grace Diaz (HR Operations)';
+      try {
+        const res = await fetch('/api/approvals/split-escrow', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            dossier_id: activeDossier.dossier_id,
+            undisputed_amount: 48500.00,
+            escrow_amount: 3500.00,
+            escrow_reason: "Quitclaim stated amount (₱52,000.00) vs Computed Final Pay (₱48,500.00)",
+            approver_name: signerName,
+            role: currentApproverRole
+          })
+        });
+        const data = await res.json();
+        closeSplitEscrowModal();
+        activeDossier.overall_status = 'PARTIALLY_DISBURSED';
+        if (!activeDossier.escrow_details) {
+          activeDossier.escrow_details = {
+            undisputed_amount: 48500.00,
+            escrow_amount: 3500.00,
+            reason: "Quitclaim disparity",
+            status: 'ESCROW_ACTIVE'
+          };
+        }
+        showDynamicToast("Split Pay Disbursed!", `₱48,500.00 released to employee · ₱3,500.00 held in Escrow.`, "success");
+        selectDossier(activeDossier.dossier_id);
+        renderQueue();
+      } catch (err) {
+        showDynamicToast("Split Escrow Failed", err.message, "error");
+      }
+    }
+
     function switchApproverRole(role) {
       currentApproverRole = role;
       const btnIT = document.getElementById('roleBtnIT');
@@ -2189,6 +2426,35 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         pulseDot.className = 'w-2 h-2 rounded-full bg-apple-green apple-pulse-green';
       }
 
+      // Check Split Escrow Button Visibility
+      const btnSplit = document.getElementById('btnSplitEscrowAction');
+      if (btnSplit) {
+        if (d.escrow_details || (d.flags_summary && d.flags_summary.includes("FLAG_AMOUNT_MISMATCH"))) {
+          btnSplit.classList.remove('hidden');
+          if (d.overall_status === 'PARTIALLY_DISBURSED') {
+            btnSplit.innerHTML = '<i class="fa-solid fa-coins mr-2"></i> Escrow Active (₱3.5K Held)';
+            btnSplit.classList.add('opacity-80');
+          } else {
+            btnSplit.innerHTML = '<i class="fa-solid fa-scale-balanced mr-2"></i> Split Escrow Release';
+            btnSplit.classList.remove('opacity-80');
+          }
+        } else {
+          btnSplit.classList.add('hidden');
+        }
+      }
+
+      // Check SLA Urgency Tag
+      const urgencyTag = document.getElementById('apprUrgencyTag');
+      if (urgencyTag) {
+        if (d.sla_auto_forwarded) {
+          urgencyTag.textContent = 'Auto-Forwarded to OIC';
+          urgencyTag.className = 'text-apple-purple font-mono font-bold px-1.5 py-0.2 rounded bg-purple-500/10';
+        } else {
+          urgencyTag.textContent = '18h Remaining';
+          urgencyTag.className = 'text-apple-amber font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/10';
+        }
+      }
+
       // Progression Steps
       updateProgressPipeline(d);
 
@@ -2203,9 +2469,122 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     }
 
     function updateProgressPipeline(d) {
-      const step = d.stage_step || 1;
-      document.getElementById('pipelineStepLabel').textContent = `Stage ${step} of 4: ${step === 1 ? 'Clearances' : step === 2 ? 'Last Pay Computation' : step === 3 ? 'Quit Claim' : 'Bank Release'}`;
+      // 1. Update Parallel Matrix Nodes
+      const nodes = d.nodes || {
+        "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "PENDING", "summary": "Awaiting IT check"},
+        "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Locker cleared"},
+        "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "PENDING", "summary": "Auditing payroll ledger"},
+        "HR": {"name": "HR Final Release", "signer": "Grace Diaz", "status": "LOCKED", "summary": "Requires 3 depts"}
+      };
 
+      function styleNode(key, boxId, badgeId, signerId, summaryId, btnId) {
+        const node = nodes[key] || {status: "PENDING", signer: "", summary: ""};
+        const badge = document.getElementById(badgeId);
+        const signer = document.getElementById(signerId);
+        const summary = document.getElementById(summaryId);
+        const btn = document.getElementById(btnId);
+        const box = document.getElementById(boxId);
+
+        if (signer) signer.textContent = `Signer: ${node.signer || 'Unassigned'}`;
+        if (summary) summary.textContent = node.summary || (node.status === 'CLEARED' ? 'Verified ✓' : 'In review');
+
+        if (node.status === 'CLEARED') {
+          if (badge) {
+            badge.textContent = 'CLEARED ✓';
+            badge.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-apple-green';
+          }
+          if (box) box.className = 'p-3.5 rounded-2xl bg-emerald-500/[0.04] dark:bg-emerald-950/20 border border-emerald-500/20 shadow-sm space-y-2 transition';
+          if (btn) {
+            btn.innerHTML = '<i class="fa-solid fa-check mr-1 text-[9px]"></i><span>Cleared ✓</span>';
+            btn.className = 'w-full py-1.5 rounded-xl bg-emerald-500/10 text-apple-green text-[10px] font-bold transition flex items-center justify-center space-x-1 cursor-default';
+            btn.disabled = true;
+          }
+        } else if (node.status === 'FLAGGED') {
+          if (badge) {
+            badge.textContent = 'FLAGGED';
+            badge.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red';
+          }
+          if (box) box.className = 'p-3.5 rounded-2xl bg-red-500/[0.04] dark:bg-red-950/20 border border-red-500/20 shadow-sm space-y-2 transition';
+          if (btn) {
+            btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1 text-[9px]"></i><span>Sign & Override</span>';
+            btn.className = 'w-full py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-apple-red text-[10px] font-bold transition flex items-center justify-center space-x-1';
+            btn.disabled = false;
+          }
+        } else {
+          if (badge) {
+            badge.textContent = 'PENDING';
+            badge.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-apple-amber';
+          }
+          if (box) box.className = 'p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-2 transition';
+          if (btn) {
+            btn.innerHTML = '<i class="fa-solid fa-pen-nib mr-1 text-[9px]"></i><span>Sign ' + key + ' Node</span>';
+            btn.className = 'w-full py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-[10px] font-bold transition flex items-center justify-center space-x-1';
+            btn.disabled = false;
+          }
+        }
+      }
+
+      styleNode('IT', 'pNodeBoxIT', 'pNodeBadgeIT', 'pNodeSignerIT', 'pNodeSummaryIT', 'btnSignNodeIT');
+      styleNode('ADMIN', 'pNodeBoxAdmin', 'pNodeBadgeAdmin', 'pNodeSignerAdmin', 'pNodeSummaryAdmin', 'btnSignNodeAdmin');
+      styleNode('FINANCE', 'pNodeBoxFinance', 'pNodeBadgeFinance', 'pNodeSignerFinance', 'pNodeSummaryFinance', 'btnSignNodeFinance');
+
+      // Check HR Node Convergence
+      const itClear = nodes.IT && nodes.IT.status === 'CLEARED';
+      const adminClear = nodes.ADMIN && nodes.ADMIN.status === 'CLEARED';
+      const finClear = nodes.FINANCE && nodes.FINANCE.status === 'CLEARED';
+      const hrNode = nodes.HR || {status: "LOCKED"};
+
+      let clearedCount = (itClear ? 1 : 0) + (adminClear ? 1 : 0) + (finClear ? 1 : 0);
+      const allDeptsClear = clearedCount === 3;
+
+      const badgeHR = document.getElementById('pNodeBadgeHR');
+      const signerHR = document.getElementById('pNodeSignerHR');
+      const summaryHR = document.getElementById('pNodeSummaryHR');
+      const btnHR = document.getElementById('btnSignNodeHR');
+      const boxHR = document.getElementById('pNodeBoxHR');
+
+      if (signerHR) signerHR.textContent = `Signer: Grace Diaz`;
+
+      if (hrNode.status === 'CLEARED' || d.overall_status === 'APPROVED') {
+        if (badgeHR) {
+          badgeHR.textContent = 'DISBURSED ✓';
+          badgeHR.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-apple-green';
+        }
+        if (summaryHR) summaryHR.textContent = 'Final pay sent, COE released';
+        if (boxHR) boxHR.className = 'p-3.5 rounded-2xl bg-emerald-500/[0.06] dark:bg-emerald-950/20 border border-emerald-500/30 shadow-sm space-y-2 transition';
+        if (btnHR) {
+          btnHR.innerHTML = '<i class="fa-solid fa-circle-check mr-1 text-[9px]"></i><span>Release Complete</span>';
+          btnHR.className = 'w-full py-1.5 rounded-xl bg-emerald-500/15 text-apple-green text-[10px] font-bold cursor-default flex items-center justify-center space-x-1';
+          btnHR.disabled = true;
+        }
+      } else if (allDeptsClear) {
+        if (badgeHR) {
+          badgeHR.textContent = '🔓 READY';
+          badgeHR.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-lark-blue animate-pulse';
+        }
+        if (summaryHR) summaryHR.textContent = 'All 3 parallel nodes cleared!';
+        if (boxHR) boxHR.className = 'p-3.5 rounded-2xl bg-blue-500/[0.04] dark:bg-blue-950/20 border border-blue-500/30 shadow-sm space-y-2 transition';
+        if (btnHR) {
+          btnHR.innerHTML = '<i class="fa-solid fa-signature mr-1 text-[9px]"></i><span>Disburse Final Pay</span>';
+          btnHR.className = 'w-full py-1.5 rounded-xl bg-apple-green hover:bg-emerald-600 text-white text-[10px] font-bold shadow-sm transition flex items-center justify-center space-x-1';
+          btnHR.disabled = false;
+        }
+      } else {
+        if (badgeHR) {
+          badgeHR.textContent = `🔒 ${clearedCount}/3 CLEARED`;
+          badgeHR.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-200/80 dark:bg-neutral-800 text-neutral-500 font-mono';
+        }
+        if (summaryHR) summaryHR.textContent = `Waiting on ${!itClear ? 'IT ' : ''}${!adminClear ? 'Admin ' : ''}${!finClear ? 'Finance' : ''}`;
+        if (boxHR) boxHR.className = 'p-3.5 rounded-2xl bg-neutral-100/50 dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.05] shadow-sm space-y-2 opacity-80';
+        if (btnHR) {
+          btnHR.innerHTML = '<i class="fa-solid fa-lock mr-1 text-[9px]"></i><span>Release Final Pay</span>';
+          btnHR.className = 'w-full py-1.5 rounded-xl bg-neutral-200/60 dark:bg-neutral-800 text-neutral-400 text-[10px] font-bold cursor-not-allowed flex items-center justify-center space-x-1';
+          btnHR.disabled = true;
+        }
+      }
+
+      // 2. Also update Sequential Boxes (for fallback view)
+      const step = d.stage_step || 1;
       const s1 = document.getElementById('step1Box');
       const s2 = document.getElementById('step2Box');
       const s3 = document.getElementById('step3Box');
