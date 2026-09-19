@@ -1,7 +1,7 @@
 """Local test harness for Clearance & Last Pay document pre-check pipeline.
 Supports:
 1. Employee Submission View (Faithfully recreating the Lark Approval Form in Apple Minimalist style)
-2. Role-Based Approver Dashboard (IT, Finance/Payroll, HR, Admin) with AI flag review & preview
+2. Role-Based Approver Desk (Ultra-refined Apple minimalist workstation with multi-doc tabs & SLA tracker)
 3. Developer Quick-Test Harness with 1-click synthetic fixtures
 4. Apple Minimalist aesthetic with default Light Mode and Dark Mode toggle
 """
@@ -26,7 +26,7 @@ from pipeline.models import DocumentType, ExtractionResult
 app = FastAPI(
     title="Clearance & Last Pay — Lark Companion App",
     description="Apple-minimalist Lark Clearance Form and Role-Based Approver Dashboard.",
-    version="2.0.0",
+    version="2.1.0",
 )
 
 # Shared singletons on app state
@@ -46,6 +46,14 @@ class HumanActionRequest(BaseModel):
     action: str  # APPROVE, REJECT, REQUEST_REVISION
     flags_reviewed: List[str] = []
     override_justification: str = ""
+
+
+class LarkNotificationRequest(BaseModel):
+    dossier_id: str
+    employee_name: str
+    recipient: str
+    message: str
+    sender_role: str
 
 
 class SubmissionPayload(BaseModel):
@@ -71,65 +79,114 @@ app.state.dossiers = [
     {
         "dossier_id": "DOS-2026-001",
         "employee_name": "Juan Dela Cruz",
+        "employee_id": "EMP-94812",
         "department": "Information Technology",
         "company": "CMG Group of Companies",
-        "unit_channel": "HQ Operations",
+        "unit_channel": "Corporate HQ",
         "job_level": "Senior Specialist",
-        "branch": "Taguig HQ",
+        "branch": "Taguig HQ - 24th Floor",
         "date_hired": "2022-03-15",
         "eoc_date": "2026-08-31",
         "employee_status": "Regular",
         "reason_for_separation": "Resignation",
         "with_clearance_already": "In Progress",
         "current_stage": "IT_CLEARANCE",
-        "overall_status": "PENDING_REVIEW",
+        "stage_step": 1,
+        "overall_status": "FLAGGED",
         "submitted_at": "2026-09-18T08:30:00Z",
         "sample_file": "clearance_missing_it.pdf",
         "sample_type": "CLEARANCE_SHEET",
         "ai_flags_count": 2,
         "flags_summary": ["FLAG_MISSING_FIELD", "FLAG_ACCOUNTABILITY_NOTED"],
+        "docs": [
+            {"title": "Clearance Sign-Off Sheet", "file": "clearance_missing_it.pdf", "type": "CLEARANCE_SHEET", "has_flags": True},
+            {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
+            {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+        ]
     },
     {
         "dossier_id": "DOS-2026-002",
         "employee_name": "Maria Clara Santos",
+        "employee_id": "EMP-10294",
         "department": "Finance & Accounting",
         "company": "CMG Retail Inc.",
-        "unit_channel": "Retail Stores",
+        "unit_channel": "Retail Stores Network",
         "job_level": "Team Lead",
-        "branch": "Makati Central",
+        "branch": "Makati Central Hub",
         "date_hired": "2020-06-01",
         "eoc_date": "2026-09-15",
         "employee_status": "Regular",
         "reason_for_separation": "End of Contract",
         "with_clearance_already": "Yes",
         "current_stage": "LAST_PAY_CALC",
+        "stage_step": 2,
         "overall_status": "FLAGGED",
         "submitted_at": "2026-09-17T11:20:00Z",
         "sample_file": "quit_claim_mismatch.pdf",
         "sample_type": "QUIT_CLAIM",
         "ai_flags_count": 2,
         "flags_summary": ["FLAG_AMOUNT_MISMATCH", "FLAG_SIGNATURE_ABSENT"],
+        "docs": [
+            {"title": "Quit Claim & Waiver", "file": "quit_claim_mismatch.pdf", "type": "QUIT_CLAIM", "has_flags": True},
+            {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
+            {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+        ]
     },
     {
         "dossier_id": "DOS-2026-003",
         "employee_name": "Pedro Penduko",
+        "employee_id": "EMP-88419",
         "department": "Logistics & Supply Chain",
         "company": "CMG Distribution Corp.",
         "unit_channel": "Logistics Hub",
         "job_level": "Rank & File",
-        "branch": "Cebu Hub",
+        "branch": "Cebu Distribution Center",
         "date_hired": "2023-01-10",
         "eoc_date": "2026-09-30",
         "employee_status": "Regular",
         "reason_for_separation": "Resignation",
         "with_clearance_already": "No",
         "current_stage": "FINANCE_DISBURSEMENT",
+        "stage_step": 3,
         "overall_status": "FLAGGED",
         "submitted_at": "2026-09-19T14:45:00Z",
         "sample_file": "bank_bad_format.png",
         "sample_type": "BANK_ENROLLMENT",
         "ai_flags_count": 1,
         "flags_summary": ["FLAG_FORMAT_MISMATCH"],
+        "docs": [
+            {"title": "Bank / E-Wallet Proof", "file": "bank_bad_format.png", "type": "BANK_ENROLLMENT", "has_flags": True},
+            {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
+            {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False}
+        ]
+    },
+    {
+        "dossier_id": "DOS-2026-004",
+        "employee_name": "Elena Cruz",
+        "employee_id": "EMP-77102",
+        "department": "Retail Operations",
+        "company": "CMG Retail Inc.",
+        "unit_channel": "Retail Stores Network",
+        "job_level": "Junior Associate",
+        "branch": "Davao Regional Hub",
+        "date_hired": "2023-08-01",
+        "eoc_date": "2026-09-25",
+        "employee_status": "Regular",
+        "reason_for_separation": "Resignation",
+        "with_clearance_already": "Yes",
+        "current_stage": "FINAL_RELEASE",
+        "stage_step": 4,
+        "overall_status": "CLEARED",
+        "submitted_at": "2026-09-20T09:10:00Z",
+        "sample_file": "clearance_sheet_valid.pdf",
+        "sample_type": "CLEARANCE_SHEET",
+        "ai_flags_count": 0,
+        "flags_summary": [],
+        "docs": [
+            {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
+            {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
+            {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+        ]
     },
 ]
 
@@ -199,6 +256,7 @@ def submit_clearance_form(data: SubmissionPayload):
     new_dossier = {
         "dossier_id": dossier_id,
         "employee_name": data.employee_name,
+        "employee_id": f"EMP-{uuid.uuid4().hex[:5].upper()}",
         "department": data.department,
         "company": data.company,
         "unit_channel": data.unit_channel,
@@ -210,12 +268,18 @@ def submit_clearance_form(data: SubmissionPayload):
         "reason_for_separation": data.reason_for_separation,
         "with_clearance_already": data.with_clearance_already,
         "current_stage": "IT_CLEARANCE",
+        "stage_step": 1,
         "overall_status": "PENDING_REVIEW",
         "submitted_at": datetime.now(timezone.utc).isoformat(),
         "sample_file": data.accountability_form_name or "uploaded_form.pdf",
         "sample_type": "CLEARANCE_SHEET",
         "ai_flags_count": 0,
         "flags_summary": [],
+        "docs": [
+            {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
+            {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
+            {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+        ]
     }
     app.state.dossiers.insert(0, new_dossier)
     app.state.audit_logger.log_human_action(
@@ -278,6 +342,7 @@ def log_approver_decision(req: HumanActionRequest):
         if d["dossier_id"] == req.document_id:
             if req.action == "APPROVE":
                 d["overall_status"] = "APPROVED"
+                d["stage_step"] = min(4, d.get("stage_step", 1) + 1)
             elif req.action == "REJECT":
                 d["overall_status"] = "REJECTED"
             else:
@@ -285,6 +350,27 @@ def log_approver_decision(req: HumanActionRequest):
             break
 
     return {"status": "SUCCESS", "audit_entry": entry}
+
+
+@app.post("/api/approvals/notify-lark")
+def send_lark_notification(req: LarkNotificationRequest):
+    """Simulates sending an interactive Lark Bot message card to the employee."""
+    entry = app.state.audit_logger.log_human_action(
+        dossier_id=req.dossier_id,
+        approver_id=f"LARK-BOT-{req.sender_role}",
+        role=req.sender_role,
+        action="LARK_NOTIFICATION_DISPATCHED",
+        flags_reviewed=[],
+        override_justification=f"To {req.employee_name} ({req.recipient}): {req.message}",
+    )
+    return {
+        "status": "SENT",
+        "channel": "Lark Workplace Bot",
+        "recipient": req.recipient,
+        "dossier_id": req.dossier_id,
+        "message": req.message,
+        "timestamp": entry["timestamp"],
+    }
 
 
 @app.get("/api/audit-logs")
@@ -306,7 +392,6 @@ HTML_DASHBOARD = """<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clearance & Last Pay — Lark Companion App</title>
   
-  <!-- Tailwind CSS CDN with dark mode config -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -358,10 +443,9 @@ HTML_DASHBOARD = """<!DOCTYPE html>
   <style>
     html { -webkit-font-smoothing: antialiased; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-thumb { background: rgba(140, 140, 145, 0.3); border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(140, 140, 145, 0.5); }
+    ::-webkit-scrollbar-thumb { background: rgba(140, 140, 145, 0.25); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(140, 140, 145, 0.45); }
     
-    /* Lark custom select and input styles with Apple touch */
     .lark-input {
       width: 100%;
       font-size: 13px;
@@ -389,16 +473,62 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       color: #1F2329;
       margin-bottom: 6px;
     }
-    .dark .lark-label {
-      color: #E5E5EA;
+    .dark .lark-label { color: #E5E5EA; }
+    .lark-required { color: #F54A45; margin-left: 2px; }
+
+    /* Apple Workstation UI Tokens */
+    .apple-glass {
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
     }
-    .lark-required {
-      color: #F54A45;
-      margin-left: 2px;
+    
+    @keyframes apple-shimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .apple-intelligence-glow {
+      background: linear-gradient(135deg, rgba(0,113,227,0.15), rgba(175,82,222,0.15), rgba(255,45,85,0.15));
+      background-size: 200% 200%;
+      animation: apple-shimmer 6s ease infinite;
+    }
+
+    .apple-pulse-green {
+      box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7);
+      animation: pulseGreen 2s infinite;
+    }
+    @keyframes pulseGreen {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 199, 89, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+    }
+
+    .apple-pulse-red {
+      box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7);
+      animation: pulseRed 2s infinite;
+    }
+    @keyframes pulseRed {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 59, 48, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
     }
   </style>
 </head>
 <body class="bg-apple-canvasLight dark:bg-apple-canvasDark text-neutral-900 dark:text-neutral-100 min-h-screen transition-colors duration-300">
+  
+  <!-- Apple Dynamic Island Floating Toast Notification -->
+  <div id="dynamicIslandToast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="px-5 py-3 rounded-full bg-neutral-900/90 dark:bg-white/95 text-white dark:text-neutral-900 shadow-2xl apple-glass border border-white/20 dark:border-black/10 flex items-center space-x-3.5 text-xs font-semibold">
+      <div id="toastIcon" class="w-6 h-6 rounded-full bg-apple-green text-white flex items-center justify-center text-xs shrink-0 shadow-sm">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <div>
+        <div id="toastTitle" class="font-bold text-xs tracking-tight">Action Completed</div>
+        <div id="toastMessage" class="text-[11px] text-neutral-300 dark:text-neutral-600 font-normal">Recorded to immutable audit trail.</div>
+      </div>
+    </div>
+  </div>
   
   <!-- Apple Frosted Glass Top Navigation -->
   <header class="sticky top-0 z-50 bg-white/85 dark:bg-neutral-900/85 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
@@ -422,10 +552,10 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
       <!-- Center Segmented View Switcher -->
       <nav class="hidden md:flex items-center p-1 bg-neutral-200/60 dark:bg-neutral-800 rounded-xl space-x-1">
-        <button id="tabBtnForm" onclick="switchView('form')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition">
+        <button id="tabBtnForm" onclick="switchView('form')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition">
           <i class="fa-regular fa-pen-to-square mr-1.5 text-lark-blue"></i> Requester Form
         </button>
-        <button id="tabBtnApprover" onclick="switchView('approver')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition">
+        <button id="tabBtnApprover" onclick="switchView('approver')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition">
           <i class="fa-solid fa-user-check mr-1.5 text-apple-green"></i> Approver Review Desk
         </button>
         <button id="tabBtnHarness" onclick="switchView('harness')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition">
@@ -451,8 +581,8 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
   <!-- Mobile View Selector Bar -->
   <div class="md:hidden bg-white dark:bg-neutral-900 border-b border-black/[0.06] dark:border-white/[0.08] px-4 py-2 flex justify-around">
-    <button onclick="switchView('form')" class="text-xs font-semibold text-lark-blue py-1">Requester Form</button>
-    <button onclick="switchView('approver')" class="text-xs font-medium text-neutral-500 py-1">Approver Desk</button>
+    <button onclick="switchView('form')" class="text-xs font-semibold text-neutral-500 py-1">Requester Form</button>
+    <button onclick="switchView('approver')" class="text-xs font-semibold text-lark-blue py-1">Approver Desk</button>
     <button onclick="switchView('harness')" class="text-xs font-medium text-neutral-500 py-1">Dev Harness</button>
   </div>
 
@@ -461,9 +591,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     <!-- ================================================================= -->
     <!-- VIEW 1: REQUESTER FORM (LARK APPROVAL RECREATION) -->
     <!-- ================================================================= -->
-    <section id="viewForm" class="max-w-3xl mx-auto space-y-6">
-      
-      <!-- Main Lark Form Container Card -->
+    <section id="viewForm" class="hidden max-w-3xl mx-auto space-y-6">
       <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark rounded-2xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] border border-black/[0.06] dark:border-white/[0.08] transition">
         
         <!-- Header -->
