@@ -134,4 +134,65 @@ def test_web_harness_endpoints(client):
     assert html_resp.status_code == 200
     assert "Clearance &amp; Last Pay" in html_resp.text or "Clearance & Last Pay" in html_resp.text
 
-# progressive refinement step
+
+def test_parallel_routing_and_node_sign(client):
+    """Verifies Option 1: Parallel routing toggle and individual node sign-off."""
+    # 1. Toggle routing mode to PARALLEL
+    toggle_resp = client.post("/api/approvals/toggle-routing-mode", json={"mode": "PARALLEL"})
+    assert toggle_resp.status_code == 200
+    assert toggle_resp.json()["routing_mode"] == "PARALLEL"
+
+    # 2. Sign off IT node for DOS-2026-001
+    sign_resp = client.post("/api/approvals/node-sign", json={
+        "dossier_id": "DOS-2026-001",
+        "node_key": "IT",
+        "approver_name": "Alex Tan (IT Lead)",
+        "role": "IT_APPROVER",
+        "action": "CLEARED",
+        "notes": "ThinkPad surrendered to HQ reception desk"
+    })
+    assert sign_resp.status_code == 200
+    data = sign_resp.json()
+    assert data["status"] == "SUCCESS"
+    assert data["dossier"]["nodes"]["IT"]["status"] == "CLEARED"
+    # In DOS-2026-001, ADMIN and FINANCE are also CLEARED, so all_dept_cleared should become True and unlock HR!
+    assert data["all_dept_cleared"] is True
+    assert data["dossier"]["nodes"]["HR"]["status"] == "READY"
+
+
+def test_sla_timeout_auto_forward(client):
+    """Verifies Option 2: SLA 48h timeout simulation and auto-forwarding to OIC."""
+    resp = client.post("/api/approvals/simulate-timeout-forward", json={
+        "dossier_id": "DOS-2026-002",
+        "current_role": "FINANCE_APPROVER",
+        "timeout_hours": 48,
+        "new_assignee": "Carlo Mendoza (Designated OIC / Peer Lead)"
+    })
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "AUTO_FORWARDED"
+    assert data["new_assignee"] == "Carlo Mendoza (Designated OIC / Peer Lead)"
+
+
+def test_split_escrow_disbursement(client):
+    """Verifies Option 3: Split clearance and escrow release for disputed amounts."""
+    resp = client.post("/api/approvals/split-escrow", json={
+        "dossier_id": "DOS-2026-002",
+        "undisputed_amount": 48500.00,
+        "escrow_amount": 3500.00,
+        "escrow_reason": "Disputed adapter deduction: Quitclaim stated amount (₱52,000) vs Computed Final Pay (₱48,500)",
+        "approver_name": "Roberto Ong (Finance Lead)",
+        "role": "FINANCE_APPROVER"
+    })
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "SPLIT_DISBURSED"
+    assert data["undisputed_amount"] == 48500.00
+    assert data["escrow_amount"] == 3500.00
+
+    # Verify audit log was recorded
+    logs_resp = client.get("/api/audit-logs?limit=5")
+    assert logs_resp.status_code == 200
+    actions = [l.get("action") for l in logs_resp.json()]
+    assert "SPLIT_ESCROW_DISBURSEMENT" in actions
+

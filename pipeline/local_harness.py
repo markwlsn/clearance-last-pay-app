@@ -550,6 +550,145 @@ def batch_approve_clean(role: str = "HR_APPROVER"):
     }
 
 
+@app.post("/api/approvals/toggle-routing-mode")
+def toggle_routing_mode(req: RoutingModeRequest):
+    """Toggles global simulation routing between PARALLEL and SEQUENTIAL."""
+    for d in app.state.dossiers:
+        d["routing_mode"] = req.mode
+    return {"status": "SUCCESS", "routing_mode": req.mode}
+
+
+@app.post("/api/approvals/node-sign")
+def sign_department_node(req: NodeSignRequest):
+    """Signs off an individual parallel clearance node (IT, Admin, Finance, HR)."""
+    target = None
+    for d in app.state.dossiers:
+        if d["dossier_id"] == req.dossier_id:
+            target = d
+            break
+    if not target:
+        raise HTTPException(status_code=404, detail="Dossier not found")
+
+    if "nodes" not in target:
+        target["nodes"] = {}
+
+    if req.node_key in target["nodes"]:
+        target["nodes"][req.node_key]["status"] = req.action
+        target["nodes"][req.node_key]["signer"] = req.approver_name
+
+    # Check parallel convergence across IT, Admin, and Finance
+    nodes = target.get("nodes", {})
+    it_clear = nodes.get("IT", {}).get("status") == "CLEARED"
+    admin_clear = nodes.get("ADMIN", {}).get("status") == "CLEARED"
+    fin_clear = nodes.get("FINANCE", {}).get("status") == "CLEARED"
+    all_dept_cleared = it_clear and admin_clear and fin_clear
+
+    if all_dept_cleared:
+        if nodes.get("HR", {}).get("status") == "LOCKED":
+            nodes["HR"]["status"] = "READY"
+            nodes["HR"]["summary"] = "All 3 parallel nodes cleared. Ready for final disbursement."
+    else:
+        if nodes.get("HR", {}).get("status") == "READY":
+            nodes["HR"]["status"] = "LOCKED"
+
+    if req.node_key == "HR" and req.action == "CLEARED":
+        target["overall_status"] = "APPROVED"
+        target["stage_step"] = 4
+
+    entry = app.state.audit_logger.log_human_action(
+        dossier_id=req.dossier_id,
+        approver_id=req.approver_name,
+        role=req.role,
+        action=f"PARALLEL_NODE_SIGN_{req.node_key}_{req.action}",
+        flags_reviewed=[],
+        override_justification=f"Parallel node {req.node_key} signed as {req.action} by {req.approver_name}. Notes: {req.notes}",
+    )
+
+    return {
+        "status": "SUCCESS",
+        "dossier": target,
+        "all_dept_cleared": all_dept_cleared,
+        "audit_entry": entry,
+    }
+
+
+@app.post("/api/approvals/simulate-timeout-forward")
+def simulate_timeout_forward(req: TimeoutForwardRequest):
+    """Simulates 48h SLA inactivity and auto-forwards signing authority to OIC/Director."""
+    target = None
+    for d in app.state.dossiers:
+        if d["dossier_id"] == req.dossier_id:
+            target = d
+            break
+    if not target:
+        raise HTTPException(status_code=404, detail="Dossier not found")
+
+    target["assigned_signer"] = req.new_assignee
+    target["sla_auto_forwarded"] = True
+    target["sla_forward_reason"] = f"Inactivity timeout ({req.timeout_hours}h SLA limit exceeded). Auto-forwarded from {req.current_role} to {req.new_assignee}."
+
+    entry = app.state.audit_logger.log_human_action(
+        dossier_id=req.dossier_id,
+        approver_id="SLA-WATCHDOG-ENGINE",
+        role="SYSTEM_DELEGATOR",
+        action="SLA_TIMEOUT_AUTO_FORWARD",
+        flags_reviewed=[],
+        override_justification=target["sla_forward_reason"],
+    )
+
+    return {
+        "status": "AUTO_FORWARDED",
+        "dossier_id": req.dossier_id,
+        "new_assignee": req.new_assignee,
+        "timestamp": entry["timestamp"],
+        "reason": target["sla_forward_reason"],
+    }
+
+
+@app.post("/api/approvals/split-escrow")
+def execute_split_escrow(req: SplitEscrowRequest):
+    """Disburses undisputed final pay immediately while escrowing disputed amounts."""
+    target = None
+    for d in app.state.dossiers:
+        if d["dossier_id"] == req.dossier_id:
+            target = d
+            break
+    if not target:
+        raise HTTPException(status_code=404, detail="Dossier not found")
+
+    target["overall_status"] = "PARTIALLY_DISBURSED"
+    target["stage_step"] = 3
+    target["escrow_details"] = {
+        "undisputed_amount": req.undisputed_amount,
+        "escrow_amount": req.escrow_amount,
+        "reason": req.escrow_reason,
+        "status": "ESCROW_ACTIVE",
+        "arbitration_window_days": 7,
+        "disbursed_at": datetime.now(timezone.utc).isoformat(),
+        "approver": req.approver_name,
+    }
+
+    entry = app.state.audit_logger.log_human_action(
+        dossier_id=req.dossier_id,
+        approver_id=req.approver_name,
+        role=req.role,
+        action="SPLIT_ESCROW_DISBURSEMENT",
+        flags_reviewed=[],
+        override_justification=(
+            f"DOLE Compliance Safeguard: Disbursed undisputed ₱{req.undisputed_amount:,.2f} to employee. "
+            f"Placed disputed ₱{req.escrow_amount:,.2f} into 7-day arbitration escrow. Reason: {req.escrow_reason}"
+        ),
+    )
+
+    return {
+        "status": "SPLIT_DISBURSED",
+        "dossier_id": req.dossier_id,
+        "undisputed_amount": req.undisputed_amount,
+        "escrow_amount": req.escrow_amount,
+        "timestamp": entry["timestamp"],
+    }
+
+
 @app.get("/api/audit-logs")
 def get_audit_logs(limit: int = 30):
     """Fetches recent immutable audit log entries."""
@@ -1110,17 +1249,103 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               </div>
             </div>
 
-            <!-- 2. Interactive 4-Stage Clearance Progress Pipeline -->
-            <div class="p-4 sm:p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3">
-              <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-400">
-                <span class="flex items-center space-x-2">
-                  <i class="fa-solid fa-list-check text-apple-blue"></i>
-                  <span>Clearance & Last Pay Progression</span>
-                </span>
-                <span id="pipelineStepLabel" class="text-apple-blue font-bold">Stage 1 of 4: Department Clearances</span>
+            <!-- 2. Dual-Mode Clearance Routing & Progression (Parallel Matrix vs Sequential) -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3.5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+                <div class="flex items-center space-x-2">
+                  <i class="fa-solid fa-route text-apple-blue"></i>
+                  <span>Clearance Routing Matrix</span>
+                  <span id="parallelBadgePill" class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-apple-green font-mono lowercase">concurrent</span>
+                </div>
+
+                <!-- Mode Switcher Pill -->
+                <div class="flex items-center p-0.5 rounded-xl bg-neutral-200/80 dark:bg-neutral-700/60 font-semibold lowercase tracking-normal">
+                  <button id="modeParallelBtn" onclick="setRoutingMode('PARALLEL')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition flex items-center space-x-1" title="IT, Admin, and Finance evaluate simultaneously, converging into HR final sign-off">
+                    <i class="fa-solid fa-bolt text-apple-green text-[9px]"></i>
+                    <span>Parallel Matrix (4.2d)</span>
+                  </button>
+                  <button id="modeSequentialBtn" onclick="setRoutingMode('SEQUENTIAL')" class="px-2.5 py-1 rounded-lg text-[10px] font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1" title="Traditional step-by-step queue where each stage blocks the next">
+                    <i class="fa-solid fa-arrow-right-long text-neutral-400 text-[9px]"></i>
+                    <span>Sequential (14d)</span>
+                  </button>
+                </div>
               </div>
-              
-              <div class="grid grid-cols-4 gap-2.5 text-center text-xs">
+
+              <!-- Parallel Convergence Grid (Default) -->
+              <div id="parallelMatrixContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
+                
+                <!-- IT Node -->
+                <div id="pNodeBoxIT" class="p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-2 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-neutral-900 dark:text-white flex items-center space-x-1.5">
+                      <i class="fa-solid fa-laptop-code text-apple-blue"></i>
+                      <span>IT Clearance</span>
+                    </span>
+                    <span id="pNodeBadgeIT" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red">FLAGGED</span>
+                  </div>
+                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="pNodeSignerIT">Signer: Alex Tan</div>
+                  <div class="text-[10px] font-mono text-neutral-400 truncate" id="pNodeSummaryIT">ThinkPad hold</div>
+                  <button onclick="signParallelNode('IT')" id="btnSignNodeIT" class="w-full py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-neutral-800 dark:text-neutral-200 text-[10px] font-bold transition flex items-center justify-center space-x-1">
+                    <i class="fa-solid fa-check text-[9px]"></i>
+                    <span>Sign IT Node</span>
+                  </button>
+                </div>
+
+                <!-- Admin & Facilities Node -->
+                <div id="pNodeBoxAdmin" class="p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-2 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-neutral-900 dark:text-white flex items-center space-x-1.5">
+                      <i class="fa-solid fa-building-user text-apple-amber"></i>
+                      <span>Facilities & Locker</span>
+                    </span>
+                    <span id="pNodeBadgeAdmin" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-apple-green">CLEARED</span>
+                  </div>
+                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="pNodeSignerAdmin">Signer: Elena Cruz</div>
+                  <div class="text-[10px] font-mono text-neutral-400 truncate" id="pNodeSummaryAdmin">Locker & parking OK</div>
+                  <button onclick="signParallelNode('ADMIN')" id="btnSignNodeAdmin" class="w-full py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-neutral-800 dark:text-neutral-200 text-[10px] font-bold transition flex items-center justify-center space-x-1">
+                    <i class="fa-solid fa-check text-[9px]"></i>
+                    <span>Sign Admin Node</span>
+                  </button>
+                </div>
+
+                <!-- Finance & Payroll Node -->
+                <div id="pNodeBoxFinance" class="p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-2 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-neutral-900 dark:text-white flex items-center space-x-1.5">
+                      <i class="fa-solid fa-calculator text-apple-purple"></i>
+                      <span>Finance Ledger</span>
+                    </span>
+                    <span id="pNodeBadgeFinance" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-apple-amber">PENDING</span>
+                  </div>
+                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="pNodeSignerFinance">Signer: Roberto Ong</div>
+                  <div class="text-[10px] font-mono text-neutral-400 truncate" id="pNodeSummaryFinance">Pay audit</div>
+                  <button onclick="signParallelNode('FINANCE')" id="btnSignNodeFinance" class="w-full py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-neutral-800 dark:text-neutral-200 text-[10px] font-bold transition flex items-center justify-center space-x-1">
+                    <i class="fa-solid fa-check text-[9px]"></i>
+                    <span>Sign Finance Node</span>
+                  </button>
+                </div>
+
+                <!-- HR Final Release Node (Convergence Target) -->
+                <div id="pNodeBoxHR" class="p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-2 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-neutral-900 dark:text-white flex items-center space-x-1.5">
+                      <i class="fa-solid fa-stamp text-apple-green"></i>
+                      <span>HR Final Release</span>
+                    </span>
+                    <span id="pNodeBadgeHR" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-200/80 dark:bg-neutral-800 text-neutral-500 font-mono">🔒 LOCKED</span>
+                  </div>
+                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="pNodeSignerHR">Signer: Grace Diaz</div>
+                  <div class="text-[10px] font-mono text-neutral-400 truncate" id="pNodeSummaryHR">Requires 3 depts</div>
+                  <button onclick="signParallelNode('HR')" id="btnSignNodeHR" disabled class="w-full py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400 text-[10px] font-bold cursor-not-allowed transition flex items-center justify-center space-x-1">
+                    <i class="fa-solid fa-lock text-[9px]"></i>
+                    <span>Release Final Pay</span>
+                  </button>
+                </div>
+
+              </div>
+
+              <!-- Sequential Pipeline Grid (Toggleable Alternative) -->
+              <div id="sequentialPipelineContainer" class="hidden grid-cols-4 gap-2.5 text-center text-xs">
                 
                 <div id="step1Box" class="p-3 rounded-xl border border-lark-blue bg-blue-50/60 dark:bg-blue-950/30 text-lark-blue font-semibold transition">
                   <div class="flex items-center justify-center space-x-1.5 mb-1">
@@ -1293,6 +1518,11 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                     <span>Escalate to VP</span>
                   </button>
 
+                  <button onclick="simulateSlaTimeoutForward()" class="px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-apple-purple text-[11px] font-semibold border border-purple-500/20 transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Simulate 48h SLA inactivity: triggers auto-forwarding to secondary OIC Carlo Mendoza">
+                    <i class="fa-solid fa-clock-rotate-left text-[10px]"></i>
+                    <span>Simulate SLA Timeout</span>
+                  </button>
+
                   <button onclick="delegateTicket()" class="px-2.5 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-[11px] font-semibold transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Reassign ticket to designated backup or OIC">
                     <i class="fa-solid fa-user-gear text-[10px]"></i>
                     <span>Delegate</span>
@@ -1302,6 +1532,9 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
               <!-- Action CTAs -->
               <div class="flex flex-wrap items-center justify-end gap-2.5 pt-1">
+                <button onclick="openSplitEscrowModal()" id="btnSplitEscrowAction" class="hidden px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold rounded-xl shadow-sm active:scale-[0.98] transition flex items-center" title="Execute partial release: disburse undisputed pay now and escrow disputed variance">
+                  <i class="fa-solid fa-scale-balanced mr-2"></i> Split Escrow Release
+                </button>
                 <button onclick="pingLarkEmployee()" class="px-4 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-100 text-xs font-semibold text-neutral-700 dark:text-neutral-200 shadow-sm active:scale-[0.98] transition flex items-center">
                   <i class="fa-brands fa-rocketchat mr-2 text-lark-blue"></i> Lark Message
                 </button>
