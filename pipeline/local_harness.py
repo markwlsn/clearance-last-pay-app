@@ -241,7 +241,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           </h2>
           <button onclick="loadAuditLogs()" class="text-xs text-blue-600 hover:underline"><i class="fa-solid fa-rotate-right mr-1"></i>Refresh</button>
         </div>
-        <div id="auditLogContainer" class="max-h-60 overflow-y-auto space-y-2 text-xs">
+        <div id="auditLogContainer" class="max-h-72 overflow-y-auto space-y-2 text-xs pr-1">
           <p class="text-slate-400">Loading audit trail...</p>
         </div>
       </div>
@@ -251,10 +251,10 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     <div class="lg:col-span-8 space-y-6">
       <!-- Active Result Card -->
       <div id="resultCard" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 min-h-[500px]">
-        <div class="text-center py-16 text-slate-400" id="emptyState">
+        <div class="text-center py-20 text-slate-400" id="emptyState">
           <i class="fa-solid fa-magnifying-glass-chart text-5xl mb-3 text-slate-300"></i>
-          <h3 class="text-base font-semibold text-slate-600">No Document Pre-Checked Yet</h3>
-          <p class="text-xs max-w-sm mx-auto mt-1">Upload a PDF/image on the left or select a synthetic test fixture to view AI extraction and pre-check flags.</p>
+          <h3 class="text-base font-semibold text-slate-700">No Document Pre-Checked Yet</h3>
+          <p class="text-xs max-w-sm mx-auto mt-1 text-slate-400">Select a synthetic fixture on the left or upload a file to view AI-extracted fields, discrepancy flags, and approver actions.</p>
         </div>
 
         <div id="resultContent" class="hidden space-y-6">
@@ -262,17 +262,31 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-4 gap-4">
             <div>
               <div class="flex items-center space-x-2">
-                <span id="resDocType" class="px-2.5 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-800 border">DOC</span>
+                <span id="resDocType" class="px-2.5 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200">DOC</span>
                 <h3 id="resFileName" class="text-base font-bold text-slate-900">file.pdf</h3>
               </div>
-              <p class="text-xs text-slate-400 mt-0.5">
-                Hash: <span id="resHash" class="font-mono text-slate-500">...</span> · 
-                Time: <span id="resTime" class="font-semibold text-slate-700">0ms</span>
+              <p class="text-xs text-slate-400 mt-1">
+                Hash: <span id="resHash" class="font-mono text-slate-600">...</span> · 
+                Time: <span id="resTime" class="font-semibold text-slate-700">0ms</span> · 
+                Model: <span id="resModel" class="font-mono text-slate-600">mock</span>
               </p>
             </div>
             <div class="text-right">
-              <div class="text-xs text-slate-500">Overall Confidence</div>
+              <div class="text-xs text-slate-500 font-medium">Overall AI Confidence</div>
               <div id="resConfidence" class="text-2xl font-black text-blue-600">95%</div>
+            </div>
+          </div>
+
+          <!-- Document Preview Accordion / Section -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
+            <div onclick="togglePreview()" class="px-4 py-2.5 bg-slate-100/70 border-b border-slate-200 flex items-center justify-between cursor-pointer hover:bg-slate-100">
+              <span class="text-xs font-bold text-slate-700 flex items-center">
+                <i class="fa-solid fa-eye mr-2 text-blue-600"></i> Document Preview
+              </span>
+              <span id="previewToggleIcon" class="text-xs text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+            </div>
+            <div id="previewContainer" class="p-3 bg-slate-900/5 flex justify-center items-center min-h-[220px]">
+              <!-- Injected iframe or image -->
             </div>
           </div>
 
@@ -289,7 +303,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           <!-- Structured Extracted Fields Table -->
           <div>
             <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center">
-              <i class="fa-solid fa-table-list mr-1.5 text-blue-500"></i> Extracted Fields & Normalized Values
+              <i class="fa-solid fa-table-list mr-1.5 text-blue-500"></i> Extracted Fields & Verification Status
             </h4>
             <div class="overflow-x-auto border border-slate-200 rounded-lg">
               <table class="w-full text-left text-xs">
@@ -299,7 +313,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                     <th class="py-2.5 px-3">Raw Extracted Value</th>
                     <th class="py-2.5 px-3">Normalized Value</th>
                     <th class="py-2.5 px-3 text-center">Confidence</th>
-                    <th class="py-2.5 px-3 text-center">Status</th>
+                    <th class="py-2.5 px-3 text-center">Verification Status</th>
                   </tr>
                 </thead>
                 <tbody id="fieldsTableBody" class="divide-y divide-slate-200">
@@ -309,19 +323,45 @@ HTML_DASHBOARD = """<!DOCTYPE html>
             </div>
           </div>
 
-          <!-- Human Approver Action Demo Box -->
-          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div>
-              <h5 class="text-xs font-bold text-slate-800">Human Approver Decision Gate</h5>
-              <p class="text-xs text-slate-500">AI only pre-checks and flags. The final clearance determination requires explicit human action.</p>
+          <!-- Human Approver Action Gate Box -->
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5 space-y-4">
+            <div class="flex items-start justify-between">
+              <div>
+                <h5 class="text-sm font-bold text-slate-800 flex items-center">
+                  <i class="fa-solid fa-user-check mr-2 text-blue-600"></i> Human Approver Decision Gate
+                </h5>
+                <p class="text-xs text-slate-600 mt-0.5">
+                  The AI pre-check does not make final decisions. Approver review is required to advance or reject clearance.
+                </p>
+              </div>
+              <span class="px-2.5 py-1 rounded bg-blue-100 text-blue-800 text-[10px] font-bold uppercase tracking-wider">
+                Audited Action
+              </span>
             </div>
-            <div class="flex items-center space-x-2">
-              <button onclick="alert('Human Approval simulated! Logged to audit trail.')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-sm">
-                <i class="fa-solid fa-check mr-1"></i> Sign-Off / Approve
-              </button>
-              <button onclick="alert('Revision requested. Clearance halted.')" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg shadow-sm">
-                <i class="fa-solid fa-xmark mr-1"></i> Request Revision
-              </button>
+
+            <!-- Optional Override Justification Input -->
+            <div id="overrideBox" class="hidden">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                Approver Override Justification <span class="text-red-500">*</span>
+              </label>
+              <textarea id="overrideNotes" rows="2" placeholder="Explain rationale for approving despite flagged discrepancies (e.g., manual ID card match, rounding adjustment)..." class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-blue-200/60">
+              <div class="text-[11px] text-slate-500">
+                Approver: <span class="font-semibold text-slate-700">Maria Santos (HR Admin)</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button onclick="submitDecision('APPROVE')" id="approveBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center">
+                  <i class="fa-solid fa-check mr-1.5"></i> Approve Clearance
+                </button>
+                <button onclick="submitDecision('REQUEST_REVISION')" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center">
+                  <i class="fa-solid fa-rotate-left mr-1.5"></i> Request Revision
+                </button>
+                <button onclick="submitDecision('REJECT')" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center">
+                  <i class="fa-solid fa-ban mr-1.5"></i> Reject
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -330,6 +370,47 @@ HTML_DASHBOARD = """<!DOCTYPE html>
   </main>
 
   <script>
+    let currentResult = null;
+    let currentFileUrl = null;
+
+    // Drag and Drop Handling
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-blue-500', 'bg-blue-50');
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+    });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleFileSelect(fileInput.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) {
+        handleFileSelect(fileInput.files[0]);
+      }
+    });
+
+    function handleFileSelect(file) {
+      document.getElementById('fileLabel').innerHTML = `Selected: <b>${file.name}</b> (${Math.round(file.size / 1024)} KB)`;
+      if (file.name.toLowerCase().includes('quit') || file.name.toLowerCase().includes('qc')) {
+        document.getElementById('docTypeSelect').value = 'QUIT_CLAIM';
+      } else if (file.name.toLowerCase().includes('bank') || file.name.toLowerCase().includes('gcash')) {
+        document.getElementById('docTypeSelect').value = 'BANK_ENROLLMENT';
+      } else if (file.name.toLowerCase().includes('clearance')) {
+        document.getElementById('docTypeSelect').value = 'CLEARANCE_SHEET';
+      }
+    }
+
     // Load Samples on startup
     async function loadSamples() {
       try {
@@ -341,12 +422,12 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           return;
         }
         container.innerHTML = samples.map(s => `
-          <button onclick="runSampleTest('${s.file_name}', '${s.document_type}')" class="w-full text-left p-2.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-lg transition text-xs flex items-center justify-between">
+          <button onclick="runSampleTest('${s.file_name}', '${s.document_type}', '${s.url}')" class="w-full text-left p-2.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-lg transition text-xs flex items-center justify-between">
             <div>
               <span class="font-semibold text-slate-800 block">${s.file_name}</span>
-              <span class="text-[10px] text-slate-500">${s.document_type}</span>
+              <span class="text-[10px] text-slate-500 uppercase">${s.document_type.replace('_', ' ')} · ${Math.round(s.size_bytes / 1024)} KB</span>
             </div>
-            <i class="fa-solid fa-chevron-right text-slate-400"></i>
+            <i class="fa-solid fa-play text-blue-500 text-xs"></i>
           </button>
         `).join('');
       } catch (err) {
@@ -364,31 +445,47 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           container.innerHTML = '<p class="text-xs text-slate-400">No audit records logged yet.</p>';
           return;
         }
-        container.innerHTML = logs.map(l => `
-          <div class="p-2 border border-slate-200 rounded bg-slate-50 font-mono text-[11px]">
-            <div class="flex justify-between font-semibold text-slate-700">
-              <span>${l.file_name}</span>
-              <span class="${l.flag_count > 0 ? 'text-red-600' : 'text-emerald-600'}">${l.flag_count} flags</span>
+        container.innerHTML = logs.map(l => {
+          if (l.log_type === 'HUMAN_DECISION') {
+            const isApproved = l.action === 'APPROVE';
+            return `
+              <div class="p-2 border border-blue-200 rounded-lg bg-blue-50/60 font-mono text-[11px]">
+                <div class="flex justify-between font-bold text-slate-800">
+                  <span class="text-blue-700"><i class="fa-solid fa-user-check mr-1"></i>${l.action}</span>
+                  <span class="text-[10px] text-slate-500">${l.role}</span>
+                </div>
+                <div class="text-[10px] text-slate-600 mt-0.5 truncate">${l.override_justification || 'Standard approval without override'}</div>
+                <div class="text-[9px] text-slate-400 mt-0.5">${l.timestamp.slice(11, 19)} · Dossier: ${l.dossier_id}</div>
+              </div>
+            `;
+          }
+
+          const hasFlags = l.flag_count > 0;
+          return `
+            <div class="p-2 border border-slate-200 rounded-lg bg-slate-50 font-mono text-[11px]">
+              <div class="flex justify-between font-semibold text-slate-700">
+                <span class="truncate max-w-[140px]">${l.file_name}</span>
+                <span class="${hasFlags ? 'text-red-600 font-bold' : 'text-emerald-600'}">${l.flag_count} flags</span>
+              </div>
+              <div class="text-[10px] text-slate-400 truncate mt-0.5">${l.timestamp.slice(11, 19)} · ${l.file_hash_sha256.slice(0, 12)}...</div>
             </div>
-            <div class="text-[10px] text-slate-400 truncate">${l.timestamp.slice(11, 19)} · ${l.file_hash_sha256.slice(0, 12)}...</div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       } catch (err) {
         console.error(err);
       }
     }
 
     // Quick Test Sample
-    async function runSampleTest(fileName, docType) {
+    async function runSampleTest(fileName, docType, fileUrl) {
       document.getElementById('emptyState').classList.add('hidden');
       document.getElementById('resultContent').classList.add('hidden');
-      
+      currentFileUrl = fileUrl;
+
       try {
-        // Fetch sample file from server as blob
-        const fileRes = await fetch(`/samples/${fileName}`);
+        const fileRes = await fetch(fileUrl);
         let blob;
         if (!fileRes.ok) {
-          // Fallback if not served directly: synthesize request
           blob = new Blob(["sample content for " + fileName], { type: fileName.endsWith('.pdf') ? 'application/pdf' : 'image/png' });
         } else {
           blob = await fileRes.blob();
@@ -403,7 +500,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           body: formData,
         });
         const data = await res.json();
-        renderResult(data);
+        renderResult(data, fileUrl);
         loadAuditLogs();
       } catch (err) {
         alert("Extraction failed: " + err.message);
