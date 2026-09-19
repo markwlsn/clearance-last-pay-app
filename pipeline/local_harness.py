@@ -56,6 +56,29 @@ class LarkNotificationRequest(BaseModel):
     sender_role: str
 
 
+class NudgeRequest(BaseModel):
+    dossier_id: str
+    target_role: str
+    target_name: str
+    sender_role: str
+    reason: str
+
+
+class HuddleRequest(BaseModel):
+    dossier_id: str
+    employee_name: str
+    sender_role: str
+    topic: str
+
+
+class EscalateRequest(BaseModel):
+    dossier_id: str
+    employee_name: str
+    escalate_to: str
+    sender_role: str
+    hours_idle: int
+
+
 class SubmissionPayload(BaseModel):
     department: str
     employee_name: str
@@ -370,6 +393,89 @@ def send_lark_notification(req: LarkNotificationRequest):
         "dossier_id": req.dossier_id,
         "message": req.message,
         "timestamp": entry["timestamp"],
+    }
+
+
+@app.post("/api/approvals/nudge")
+def nudge_pending_signer(req: NudgeRequest):
+    """Dispatches high-priority Lark reminder to the signer currently holding up the ticket."""
+    entry = app.state.audit_logger.log_human_action(
+        dossier_id=req.dossier_id,
+        approver_id=f"NUDGE-{req.sender_role}",
+        role=req.sender_role,
+        action="LARK_NUDGE_DISPATCHED",
+        flags_reviewed=[],
+        override_justification=f"Nudged {req.target_name} ({req.target_role}): {req.reason}",
+    )
+    return {
+        "status": "SENT",
+        "target": req.target_name,
+        "role": req.target_role,
+        "dossier_id": req.dossier_id,
+        "timestamp": entry["timestamp"],
+    }
+
+
+@app.post("/api/approvals/huddle")
+def create_lark_huddle(req: HuddleRequest):
+    """Creates a temporary 3-way Lark group chat room [Employee, Dept Head, HR] for rapid resolution."""
+    entry = app.state.audit_logger.log_human_action(
+        dossier_id=req.dossier_id,
+        approver_id=f"HUDDLE-{req.sender_role}",
+        role=req.sender_role,
+        action="LARK_HUDDLE_CREATED",
+        flags_reviewed=[],
+        override_justification=f"3-way group created for {req.employee_name}: {req.topic}",
+    )
+    return {
+        "status": "CREATED",
+        "chat_name": f"⚡ Clearance Huddle · {req.dossier_id} ({req.employee_name})",
+        "members": [req.employee_name, "Department Head", "HR Operations Lead"],
+        "dossier_id": req.dossier_id,
+        "timestamp": entry["timestamp"],
+    }
+
+
+@app.post("/api/approvals/escalate")
+def escalate_ticket(req: EscalateRequest):
+    """Escalates idle ticket to Division VP / HR Director to break approval bottlenecks."""
+    entry = app.state.audit_logger.log_human_action(
+        dossier_id=req.dossier_id,
+        approver_id=f"ESCALATE-{req.sender_role}",
+        role=req.sender_role,
+        action="LARK_ESCALATION_DISPATCHED",
+        flags_reviewed=[],
+        override_justification=f"Escalated to {req.escalate_to} after {req.hours_idle}h idle on {req.employee_name}",
+    )
+    return {
+        "status": "ESCALATED",
+        "escalate_to": req.escalate_to,
+        "dossier_id": req.dossier_id,
+        "timestamp": entry["timestamp"],
+    }
+
+
+@app.post("/api/approvals/batch-approve-clean")
+def batch_approve_clean(role: str = "HR_APPROVER"):
+    """Fast-tracks all dossiers with 0 AI flags and signs them off in one audited action."""
+    approved_ids = []
+    for d in app.state.dossiers:
+        if d.get("ai_flags_count", 0) == 0 and d.get("overall_status") != "APPROVED":
+            d["overall_status"] = "APPROVED"
+            d["stage_step"] = 4
+            approved_ids.append(d["dossier_id"])
+            app.state.audit_logger.log_human_action(
+                dossier_id=d["dossier_id"],
+                approver_id="BATCH-FAST-TRACK",
+                role=role,
+                action="BATCH_APPROVE_HUMAN",
+                flags_reviewed=[],
+                override_justification="Batch 1-click fast-track sign-off for 0-flag verified clean dossier",
+            )
+    return {
+        "status": "SUCCESS",
+        "approved_count": len(approved_ids),
+        "dossier_ids": approved_ids,
     }
 
 
@@ -851,9 +957,15 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                 </h3>
                 <span class="w-1.5 h-1.5 rounded-full bg-apple-blue"></span>
               </div>
-              <span id="queueCount" class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-500">
-                4 dossiers
-              </span>
+              <div class="flex items-center space-x-1.5">
+                <button onclick="batchApproveCleanDossiers()" id="batchSignBtn" class="px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-apple-green text-[10px] font-bold border border-emerald-500/20 transition flex items-center space-x-1 shadow-sm active:scale-95" title="Batch sign-off all clean dossiers with 0 AI flags">
+                  <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i>
+                  <span>Fast-Track</span>
+                </button>
+                <span id="queueCount" class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-500">
+                  4 dossiers
+                </span>
+              </div>
             </div>
 
             <!-- Search Box with Apple Style -->
