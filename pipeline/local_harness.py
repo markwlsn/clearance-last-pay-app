@@ -1,12 +1,17 @@
 """Local test harness for Clearance & Last Pay document pre-check pipeline.
-Supports both CLI batch processing and an interactive local browser dashboard
-designed with an Apple minimalist aesthetic and full Light/Dark mode support.
+Supports:
+1. Employee Submission View (Faithfully recreating the Lark Approval Form in Apple Minimalist style)
+2. Role-Based Approver Dashboard (IT, Finance/Payroll, HR, Admin) with AI flag review & preview
+3. Developer Quick-Test Harness with 1-click synthetic fixtures
+4. Apple Minimalist aesthetic with default Light Mode and Dark Mode toggle
 """
 import argparse
 import os
 import sys
+import uuid
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import uvicorn
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
@@ -19,9 +24,9 @@ from pipeline.extractor import BaseExtractor, get_extractor
 from pipeline.models import DocumentType, ExtractionResult
 
 app = FastAPI(
-    title="Clearance & Last Pay — Document Pre-Check Local Harness",
-    description="Apple-minimalist local test runner and visualizer for AI document extraction pre-checks.",
-    version="1.1.0",
+    title="Clearance & Last Pay — Lark Companion App",
+    description="Apple-minimalist Lark Clearance Form and Role-Based Approver Dashboard.",
+    version="2.0.0",
 )
 
 # Shared singletons on app state
@@ -39,8 +44,94 @@ class HumanActionRequest(BaseModel):
     approver_id: str
     role: str
     action: str  # APPROVE, REJECT, REQUEST_REVISION
-    flags_reviewed: List[str]
+    flags_reviewed: List[str] = []
     override_justification: str = ""
+
+
+class SubmissionPayload(BaseModel):
+    department: str
+    employee_name: str
+    date_hired: str
+    job_level: str
+    company: str
+    unit_channel: str
+    branch: str
+    employee_status: str
+    eoc_date: str
+    with_clearance_already: str
+    reason_for_separation: str
+    accountability_form_name: Optional[str] = None
+    accountability_precheck: Optional[Dict[str, Any]] = None
+    id_form_name: Optional[str] = None
+    id_precheck: Optional[Dict[str, Any]] = None
+
+
+# In-memory dossier store for demonstration
+app.state.dossiers = [
+    {
+        "dossier_id": "DOS-2026-001",
+        "employee_name": "Juan Dela Cruz",
+        "department": "Information Technology",
+        "company": "CMG Group of Companies",
+        "unit_channel": "HQ Operations",
+        "job_level": "Senior Specialist",
+        "branch": "Taguig HQ",
+        "date_hired": "2022-03-15",
+        "eoc_date": "2026-08-31",
+        "employee_status": "Regular",
+        "reason_for_separation": "Resignation",
+        "with_clearance_already": "In Progress",
+        "current_stage": "IT_CLEARANCE",
+        "overall_status": "PENDING_REVIEW",
+        "submitted_at": "2026-09-18T08:30:00Z",
+        "sample_file": "clearance_missing_it.pdf",
+        "sample_type": "CLEARANCE_SHEET",
+        "ai_flags_count": 2,
+        "flags_summary": ["FLAG_MISSING_FIELD", "FLAG_ACCOUNTABILITY_NOTED"],
+    },
+    {
+        "dossier_id": "DOS-2026-002",
+        "employee_name": "Maria Clara Santos",
+        "department": "Finance & Accounting",
+        "company": "CMG Retail Inc.",
+        "unit_channel": "Retail Stores",
+        "job_level": "Team Lead",
+        "branch": "Makati Central",
+        "date_hired": "2020-06-01",
+        "eoc_date": "2026-09-15",
+        "employee_status": "Regular",
+        "reason_for_separation": "End of Contract",
+        "with_clearance_already": "Yes",
+        "current_stage": "LAST_PAY_CALC",
+        "overall_status": "FLAGGED",
+        "submitted_at": "2026-09-17T11:20:00Z",
+        "sample_file": "quit_claim_mismatch.pdf",
+        "sample_type": "QUIT_CLAIM",
+        "ai_flags_count": 2,
+        "flags_summary": ["FLAG_AMOUNT_MISMATCH", "FLAG_SIGNATURE_ABSENT"],
+    },
+    {
+        "dossier_id": "DOS-2026-003",
+        "employee_name": "Pedro Penduko",
+        "department": "Logistics & Supply Chain",
+        "company": "CMG Distribution Corp.",
+        "unit_channel": "Logistics Hub",
+        "job_level": "Rank & File",
+        "branch": "Cebu Hub",
+        "date_hired": "2023-01-10",
+        "eoc_date": "2026-09-30",
+        "employee_status": "Regular",
+        "reason_for_separation": "Resignation",
+        "with_clearance_already": "No",
+        "current_stage": "FINANCE_DISBURSEMENT",
+        "overall_status": "FLAGGED",
+        "submitted_at": "2026-09-19T14:45:00Z",
+        "sample_file": "bank_bad_format.png",
+        "sample_type": "BANK_ENROLLMENT",
+        "ai_flags_count": 1,
+        "flags_summary": ["FLAG_FORMAT_MISMATCH"],
+    },
+]
 
 
 def run_cli_extraction(
@@ -95,6 +186,49 @@ def list_samples():
     return sorted(samples, key=lambda x: x["file_name"])
 
 
+@app.get("/api/clearance/dossiers")
+def get_dossiers():
+    """Returns active clearance dossiers for approver dashboards."""
+    return app.state.dossiers
+
+
+@app.post("/api/clearance/submit")
+def submit_clearance_form(data: SubmissionPayload):
+    """Handles submission of the Lark Clearance form."""
+    dossier_id = f"DOS-2026-{uuid.uuid4().hex[:4].upper()}"
+    new_dossier = {
+        "dossier_id": dossier_id,
+        "employee_name": data.employee_name,
+        "department": data.department,
+        "company": data.company,
+        "unit_channel": data.unit_channel,
+        "job_level": data.job_level,
+        "branch": data.branch,
+        "date_hired": data.date_hired,
+        "eoc_date": data.eoc_date,
+        "employee_status": data.employee_status,
+        "reason_for_separation": data.reason_for_separation,
+        "with_clearance_already": data.with_clearance_already,
+        "current_stage": "IT_CLEARANCE",
+        "overall_status": "PENDING_REVIEW",
+        "submitted_at": datetime.now(timezone.utc).isoformat(),
+        "sample_file": data.accountability_form_name or "uploaded_form.pdf",
+        "sample_type": "CLEARANCE_SHEET",
+        "ai_flags_count": 0,
+        "flags_summary": [],
+    }
+    app.state.dossiers.insert(0, new_dossier)
+    app.state.audit_logger.log_human_action(
+        dossier_id=dossier_id,
+        approver_id=data.employee_name,
+        role="REQUESTER",
+        action="SUBMIT_APPLICATION",
+        flags_reviewed=[],
+        override_justification="Initial employee submission via Lark Form",
+    )
+    return {"status": "SUCCESS", "dossier": new_dossier}
+
+
 @app.post("/api/precheck")
 async def precheck_document(
     file: UploadFile = File(...),
@@ -139,6 +273,17 @@ def log_approver_decision(req: HumanActionRequest):
         flags_reviewed=req.flags_reviewed,
         override_justification=req.override_justification,
     )
+    # Update in-memory dossier status
+    for d in app.state.dossiers:
+        if d["dossier_id"] == req.document_id:
+            if req.action == "APPROVE":
+                d["overall_status"] = "APPROVED"
+            elif req.action == "REJECT":
+                d["overall_status"] = "REJECTED"
+            else:
+                d["overall_status"] = "REVISION_REQUESTED"
+            break
+
     return {"status": "SUCCESS", "audit_entry": entry}
 
 
@@ -159,7 +304,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clearance & Last Pay — AI Document Pre-Check</title>
+  <title>Clearance & Last Pay — Lark Companion App</title>
   
   <!-- Tailwind CSS CDN with dark mode config -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -178,13 +323,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               'Arial',
               'sans-serif'
             ],
-            mono: [
-              '"SF Mono"',
-              'Menlo',
-              'Monaco',
-              'Consolas',
-              'monospace'
-            ],
+            mono: ['"SF Mono"', 'Menlo', 'Monaco', 'monospace'],
           },
           colors: {
             apple: {
