@@ -393,29 +393,34 @@ HTML_DASHBOARD = """<!DOCTYPE html>
             
             <!-- Overall Confidence Metric -->
             <div class="text-right">
-              <div class="text-xs text-slate-500 font-medium">Overall AI Confidence</div>
-              <div id="resConfidence" class="text-2xl font-black text-blue-600">95%</div>
+              <div class="text-[10px] uppercase font-bold tracking-wider text-neutral-400 dark:text-neutral-500">Extraction Confidence</div>
+              <div id="resConfidence" class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">95%</div>
             </div>
           </div>
 
-          <!-- Document Preview Accordion / Section -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
-            <div onclick="togglePreview()" class="px-4 py-2.5 bg-slate-100/70 border-b border-slate-200 flex items-center justify-between cursor-pointer hover:bg-slate-100">
-              <span class="text-xs font-bold text-slate-700 flex items-center">
-                <i class="fa-solid fa-eye mr-2 text-blue-600"></i> Document Preview
+          <!-- Document Preview Accordion -->
+          <div class="border border-black/[0.06] dark:border-white/[0.08] rounded-xl overflow-hidden bg-neutral-50/50 dark:bg-neutral-900/40">
+            <div onclick="togglePreview()" class="px-4 py-2.5 bg-neutral-100/50 dark:bg-neutral-800/40 border-b border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between cursor-pointer hover:bg-neutral-100/80 dark:hover:bg-neutral-800/60 transition">
+              <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 flex items-center">
+                <i class="fa-regular fa-file-lines mr-2 text-neutral-500"></i> Visual Document Preview
               </span>
-              <span id="previewToggleIcon" class="text-xs text-slate-400"><i class="fa-solid fa-chevron-down"></i></span>
+              <span id="previewToggleIcon" class="text-xs text-neutral-400"><i class="fa-solid fa-chevron-up"></i></span>
             </div>
-            <div id="previewContainer" class="p-3 bg-slate-900/5 flex justify-center items-center min-h-[220px]">
+            <div id="previewContainer" class="p-3 flex justify-center items-center min-h-[220px]">
               <!-- Injected iframe or image -->
             </div>
           </div>
 
-          <!-- Pre-Check Flags Section -->
+          <!-- Pre-Check Discrepancy Flags Section -->
           <div>
-            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center">
-              <i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-500"></i> Pre-Check Discrepancy Flags
-            </h4>
+            <div class="flex items-center justify-between mb-2.5">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center">
+                <i class="fa-solid fa-triangle-exclamation mr-1.5 text-neutral-400"></i> Pre-Check Discrepancy Flags
+              </h4>
+              <span id="flagsCountBadge" class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+                0 detected
+              </span>
+            </div>
             <div id="flagsContainer" class="space-y-2">
               <!-- Flag items injected here -->
             </div>
@@ -423,76 +428,115 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
           <!-- Structured Extracted Fields Table -->
           <div>
-            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center">
-              <i class="fa-solid fa-table-list mr-1.5 text-blue-500"></i> Extracted Fields & Verification Status
+            <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-2.5 flex items-center">
+              <i class="fa-solid fa-list-check mr-1.5 text-neutral-400"></i> Extracted Fields & Normalized Data
             </h4>
-            <div class="overflow-x-auto border border-slate-200 rounded-lg">
+            <div class="overflow-x-auto border border-black/[0.06] dark:border-white/[0.08] rounded-xl">
               <table class="w-full text-left text-xs">
-                <thead class="bg-slate-100 text-slate-600 uppercase font-semibold">
+                <thead class="bg-neutral-50 dark:bg-neutral-800/60 text-neutral-500 dark:text-neutral-400 font-semibold border-b border-black/[0.06] dark:border-white/[0.08]">
                   <tr>
-                    <th class="py-2.5 px-3">Field Name</th>
-                    <th class="py-2.5 px-3">Raw Extracted Value</th>
-                    <th class="py-2.5 px-3">Normalized Value</th>
+                    <th class="py-2.5 px-3.5">Field Name</th>
+                    <th class="py-2.5 px-3.5">Raw Extracted</th>
+                    <th class="py-2.5 px-3.5">Normalized Value</th>
                     <th class="py-2.5 px-3 text-center">Confidence</th>
-                    <th class="py-2.5 px-3 text-center">Verification Status</th>
+                    <th class="py-2.5 px-3 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody id="fieldsTableBody" class="divide-y divide-slate-200">
+                <tbody id="fieldsTableBody" class="divide-y divide-black/[0.04] dark:divide-white/[0.04]">
                   <!-- Field rows injected here -->
                 </tbody>
               </table>
             </div>
           </div>
 
-          <!-- Human Approver Action Gate Box -->
-          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5 space-y-4">
+          <!-- Human Approver Decision Gate (Cupertino Card) -->
+          <div class="bg-neutral-50 dark:bg-neutral-800/40 border border-black/[0.06] dark:border-white/[0.08] rounded-2xl p-5 space-y-4">
             <div class="flex items-start justify-between">
               <div>
-                <h5 class="text-sm font-bold text-slate-800 flex items-center">
-                  <i class="fa-solid fa-user-check mr-2 text-blue-600"></i> Human Approver Decision Gate
+                <h5 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white flex items-center">
+                  <i class="fa-solid fa-signature mr-2 text-apple-blue"></i> Human Approver Decision Gate
                 </h5>
-                <p class="text-xs text-slate-600 mt-0.5">
-                  The AI pre-check does not make final decisions. Approver review is required to advance or reject clearance.
+                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                  AI pre-checks and flags discrepancies. An authorized human approver must confirm or reject the clearance step.
                 </p>
               </div>
-              <span class="px-2.5 py-1 rounded bg-blue-100 text-blue-800 text-[10px] font-bold uppercase tracking-wider">
-                Audited Action
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-200/70 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300">
+                Audited
               </span>
             </div>
 
-            <!-- Optional Override Justification Input -->
+            <!-- Mandatory Override Box when Blockers Exist -->
             <div id="overrideBox" class="hidden">
-              <label class="block text-xs font-semibold text-slate-700 mb-1">
-                Approver Override Justification <span class="text-red-500">*</span>
+              <label class="block text-xs font-medium text-apple-red mb-1">
+                Approver Override Justification <span class="text-apple-red">*</span>
               </label>
-              <textarea id="overrideNotes" rows="2" placeholder="Explain rationale for approving despite flagged discrepancies (e.g., manual ID card match, rounding adjustment)..." class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+              <textarea id="overrideNotes" rows="2" placeholder="Required rationale if overriding active BLOCKER flags (e.g., physical signature verified manually, approved rounding adjustment)..." class="w-full text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl p-2.5 focus:ring-2 focus:ring-apple-blue focus:outline-none transition"></textarea>
             </div>
 
-            <div class="flex items-center justify-between pt-2 border-t border-blue-200/60">
-              <div class="text-[11px] text-slate-500">
-                Approver: <span class="font-semibold text-slate-700">Maria Santos (HR Admin)</span>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-3 border-t border-black/[0.06] dark:border-white/[0.08] gap-3">
+              <div class="text-[11px] text-neutral-500 dark:text-neutral-400">
+                Logged Approver: <span class="font-medium text-neutral-800 dark:text-neutral-200">Maria Santos (HR Approver)</span>
               </div>
               <div class="flex items-center space-x-2">
-                <button onclick="submitDecision('APPROVE')" id="approveBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center">
+                <button onclick="submitDecision('APPROVE')" id="approveBtn" class="px-4 py-2 bg-apple-green text-white hover:bg-emerald-600 text-xs font-semibold rounded-xl shadow-sm active:scale-[0.98] transition flex items-center">
                   <i class="fa-solid fa-check mr-1.5"></i> Approve Clearance
                 </button>
-                <button onclick="submitDecision('REQUEST_REVISION')" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center">
+                <button onclick="submitDecision('REQUEST_REVISION')" class="px-3.5 py-2 bg-apple-amber text-white hover:bg-amber-600 text-xs font-semibold rounded-xl shadow-sm active:scale-[0.98] transition flex items-center">
                   <i class="fa-solid fa-rotate-left mr-1.5"></i> Request Revision
                 </button>
-                <button onclick="submitDecision('REJECT')" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center">
+                <button onclick="submitDecision('REJECT')" class="px-3.5 py-2 bg-apple-red text-white hover:bg-red-600 text-xs font-semibold rounded-xl shadow-sm active:scale-[0.98] transition flex items-center">
                   <i class="fa-solid fa-ban mr-1.5"></i> Reject
                 </button>
               </div>
             </div>
           </div>
+
         </div>
+
       </div>
+
     </div>
+
   </main>
 
   <script>
     let currentResult = null;
     let currentFileUrl = null;
+
+    // Theme Management (Light / Dark)
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+        document.getElementById('themeIconSun').classList.remove('hidden');
+        document.getElementById('themeIconMoon').classList.add('hidden');
+      } else {
+        document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
+        document.getElementById('themeIconSun').classList.add('hidden');
+        document.getElementById('themeIconMoon').classList.remove('hidden');
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      if (isDark) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        document.getElementById('themeIconSun').classList.add('hidden');
+        document.getElementById('themeIconMoon').classList.remove('hidden');
+      } else {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+        localStorage.setItem('theme', 'dark');
+        document.getElementById('themeIconSun').classList.remove('hidden');
+        document.getElementById('themeIconMoon').classList.add('hidden');
+      }
+    }
 
     // Drag and Drop Handling
     const dropZone = document.getElementById('dropZone');
@@ -501,14 +545,14 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     dropZone.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.classList.add('border-blue-500', 'bg-blue-50');
+      dropZone.classList.add('border-apple-blue', 'bg-blue-50/20');
     });
     dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+      dropZone.classList.remove('border-apple-blue', 'bg-blue-50/20');
     });
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+      dropZone.classList.remove('border-apple-blue', 'bg-blue-50/20');
       if (e.dataTransfer.files.length) {
         fileInput.files = e.dataTransfer.files;
         handleFileSelect(fileInput.files[0]);
@@ -522,17 +566,18 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     });
 
     function handleFileSelect(file) {
-      document.getElementById('fileLabel').innerHTML = `Selected: <b>${file.name}</b> (${Math.round(file.size / 1024)} KB)`;
-      if (file.name.toLowerCase().includes('quit') || file.name.toLowerCase().includes('qc')) {
+      document.getElementById('fileLabel').innerHTML = `Selected: <b class="text-neutral-900 dark:text-white">${file.name}</b> (${Math.round(file.size / 1024)} KB)`;
+      const name = file.name.toLowerCase();
+      if (name.includes('quit') || name.includes('qc')) {
         document.getElementById('docTypeSelect').value = 'QUIT_CLAIM';
-      } else if (file.name.toLowerCase().includes('bank') || file.name.toLowerCase().includes('gcash')) {
+      } else if (name.includes('bank') || name.includes('gcash')) {
         document.getElementById('docTypeSelect').value = 'BANK_ENROLLMENT';
-      } else if (file.name.toLowerCase().includes('clearance')) {
+      } else if (name.includes('clearance')) {
         document.getElementById('docTypeSelect').value = 'CLEARANCE_SHEET';
       }
     }
 
-    // Load Samples on startup
+    // Load Samples
     async function loadSamples() {
       try {
         const res = await fetch('/api/samples');
