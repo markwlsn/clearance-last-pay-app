@@ -5,11 +5,13 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 import uvicorn
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
 from pipeline.audit import AuditLogger
 from pipeline.extractor import BaseExtractor, get_extractor
@@ -24,6 +26,20 @@ app = FastAPI(
 # Shared singletons on app state
 app.state.audit_logger = AuditLogger(log_path=os.environ.get("AUDIT_LOG_PATH", "logs/audit_log.jsonl"))
 app.state.extractor = get_extractor()
+
+# Mount static samples directory for direct serving and previews
+samples_dir = Path(__file__).resolve().parent.parent / "samples"
+if samples_dir.exists():
+    app.mount("/samples", StaticFiles(directory=str(samples_dir)), name="samples")
+
+
+class HumanActionRequest(BaseModel):
+    document_id: str
+    approver_id: str
+    role: str
+    action: str  # APPROVE, REJECT, REQUEST_REVISION
+    flags_reviewed: List[str]
+    override_justification: str = ""
 
 
 def run_cli_extraction(
@@ -57,10 +73,9 @@ def run_cli_extraction(
 @app.get("/api/samples")
 def list_samples():
     """Lists available synthetic sample fixtures for easy 1-click testing."""
-    samples_dir = Path(__file__).resolve().parent.parent / "samples"
     if not samples_dir.exists():
         return []
-    
+
     samples = []
     for f in samples_dir.iterdir():
         if f.name.startswith("."):
@@ -74,6 +89,7 @@ def list_samples():
             "file_name": f.name,
             "document_type": doc_type,
             "size_bytes": f.stat().st_size,
+            "url": f"/samples/{f.name}",
         })
     return sorted(samples, key=lambda x: x["file_name"])
 
@@ -111,8 +127,22 @@ async def precheck_document(
     return result.model_dump()
 
 
+@app.post("/api/approvals/action")
+def log_approver_decision(req: HumanActionRequest):
+    """Logs human approver decision to the immutable audit trail."""
+    entry = app.state.audit_logger.log_human_action(
+        dossier_id=req.document_id,
+        approver_id=req.approver_id,
+        role=req.role,
+        action=req.action,
+        flags_reviewed=req.flags_reviewed,
+        override_justification=req.override_justification,
+    )
+    return {"status": "SUCCESS", "audit_entry": entry}
+
+
 @app.get("/api/audit-logs")
-def get_audit_logs(limit: int = 20):
+def get_audit_logs(limit: int = 30):
     """Fetches recent immutable audit log entries."""
     return app.state.audit_logger.get_recent_logs(limit=limit)
 
@@ -139,18 +169,20 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen">
   <!-- Top Navigation -->
-  <header class="bg-slate-900 text-white shadow-md">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <i class="fa-solid fa-file-shield text-blue-400 text-2xl"></i>
+        <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow">
+          <i class="fa-solid fa-file-shield text-lg"></i>
+        </div>
         <div>
-          <h1 class="text-lg font-bold">Clearance & Last Pay — AI Pre-Check Harness</h1>
-          <p class="text-xs text-slate-400">Milestone 1 Local Test Run · Track B Companion Web App</p>
+          <h1 class="text-base font-bold tracking-tight">Clearance & Last Pay — AI Pre-Check Harness</h1>
+          <p class="text-[11px] text-slate-400">Milestone 1 Validation · Spec-Driven Development Phase 6</p>
         </div>
       </div>
       <div class="flex items-center space-x-3">
         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-          <i class="fa-solid fa-lock mr-1.5"></i> Constitutional Guardrail: Human Sign-Off Mandatory
+          <i class="fa-solid fa-shield-halved mr-1.5 text-amber-400"></i> Constitutional Guardrail: Human Sign-Off Mandatory
         </span>
       </div>
     </div>
@@ -162,26 +194,29 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     <div class="lg:col-span-4 space-y-6">
       <!-- Upload Card -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3 flex items-center">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center">
           <i class="fa-solid fa-cloud-arrow-up mr-2 text-blue-600"></i> Upload Document
         </h2>
 
         <form id="uploadForm" class="space-y-4">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Document Type</label>
-            <select id="docTypeSelect" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <select id="docTypeSelect" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
               <option value="QUIT_CLAIM">Quit Claim Form (PDF)</option>
               <option value="BANK_ENROLLMENT">Bank / E-Wallet Proof (Image/PDF)</option>
               <option value="CLEARANCE_SHEET">Department Clearance Sheet (PDF)</option>
             </select>
           </div>
 
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Select File</label>
-            <input type="file" id="fileInput" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-slate-300 rounded-lg p-1.5" />
+          <!-- Drag and Drop Dropzone -->
+          <div id="dropZone" class="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-5 text-center transition cursor-pointer bg-slate-50 hover:bg-blue-50/50">
+            <input type="file" id="fileInput" class="hidden" />
+            <i class="fa-solid fa-file-arrow-up text-3xl text-slate-400 mb-2"></i>
+            <p id="fileLabel" class="text-xs font-medium text-slate-700">Drag & drop document here or <span class="text-blue-600 underline">browse</span></p>
+            <p class="text-[10px] text-slate-400 mt-1">Supports PDF, PNG, JPG</p>
           </div>
 
-          <button type="submit" id="submitBtn" class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow transition flex items-center justify-center">
+          <button type="submit" id="submitBtn" class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center justify-center">
             <i class="fa-solid fa-bolt mr-2"></i> Run AI Pre-Check
           </button>
         </form>
@@ -189,10 +224,10 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
       <!-- Quick Test Synthetic Samples -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3 flex items-center">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center">
           <i class="fa-solid fa-flask-vial mr-2 text-indigo-600"></i> Synthetic Test Samples
         </h2>
-        <p class="text-xs text-slate-500 mb-3">Click any fixture to test edge-case detection instantly:</p>
+        <p class="text-[11px] text-slate-500 mb-3">Click any fixture to test edge-case detection instantly:</p>
         <div id="samplesList" class="space-y-2">
           <p class="text-xs text-slate-400">Loading samples...</p>
         </div>
@@ -201,8 +236,8 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       <!-- Audit Trail Card -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
         <div class="flex items-center justify-between mb-3">
-          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 flex items-center">
-            <i class="fa-solid fa-list-check mr-2 text-emerald-600"></i> Recent Audit Trail
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center">
+            <i class="fa-solid fa-list-check mr-2 text-emerald-600"></i> Immutable Audit Trail
           </h2>
           <button onclick="loadAuditLogs()" class="text-xs text-blue-600 hover:underline"><i class="fa-solid fa-rotate-right mr-1"></i>Refresh</button>
         </div>
