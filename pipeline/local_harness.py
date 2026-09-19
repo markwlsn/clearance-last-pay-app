@@ -1197,55 +1197,26 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         document.getElementById('formCompany').value = "CMG Retail Inc.";
         document.getElementById('formUnitChannel').value = "Retail Stores Network";
         document.getElementById('formBranch').value = "Makati Central Hub";
+      } else if (name.includes("Elena")) {
+        document.getElementById('formDept').value = "Retail Operations";
+        document.getElementById('formJobLevel').value = "Junior Associate";
+        document.getElementById('formCompany').value = "CMG Retail Inc.";
+        document.getElementById('formUnitChannel').value = "Retail Stores Network";
+        document.getElementById('formBranch').value = "Davao Regional Hub";
       }
     }
 
-    function toggleApprovalTree() {
-      const content = document.getElementById('approvalTreeContent');
-      const icon = document.getElementById('treeIcon');
-      if (content.classList.contains('hidden')) {
-        content.classList.remove('hidden');
-        icon.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
-      } else {
-        content.classList.add('hidden');
-        icon.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+    function handleFormAttachment(input, labelId) {
+      if (input.files.length) {
+        document.getElementById(labelId).textContent = input.files[0].name;
       }
     }
 
-    // Attachment Handler on Form
-    async function handleFormAttachment(input, labelId, docType, tagId) {
-      if (!input.files.length) return;
-      const file = input.files[0];
-      document.getElementById(labelId).textContent = `${file.name} (${Math.round(file.size/1024)} KB)`;
-
-      // Run background pre-check
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('document_type', docType);
-
-      try {
-        const res = await fetch('/api/precheck', { method: 'POST', body: formData });
-        const data = await res.json();
-        const tag = document.getElementById(tagId);
-        tag.classList.remove('hidden');
-        if (data.flags && data.flags.length > 0) {
-          tag.className = "text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red border border-red-500/20";
-          tag.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i>${data.flags.length} Flag(s)`;
-        } else {
-          tag.className = "text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20";
-          tag.innerHTML = `<i class="fa-solid fa-check mr-1"></i>Pre-Check Passed`;
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // Handle Lark Submit
     async function handleLarkSubmit(e) {
       e.preventDefault();
       const submitBtn = document.getElementById('larkSubmitBtn');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1.5"></i> Submitting to Lark...';
+      submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1.5"></i> Submitting...';
 
       const payload = {
         department: document.getElementById('formDept').value,
@@ -1270,10 +1241,10 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           body: JSON.stringify(payload),
         });
         const data = await res.json();
-        alert(`Application Submitted Successfully!\nInstance ID: ${data.dossier.dossier_id}\nRouting to Approvers in Lark Approval Flow.`);
+        alert(`Clearance Application Submitted!\nDossier ID: ${data.dossier.dossier_id}`);
         switchView('approver');
       } catch (err) {
-        alert('Submission failed: ' + err.message);
+        alert('Submission error: ' + err.message);
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = 'Submit';
@@ -1284,137 +1255,623 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       document.getElementById('larkClearanceForm').reset();
     }
 
-    // Load Approver Queue
+    // Approver Queue Logic
+    function setQueueFilter(filter) {
+      currentFilter = filter;
+      const fAll = document.getElementById('filterAll');
+      const fFlag = document.getElementById('filterFlagged');
+      const fClear = document.getElementById('filterCleared');
+
+      const activeClass = "flex-1 py-1 rounded-lg font-semibold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition";
+      const inactiveClass = "flex-1 py-1 rounded-lg hover:text-neutral-900 dark:hover:text-white transition";
+
+      fAll.className = filter === 'ALL' ? activeClass : inactiveClass;
+      fFlag.className = filter === 'FLAGGED' ? activeClass : inactiveClass;
+      fClear.className = filter === 'CLEARED' ? activeClass : inactiveClass;
+
+      renderQueue();
+    }
+
+    function filterQueue() {
+      renderQueue();
+    }
+
+    let allDossiersCache = [];
+
     async function loadDossiersQueue() {
       try {
         const res = await fetch('/api/clearance/dossiers');
-        const dossiers = await res.json();
-        const container = document.getElementById('dossiersQueue');
-        document.getElementById('queueBadge').textContent = `${dossiers.length} submissions`;
+        allDossiersCache = await res.json();
 
-        container.innerHTML = dossiers.map(d => {
-          const hasFlags = d.ai_flags_count > 0;
-          const statusClass = d.overall_status === 'APPROVED' ? 'bg-emerald-500/10 text-apple-green' : (hasFlags ? 'bg-red-500/10 text-apple-red' : 'bg-amber-500/10 text-apple-amber');
-          return `
-            <div onclick="selectDossier('${d.dossier_id}')" class="p-3.5 rounded-xl bg-neutral-50 dark:bg-apple-elevatedDark hover:bg-blue-50/40 dark:hover:bg-neutral-700/50 border border-black/[0.04] dark:border-white/[0.06] cursor-pointer transition flex items-center justify-between group">
-              <div>
-                <div class="flex items-center space-x-2">
-                  <span class="text-[10px] font-mono font-bold text-neutral-400">${d.dossier_id}</span>
-                  <span class="text-xs font-bold text-neutral-800 dark:text-neutral-200 group-hover:text-lark-blue transition">${d.employee_name}</span>
-                </div>
-                <div class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">${d.department} · ${d.reason_for_separation}</div>
-              </div>
-              <div class="text-right">
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusClass}">
-                  ${d.overall_status}
-                </span>
-                <span class="text-[10px] text-neutral-400 block mt-0.5">${d.ai_flags_count} AI flags</span>
-              </div>
-            </div>
-          `;
-        }).join('');
+        // Update stats
+        const pending = allDossiersCache.filter(d => d.overall_status !== 'APPROVED').length;
+        const flagged = allDossiersCache.filter(d => d.ai_flags_count > 0).length;
+        const cleared = allDossiersCache.filter(d => d.overall_status === 'CLEARED' || d.overall_status === 'APPROVED').length;
 
-        if (dossiers.length && !activeDossier) {
-          selectDossier(dossiers[0].dossier_id);
+        document.getElementById('statPending').textContent = pending;
+        document.getElementById('statFlagged').textContent = flagged;
+        document.getElementById('statCleared').textContent = cleared;
+
+        renderQueue();
+
+        if (allDossiersCache.length && !activeDossier) {
+          selectDossier(allDossiersCache[0].dossier_id);
         }
       } catch (err) {
         console.error(err);
       }
     }
 
-    async function selectDossier(dossierId) {
-      try {
-        const res = await fetch('/api/clearance/dossiers');
-        const dossiers = await res.json();
-        const d = dossiers.find(item => item.dossier_id === dossierId);
-        if (!d) return;
+    function renderQueue() {
+      const q = document.getElementById('queueSearchInput').value.toLowerCase();
+      const container = document.getElementById('dossiersQueue');
 
-        activeDossier = d;
-        document.getElementById('approverEmptyCard').classList.add('hidden');
-        document.getElementById('approverActiveCard').classList.remove('hidden');
+      const filtered = allDossiersCache.filter(d => {
+        const matchSearch = d.employee_name.toLowerCase().includes(q) || 
+                            d.dossier_id.toLowerCase().includes(q) || 
+                            d.department.toLowerCase().includes(q);
+        if (!matchSearch) return false;
 
-        document.getElementById('apprDossierId').textContent = d.dossier_id;
-        document.getElementById('apprEmpName').textContent = d.employee_name;
-        document.getElementById('apprDeptRole').textContent = `${d.department} · ${d.job_level}`;
-        document.getElementById('apprCompany').textContent = d.company;
-        document.getElementById('apprUnit').textContent = d.unit_channel;
-        document.getElementById('apprBranch').textContent = d.branch;
-        document.getElementById('apprDateHired').textContent = d.date_hired;
-        document.getElementById('apprEocDate').textContent = d.eoc_date;
-        document.getElementById('apprReason').textContent = d.reason_for_separation;
+        if (currentFilter === 'FLAGGED') return d.ai_flags_count > 0;
+        if (currentFilter === 'CLEARED') return d.ai_flags_count === 0 || d.overall_status === 'APPROVED';
+        return true;
+      });
 
-        const statusBadge = document.getElementById('apprStatusBadge');
-        statusBadge.textContent = d.overall_status.replace('_', ' ');
+      document.getElementById('queueCount').textContent = `${filtered.length} dossiers`;
 
-        document.getElementById('apprDocName').textContent = d.sample_file;
-        document.getElementById('apprDocLink').href = `/samples/${d.sample_file}`;
-
-        // Preview rendering
-        const preview = document.getElementById('apprDocPreview');
-        if (d.sample_file.endsWith('.pdf')) {
-          preview.innerHTML = `<iframe src="/samples/${d.sample_file}" class="w-full h-80 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white" frameborder="0"></iframe>`;
+      container.innerHTML = filtered.map(d => {
+        const isActive = activeDossier && activeDossier.dossier_id === d.dossier_id;
+        const hasFlags = d.ai_flags_count > 0;
+        const initials = d.employee_name.split(' ').map(n => n[0]).slice(0, 2).join('');
+        
+        let statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-apple-green">CLEARED</span>';
+        if (d.overall_status === 'APPROVED') {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-apple-green">APPROVED</span>';
+        } else if (hasFlags) {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-apple-red">FLAGGED</span>';
         } else {
-          preview.innerHTML = `<img src="/samples/${d.sample_file}" class="max-h-72 rounded-lg object-contain border border-neutral-200 dark:border-neutral-700 bg-white" />`;
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-apple-amber">IN PROGRESS</span>';
         }
 
-        // Run pre-check on that sample to load exact flags
-        const fileRes = await fetch(`/samples/${d.sample_file}`);
-        const blob = await fileRes.blob();
-        const formData = new FormData();
-        formData.append('file', blob, d.sample_file);
-        formData.append('document_type', d.sample_type);
+        const borderClass = isActive ? 'border-l-4 border-apple-blue bg-blue-50/40 dark:bg-neutral-800 shadow-sm' : 'border border-black/[0.04] dark:border-white/[0.06] bg-neutral-50/70 dark:bg-apple-elevatedDark hover:bg-neutral-100/60 dark:hover:bg-neutral-700/50';
 
-        const checkRes = await fetch('/api/precheck', { method: 'POST', body: formData });
-        const checkData = await checkRes.json();
-
-        const flagsList = document.getElementById('apprFlagsList');
-        const flagsCount = document.getElementById('apprFlagsCount');
-        const overrideBox = document.getElementById('apprOverrideBox');
-
-        if (!checkData.flags || checkData.flags.length === 0) {
-          flagsCount.textContent = "0 Flags (Clean)";
-          flagsCount.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-apple-green font-semibold";
-          flagsList.innerHTML = `
-            <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs flex items-center space-x-2">
-              <i class="fa-solid fa-check-circle text-apple-green"></i>
-              <span>All automated pre-checks passed cleanly. Zero accountabilities or format discrepancies detected.</span>
+        return `
+          <div onclick="selectDossier('${d.dossier_id}')" class="p-3 rounded-xl ${borderClass} cursor-pointer transition flex items-center space-x-3 group">
+            <div class="w-10 h-10 rounded-xl bg-neutral-200/80 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 font-bold text-xs flex items-center justify-center shrink-0">
+              ${initials}
             </div>
-          `;
-          overrideBox.classList.add('hidden');
-        } else {
-          flagsCount.textContent = `${checkData.flags.length} Flags Detected`;
-          flagsCount.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red font-semibold";
-          overrideBox.classList.remove('hidden');
-
-          flagsList.innerHTML = checkData.flags.map(f => `
-            <div class="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-neutral-800 dark:text-neutral-200 flex items-start space-x-2.5">
-              <i class="fa-solid fa-triangle-exclamation text-apple-red mt-0.5"></i>
-              <div class="flex-1">
-                <div class="font-bold flex items-center justify-between">
-                  <span>${f.code}</span>
-                  <span class="text-[9px] uppercase px-1.5 py-0.5 rounded bg-apple-red text-white font-mono">${f.severity}</span>
-                </div>
-                <div class="mt-0.5 text-neutral-600 dark:text-neutral-300">${f.message}</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-neutral-800 dark:text-neutral-200 truncate group-hover:text-apple-blue transition">${d.employee_name}</span>
+                ${statusBadge}
+              </div>
+              <div class="text-[11px] text-neutral-400 truncate mt-0.5">${d.department} · ${d.dossier_id}</div>
+              <div class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
+                <span>${hasFlags ? `<span class="text-apple-red font-semibold"><i class="fa-solid fa-triangle-exclamation mr-1"></i>${d.ai_flags_count} flag(s)</span>` : '<span class="text-apple-green"><i class="fa-solid fa-check mr-1"></i>Clean pre-check</span>'}</span>
+                <span>EOC: ${d.eoc_date}</span>
               </div>
             </div>
-          `).join('');
-        }
+          </div>
+        `;
+      }).join('');
+    }
+
+    let currentApproverRole = 'IT_APPROVER';
+
+    function showDynamicToast(title, message, type = 'success') {
+      const toast = document.getElementById('dynamicIslandToast');
+      const icon = document.getElementById('toastIcon');
+      const tTitle = document.getElementById('toastTitle');
+      const tMsg = document.getElementById('toastMessage');
+
+      tTitle.textContent = title;
+      tMsg.textContent = message;
+
+      if (type === 'error') {
+        icon.className = 'w-6 h-6 rounded-full bg-apple-red text-white flex items-center justify-center text-xs shrink-0 shadow-sm';
+        icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+      } else if (type === 'info') {
+        icon.className = 'w-6 h-6 rounded-full bg-apple-blue text-white flex items-center justify-center text-xs shrink-0 shadow-sm';
+        icon.innerHTML = '<i class="fa-brands fa-rocketchat"></i>';
+      } else {
+        icon.className = 'w-6 h-6 rounded-full bg-apple-green text-white flex items-center justify-center text-xs shrink-0 shadow-sm';
+        icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+      }
+
+      toast.classList.remove('-translate-y-24', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      clearTimeout(window._toastTimeout);
+      window._toastTimeout = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('-translate-y-24', 'opacity-0', 'pointer-events-none');
+      }, 3200);
+    }
+
+    async function pingLarkEmployee() {
+      if (!activeDossier) return;
+      try {
+        const res = await fetch('/api/approvals/notify-lark', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            dossier_id: activeDossier.dossier_id,
+            employee_name: activeDossier.employee_name,
+            recipient: `lark://user/${activeDossier.employee_id}`,
+            message: `Hello ${activeDossier.employee_name}, your clearance dossier ${activeDossier.dossier_id} is currently in review under ${currentApproverRole}. Please monitor Lark for updates.`,
+            sender_role: currentApproverRole,
+          })
+        });
+        await res.json();
+        showDynamicToast("Lark Workplace Card Sent", `Direct reminder dispatched to ${activeDossier.employee_name}.`, "info");
       } catch (err) {
-        console.error(err);
+        showDynamicToast("Notification Failed", err.message, "error");
       }
     }
 
     function switchApproverRole(role) {
-      document.getElementById('currentRoleLabel').textContent = role;
+      currentApproverRole = role;
+      const btnIT = document.getElementById('roleBtnIT');
+      const btnFin = document.getElementById('roleBtnFinance');
+      const btnHR = document.getElementById('roleBtnHR');
+      const btnAdmin = document.getElementById('roleBtnAdmin');
+      const currentRoleLabel = document.getElementById('currentRoleLabel');
+
+      const activeClass = "px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm";
+      const inactiveClass = "px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2";
+
+      if (btnIT) btnIT.className = role === 'IT_APPROVER' ? activeClass : inactiveClass;
+      if (btnFin) btnFin.className = role === 'FINANCE_APPROVER' ? activeClass : inactiveClass;
+      if (btnHR) btnHR.className = role === 'HR_APPROVER' ? activeClass : inactiveClass;
+      if (btnAdmin) btnAdmin.className = role === 'ADMIN_APPROVER' ? activeClass : inactiveClass;
+
+      if (role === 'IT_APPROVER') {
+        currentRoleLabel.textContent = 'Alex Tan (IT Clearance Lead)';
+      } else if (role === 'FINANCE_APPROVER') {
+        currentRoleLabel.textContent = 'Roberto Ong (Finance & Payroll Lead)';
+      } else if (role === 'HR_APPROVER') {
+        currentRoleLabel.textContent = 'Grace Diaz (HR Operations Manager)';
+      } else if (role === 'ADMIN_APPROVER') {
+        currentRoleLabel.textContent = 'Elena Cruz (Facilities & Admin Lead)';
+      }
+
+      if (activeDossier) {
+        renderRoleWorkDesk(role, activeDossier);
+      }
+    }
+
+    function renderRoleWorkDesk(role, d) {
+      const container = document.getElementById('roleSpecificDesk');
+      if (!container) return;
+
+      const hasITFlag = d.flags_summary && (d.flags_summary.includes("FLAG_ACCOUNTABILITY_NOTED") || d.flags_summary.includes("FLAG_MISSING_FIELD"));
+      const hasFinanceFlag = d.flags_summary && (d.flags_summary.includes("FLAG_AMOUNT_MISMATCH") || d.flags_summary.includes("FLAG_FORMAT_MISMATCH"));
+
+      if (role === 'IT_APPROVER') {
+        container.innerHTML = `
+          <div class="flex items-center justify-between pb-2 border-b border-black/[0.05] dark:border-white/[0.06]">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-laptop-code text-apple-blue"></i>
+              <span class="font-bold text-xs uppercase tracking-wider text-neutral-800 dark:text-neutral-200">IT Clearance Check & Asset Turnover</span>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${hasITFlag ? 'bg-red-500/10 text-apple-red' : 'bg-emerald-500/10 text-apple-green'}">
+              ${hasITFlag ? 'Action Required (Hold)' : 'Hardware Clean'}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+            <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] space-y-2">
+              <div class="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 flex items-center justify-between">
+                <span>Hardware Assets Surrendered</span>
+                <span class="text-[9px] font-mono text-neutral-400">Inventory S/N</span>
+              </div>
+              <div class="space-y-1.5 text-xs">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" ${hasITFlag ? '' : 'checked'} class="rounded text-apple-blue focus:ring-0" />
+                  <span class="text-neutral-700 dark:text-neutral-300">Lenovo ThinkPad T14s (S/N: 20WM-0045PH)</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked class="rounded text-apple-blue focus:ring-0" />
+                  <span class="text-neutral-700 dark:text-neutral-300">65W USB-C AC Power Adapter</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked class="rounded text-apple-blue focus:ring-0" />
+                  <span class="text-neutral-700 dark:text-neutral-300">Jabra Evolve2 Headset (Asset #HW-8812)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] space-y-2">
+              <div class="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 flex items-center justify-between">
+                <span>Identity & Access Revocation</span>
+                <span class="text-[9px] font-mono text-apple-green">SSO Synced</span>
+              </div>
+              <div class="space-y-1.5 text-xs">
+                <div class="flex items-center justify-between">
+                  <span class="text-neutral-600 dark:text-neutral-300">Lark Suite Enterprise Account:</span>
+                  <span class="text-[10px] font-bold text-apple-amber">Pending Sign-off</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-neutral-600 dark:text-neutral-300">GitHub & AWS Production IAM:</span>
+                  <span class="text-[10px] font-bold text-apple-green">Revoked ✓</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-neutral-600 dark:text-neutral-300">24th Floor RFID Turnstile Badge:</span>
+                  <span class="text-[10px] font-bold ${hasITFlag ? 'text-apple-red' : 'text-apple-green'}">${hasITFlag ? 'Not Surrendered' : 'Deactivated ✓'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (role === 'FINANCE_APPROVER') {
+        container.innerHTML = `
+          <div class="flex items-center justify-between pb-2 border-b border-black/[0.05] dark:border-white/[0.06]">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-money-check-dollar text-apple-green"></i>
+              <span class="font-bold text-xs uppercase tracking-wider text-neutral-800 dark:text-neutral-200">Finance & Last Pay Computation Reconciliation</span>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${hasFinanceFlag ? 'bg-red-500/10 text-apple-red' : 'bg-emerald-500/10 text-apple-green'}">
+              ${hasFinanceFlag ? 'Discrepancy Detected' : 'Formula Reconciled'}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+            <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] space-y-1.5 text-xs">
+              <div class="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 pb-1 border-b border-black/[0.04] dark:border-white/[0.06] flex justify-between">
+                <span>Final Pay Itemization</span>
+                <span class="font-mono">PHP (₱)</span>
+              </div>
+              <div class="flex justify-between"><span>Pro-rated Basic Salary (Aug 1–31):</span><span class="font-mono font-medium">₱32,000.00</span></div>
+              <div class="flex justify-between"><span>13th Month Pay Accrual (8 mos):</span><span class="font-mono font-medium">₱16,500.00</span></div>
+              <div class="flex justify-between"><span>Tax Annualization Withholding Refund:</span><span class="font-mono text-apple-green font-medium">+₱1,200.00</span></div>
+              <div class="flex justify-between"><span>Equipment Deduction (Lost Adapter):</span><span class="font-mono text-apple-red font-medium">-₱1,200.00</span></div>
+              <div class="pt-1.5 border-t border-black/[0.04] dark:border-white/[0.06] flex justify-between font-bold text-neutral-900 dark:text-white">
+                <span>Computed Net Last Pay:</span>
+                <span class="font-mono text-apple-blue text-sm">₱48,500.00</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] space-y-2 text-xs">
+              <div class="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 pb-1 border-b border-black/[0.04] dark:border-white/[0.06] flex justify-between">
+                <span>Discrepancy Analysis</span>
+                <span class="font-mono text-apple-red">DIFF</span>
+              </div>
+              <div class="space-y-1">
+                <div class="flex justify-between"><span>Quit Claim Signed Figure:</span><span class="font-mono font-bold ${hasFinanceFlag ? 'text-apple-red' : 'text-apple-green'}">₱52,000.00</span></div>
+                <div class="flex justify-between"><span>HR/Payroll Ledger:</span><span class="font-mono font-bold text-neutral-800 dark:text-neutral-200">₱48,500.00</span></div>
+                <div class="p-2 rounded-lg ${hasFinanceFlag ? 'bg-red-500/10 text-apple-red' : 'bg-emerald-500/10 text-apple-green'} font-semibold text-[11px] flex items-center justify-between">
+                  <span>${hasFinanceFlag ? 'Disparity: +₱3,500.00' : 'Perfect Match (₱0.00 diff)'}</span>
+                  <i class="fa-solid ${hasFinanceFlag ? 'fa-circle-exclamation' : 'fa-circle-check'}"></i>
+                </div>
+              </div>
+              <div class="text-[10px] text-neutral-400">Bank Target: GCash 0917-XXX-8819 (Verified Holder Name Match)</div>
+            </div>
+          </div>
+        `;
+      } else if (role === 'HR_APPROVER') {
+        container.innerHTML = `
+          <div class="flex items-center justify-between pb-2 border-b border-black/[0.05] dark:border-white/[0.06]">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-user-tie text-apple-purple"></i>
+              <span class="font-bold text-xs uppercase tracking-wider text-neutral-800 dark:text-neutral-200">HR Separation Compliance & COE Release Desk</span>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-purple-500/10 text-apple-purple">
+              Compliance Review
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 text-xs">
+            <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] space-y-1.5">
+              <div class="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 pb-1 border-b border-black/[0.04] dark:border-white/[0.06]">Separation Compliance Checklist</div>
+              <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" checked class="rounded text-apple-purple" /><span>Resignation Letter Accepted & Signed by Dept VP</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" checked class="rounded text-apple-purple" /><span>Lark Exit Interview Survey Completed</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="rounded text-apple-purple" /><span>All 4 Department Sign-off Stamps Verified</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" checked class="rounded text-apple-purple" /><span>Notarized Release & Quit Claim Form Stored</span></label>
+            </div>
+
+            <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] space-y-2">
+              <div class="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 pb-1 border-b border-black/[0.04] dark:border-white/[0.06]">Post-Clearance Artifacts</div>
+              <div class="space-y-1 text-neutral-600 dark:text-neutral-300">
+                <div class="flex justify-between"><span>Certificate of Employment (COE):</span><span class="font-bold text-apple-green">Draft Ready</span></div>
+                <div class="flex justify-between"><span>BIR Form 2316 (Tax Cert):</span><span class="font-bold text-apple-amber">Auto-generating</span></div>
+                <div class="flex justify-between"><span>Alumni Network Invite:</span><span class="font-bold text-neutral-400">Pending Release</span></div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="flex items-center justify-between pb-2 border-b border-black/[0.05] dark:border-white/[0.06]">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-building-user text-apple-amber"></i>
+              <span class="font-bold text-xs uppercase tracking-wider text-neutral-800 dark:text-neutral-200">Facilities & Administrative Asset Clearance</span>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/10 text-apple-amber">
+              Facilities Audit
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 text-xs">
+            <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] space-y-1.5">
+              <div class="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 pb-1 border-b border-black/[0.04] dark:border-white/[0.06]">Physical Access & Assets</div>
+              <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" checked class="rounded text-apple-amber" /><span>Office Locker #24 Key Surrendered</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" checked class="rounded text-apple-amber" /><span>Taguig Parking Deck RFID Transponder</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" checked class="rounded text-apple-amber" /><span>Laminated Company ID Badge Cut & Disposed</span></label>
+            </div>
+            <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] space-y-2">
+              <div class="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 pb-1 border-b border-black/[0.04] dark:border-white/[0.06]">Admin Sign-Off Status</div>
+              <p class="text-neutral-600 dark:text-neutral-300 text-[11px]">All physical locker amenities and security access credentials have been returned in satisfactory condition.</p>
+              <div class="text-[10px] font-bold text-apple-green">✓ Facilities Clearance Approved</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    async function selectDossier(dossierId) {
+      const d = allDossiersCache.find(item => item.dossier_id === dossierId);
+      if (!d) return;
+
+      activeDossier = d;
+      activeDocIndex = 0;
+      renderQueue();
+
+      // Populate Hero Card
+      const initials = d.employee_name.split(' ').map(n => n[0]).slice(0, 2).join('');
+      document.getElementById('apprAvatar').textContent = initials;
+      document.getElementById('apprEmpName').textContent = d.employee_name;
+      document.getElementById('apprEmpIdBadge').textContent = d.employee_id || d.dossier_id;
+      document.getElementById('apprDeptRole').textContent = `${d.department} · ${d.job_level}`;
+      document.getElementById('apprSubText').textContent = `${d.company} · ${d.branch} · Separation: ${d.eoc_date} (${d.reason_for_separation})`;
+
+      // Status Badge & Pulse Dot
+      const statusBadge = document.getElementById('apprStatusBadge');
+      const statusText = document.getElementById('apprStatusText');
+      const pulseDot = document.getElementById('apprPulseDot');
+
+      if (d.overall_status === 'APPROVED') {
+        statusText.textContent = 'APPROVED';
+        statusBadge.className = 'text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-500/15 text-apple-green border border-emerald-500/30 flex items-center space-x-1.5';
+        pulseDot.className = 'w-2 h-2 rounded-full bg-apple-green';
+      } else if (d.ai_flags_count > 0) {
+        statusText.textContent = `${d.ai_flags_count} DISCREPANCY FLAGS`;
+        statusBadge.className = 'text-xs font-bold px-3 py-1.5 rounded-full bg-red-500/10 text-apple-red border border-red-500/20 flex items-center space-x-1.5';
+        pulseDot.className = 'w-2 h-2 rounded-full bg-apple-red apple-pulse-red';
+      } else {
+        statusText.textContent = 'READY FOR SIGN-OFF';
+        statusBadge.className = 'text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-500/10 text-apple-green border border-emerald-500/20 flex items-center space-x-1.5';
+        pulseDot.className = 'w-2 h-2 rounded-full bg-apple-green apple-pulse-green';
+      }
+
+      // Progression Steps
+      updateProgressPipeline(d);
+
+      // Render Role-Specific Work Desk
+      renderRoleWorkDesk(currentApproverRole, d);
+
+      // Render Document Tabs
+      renderDocTabs(d);
+
+      // Load Pre-check on primary document
+      await inspectDossierDocument(d.sample_file, d.sample_type);
+    }
+
+    function updateProgressPipeline(d) {
+      const step = d.stage_step || 1;
+      document.getElementById('pipelineStepLabel').textContent = `Stage ${step} of 4: ${step === 1 ? 'Clearances' : step === 2 ? 'Last Pay Computation' : step === 3 ? 'Quit Claim' : 'Bank Release'}`;
+
+      const s1 = document.getElementById('step1Box');
+      const s2 = document.getElementById('step2Box');
+      const s3 = document.getElementById('step3Box');
+      const s4 = document.getElementById('step4Box');
+
+      const s1Status = document.getElementById('step1Status');
+      const s2Status = document.getElementById('step2Status');
+      const s3Status = document.getElementById('step3Status');
+      const s4Status = document.getElementById('step4Status');
+
+      const baseInactive = "p-3 rounded-xl border border-black/[0.05] dark:border-white/[0.08] bg-white dark:bg-neutral-800 text-neutral-400 transition";
+      const baseActive = "p-3 rounded-xl border border-lark-blue bg-blue-50/60 dark:bg-blue-950/30 text-lark-blue font-semibold transition";
+      const baseCleared = "p-3 rounded-xl border border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/20 text-apple-green font-semibold transition";
+
+      s1.className = baseInactive;
+      s2.className = baseInactive;
+      s3.className = baseInactive;
+      s4.className = baseInactive;
+
+      if (d.ai_flags_count > 0 && d.flags_summary && d.flags_summary.includes("FLAG_ACCOUNTABILITY_NOTED")) {
+        s1.className = "p-3 rounded-xl border border-red-500/30 bg-red-50/50 dark:bg-red-950/20 text-apple-red font-semibold transition";
+        s1Status.textContent = "IT Hold";
+      } else {
+        s1.className = baseCleared;
+        s1Status.textContent = "Cleared ✓";
+      }
+
+      if (step >= 2) {
+        if (d.flags_summary && d.flags_summary.includes("FLAG_AMOUNT_MISMATCH")) {
+          s2.className = "p-3 rounded-xl border border-red-500/30 bg-red-50/50 dark:bg-red-950/20 text-apple-red font-semibold transition";
+          s2Status.textContent = "Disparity";
+        } else {
+          s2.className = step > 2 ? baseCleared : baseActive;
+          s2Status.textContent = step > 2 ? "Audited ✓" : "In Review";
+        }
+      }
+
+      if (step >= 3) {
+        s3.className = step > 3 ? baseCleared : baseActive;
+        s3Status.textContent = step > 3 ? "Signed ✓" : "Reviewing";
+      }
+
+      if (step >= 4) {
+        s4.className = d.overall_status === 'APPROVED' ? baseCleared : baseActive;
+        s4Status.textContent = d.overall_status === 'APPROVED' ? "Released ✓" : "Disbursement";
+      }
+    }
+
+    function renderDocTabs(d) {
+      const tabsBar = document.getElementById('docTabsBar');
+      const docs = d.docs || [
+        {"title": "Primary Document", "file": d.sample_file, "type": d.sample_type, "has_flags": d.ai_flags_count > 0}
+      ];
+
+      tabsBar.innerHTML = docs.map((doc, idx) => {
+        const isSelected = idx === activeDocIndex;
+        const tabClass = isSelected 
+          ? "px-3.5 py-1.5 rounded-xl font-bold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm border border-black/[0.04] dark:border-white/[0.06]"
+          : "px-3.5 py-1.5 rounded-xl font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition";
+
+        const flagDot = doc.has_flags 
+          ? '<span class="w-2 h-2 rounded-full bg-apple-red inline-block ml-1.5 apple-pulse-red"></span>' 
+          : '<span class="w-2 h-2 rounded-full bg-apple-green inline-block ml-1.5"></span>';
+
+        return `
+          <button onclick="switchDocTab(${idx})" class="${tabClass} flex items-center space-x-1">
+            <span>${doc.title}</span>
+            ${flagDot}
+          </button>
+        `;
+      }).join('');
+    }
+
+    async function switchDocTab(index) {
+      activeDocIndex = index;
+      renderDocTabs(activeDossier);
+      const doc = activeDossier.docs[index];
+      await inspectDossierDocument(doc.file, doc.type);
+    }
+
+    async function inspectDossierDocument(fileName, docType) {
+      document.getElementById('apprDocLink').href = `/samples/${fileName}`;
+      document.getElementById('docTypeInspectorBadge').textContent = docType;
+
+      // Preview frame
+      const preview = document.getElementById('apprDocPreview');
+      if (fileName.endsWith('.pdf')) {
+        preview.innerHTML = `<iframe src="/samples/${fileName}" class="w-full h-80 rounded-xl border border-black/[0.05] dark:border-white/[0.06] bg-white shadow-inner" frameborder="0"></iframe>`;
+      } else {
+        preview.innerHTML = `<img src="/samples/${fileName}" class="max-h-72 rounded-xl object-contain border border-black/[0.05] dark:border-white/[0.06] bg-white shadow-sm" />`;
+      }
+
+      // Call precheck
+      try {
+        const fileRes = await fetch(`/samples/${fileName}`);
+        const blob = await fileRes.blob();
+        const formData = new FormData();
+        formData.append('file', blob, fileName);
+        formData.append('document_type', docType);
+
+        const checkRes = await fetch('/api/precheck', { method: 'POST', body: formData });
+        const checkData = await checkRes.json();
+
+        document.getElementById('apprConfidenceText').textContent = `${Math.round(checkData.overall_confidence * 100)}%`;
+        if (checkData.metadata && checkData.metadata.file_hash_sha256) {
+          document.getElementById('docShaShort').textContent = `SHA: ${checkData.metadata.file_hash_sha256.slice(0, 8)}...`;
+        }
+
+        const flagsList = document.getElementById('apprFlagsList');
+        const overrideBox = document.getElementById('apprOverrideBox');
+
+        if (!checkData.flags || checkData.flags.length === 0) {
+          flagsList.innerHTML = `
+            <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs flex items-center space-x-3 shadow-sm">
+              <div class="w-7 h-7 rounded-lg bg-apple-green text-white flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-shield-check"></i>
+              </div>
+              <div>
+                <div class="font-bold">Apple Intelligence Pre-Check Verified</div>
+                <div class="text-[11px] text-neutral-600 dark:text-neutral-300">All signatures, settlement calculations, and employee identity fields match corporate records.</div>
+              </div>
+            </div>
+          `;
+          overrideBox.classList.add('hidden');
+        } else {
+          overrideBox.classList.remove('hidden');
+          flagsList.innerHTML = checkData.flags.map(f => {
+            const isBlocker = f.severity === 'BLOCKER';
+            const bgClass = isBlocker ? 'bg-red-500/10 border-red-500/20 text-neutral-800 dark:text-neutral-200' : 'bg-amber-500/10 border-amber-500/20 text-neutral-800 dark:text-neutral-200';
+            const badgeClass = isBlocker ? 'bg-apple-red text-white' : 'bg-apple-amber text-white';
+            const icon = isBlocker ? 'fa-solid fa-circle-xmark text-apple-red' : 'fa-solid fa-triangle-exclamation text-apple-amber';
+
+            return `
+              <div class="p-3 rounded-xl border text-xs flex items-start space-x-3 ${bgClass} shadow-sm">
+                <i class="${icon} text-base mt-0.5 shrink-0"></i>
+                <div class="flex-1">
+                  <div class="font-bold flex items-center justify-between">
+                    <span class="font-mono tracking-tight">${f.code}</span>
+                    <span class="text-[9px] uppercase tracking-wider font-mono font-bold px-2 py-0.5 rounded-full ${badgeClass}">${f.severity}</span>
+                  </div>
+                  <div class="mt-1 text-neutral-600 dark:text-neutral-300 text-[11px]">${f.message}</div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Populate Extracted Fields Inspector
+        renderExtractedFieldsInspector(checkData);
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderExtractedFieldsInspector(data) {
+      const container = document.getElementById('extractedFieldsInspector');
+      if (!container || !data.fields) return;
+
+      const f = data.fields;
+      let rows = [];
+
+      if (data.document_type === 'QUIT_CLAIM') {
+        if (f.employee_name) rows.push({label: 'Employee Name', val: f.employee_name.raw_value, conf: f.employee_name.confidence, flagged: f.employee_name.is_flagged});
+        if (f.settlement_amount_figures) rows.push({label: 'Settlement Amount', val: '₱' + Number(f.settlement_amount_figures.normalized_value || 0).toLocaleString(), conf: f.settlement_amount_figures.confidence, flagged: f.settlement_amount_figures.is_flagged});
+        if (f.amounts_match) rows.push({label: 'Figures & Words Match', val: f.amounts_match.normalized_value ? 'Match ✓' : 'Mismatch ⚠️', conf: f.amounts_match.confidence, flagged: !f.amounts_match.normalized_value});
+        if (f.employee_signature_present) rows.push({label: 'Employee Signature', val: f.employee_signature_present.normalized_value ? 'Detected ✓' : 'Missing ⚠️', conf: f.employee_signature_present.confidence, flagged: !f.employee_signature_present.normalized_value});
+        if (f.notary_present) rows.push({label: 'Notary Seal', val: f.notary_present.normalized_value ? 'Verified ✓' : 'Absent', conf: f.notary_present.confidence, flagged: false});
+        if (f.waiver_clauses_intact) rows.push({label: 'Waiver Clauses', val: f.waiver_clauses_intact.normalized_value ? 'Intact ✓' : 'Modified ⚠️', conf: f.waiver_clauses_intact.confidence, flagged: !f.waiver_clauses_intact.normalized_value});
+      } else if (data.document_type === 'BANK_ENROLLMENT') {
+        if (f.account_holder_name) rows.push({label: 'Account Holder', val: f.account_holder_name.raw_value, conf: f.account_holder_name.confidence, flagged: f.account_holder_name.is_flagged});
+        if (f.institution) rows.push({label: 'Platform / Bank', val: f.institution.normalized_value, conf: f.institution.confidence, flagged: f.institution.is_flagged});
+        if (f.account_number) rows.push({label: 'Account Number', val: f.account_number.raw_value, conf: f.account_number.confidence, flagged: f.account_number.is_flagged});
+        if (f.account_number_format_valid) rows.push({label: 'Format Valid', val: f.account_number_format_valid.normalized_value ? 'Valid Format ✓' : 'Invalid Format ⚠️', conf: f.account_number_format_valid.confidence, flagged: !f.account_number_format_valid.normalized_value});
+        if (f.proof_type) rows.push({label: 'Proof Category', val: f.proof_type.normalized_value, conf: f.proof_type.confidence, flagged: false});
+      } else if (data.document_type === 'CLEARANCE_SHEET') {
+        if (f.employee_name) rows.push({label: 'Employee Name', val: f.employee_name.raw_value, conf: f.employee_name.confidence, flagged: f.employee_name.is_flagged});
+        if (f.all_departments_cleared) rows.push({label: 'All Depts Cleared', val: f.all_departments_cleared.normalized_value ? 'Complete ✓' : 'Pending ⚠️', conf: f.all_departments_cleared.confidence, flagged: !f.all_departments_cleared.normalized_value});
+        if (f.department_statuses) {
+          f.department_statuses.forEach(ds => {
+            rows.push({
+              label: `${ds.department} Clearance`,
+              val: ds.is_cleared.normalized_value ? 'Cleared ✓' : 'Hold Active ⚠️',
+              conf: ds.is_cleared.confidence,
+              flagged: !ds.is_cleared.normalized_value
+            });
+          });
+        }
+      }
+
+      container.innerHTML = rows.map(r => `
+        <div class="p-2 rounded-xl bg-white dark:bg-neutral-800/80 border border-black/[0.04] dark:border-white/[0.05] flex items-center justify-between">
+          <div class="min-w-0 flex-1 pr-2">
+            <div class="text-[10px] text-neutral-400 font-medium">${r.label}</div>
+            <div class="font-bold text-xs ${r.flagged ? 'text-apple-red' : 'text-neutral-800 dark:text-neutral-200'} truncate">${r.val}</div>
+          </div>
+          <div class="text-right shrink-0">
+            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded ${r.flagged ? 'bg-red-500/10 text-apple-red' : 'bg-emerald-500/10 text-apple-green'} font-bold">
+              ${Math.round(r.conf * 100)}%
+            </span>
+          </div>
+        </div>
+      `).join('');
     }
 
     async function submitApproverDeskDecision(action) {
       if (!activeDossier) return;
-      const role = document.getElementById('approverRoleSelect').value;
+      const role = currentApproverRole;
       const overrideNotes = document.getElementById('apprOverrideNotes').value.trim();
 
       if (action === 'APPROVE' && activeDossier.ai_flags_count > 0 && !overrideNotes) {
-        alert('Approver Override Required: This clearance dossier has active blocker flags. Please provide an override explanation before finalizing approval.');
+        showDynamicToast("Override Rationale Required", "Please justify approving with active blocker flags.", "error");
         document.getElementById('apprOverrideNotes').focus();
         return;
       }
@@ -1425,7 +1882,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
             document_id: activeDossier.dossier_id,
-            approver_id: "USR-CURRENT-APPROVER",
+            approver_id: "USR-ACTIVE-APPROVER",
             role: role,
             action: action,
             flags_reviewed: activeDossier.flags_summary || [],
@@ -1433,11 +1890,11 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           })
         });
         await res.json();
-        alert(`Dossier ${activeDossier.dossier_id} updated: ${action}!\nLogged permanently to audit trail.`);
+        showDynamicToast(`Decision Logged: ${action}`, `${activeDossier.employee_name} (${activeDossier.dossier_id}) updated.`, "success");
         document.getElementById('apprOverrideNotes').value = '';
-        loadDossiersQueue();
+        await loadDossiersQueue();
       } catch (err) {
-        alert('Action failed: ' + err.message);
+        showDynamicToast("Action Failed", err.message, "error");
       }
     }
 
@@ -1484,15 +1941,14 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         flagsBox.innerHTML = '<p class="text-xs text-apple-green font-semibold">0 Flags detected. Clean validation.</p>';
       } else {
         flagsBox.innerHTML = data.flags.map(f => `
-          <div class="p-2 rounded bg-red-500/10 text-apple-red text-xs">
-            <b>${f.code}</b> [${f.severity}]: ${f.message}
+          <div class="p-2 rounded bg-red-500/10 text-apple-red text-xs font-semibold">
+            ${f.code} [${f.severity}]: ${f.message}
           </div>
         `).join('');
       }
       loadAuditLogs();
     }
 
-    // Audit logs
     async function loadAuditLogs() {
       try {
         const res = await fetch('/api/audit-logs');
@@ -1513,10 +1969,9 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       }
     }
 
-    // Theme Switcher
+    // Theme Switcher (Default: Light Mode)
     function initTheme() {
       const savedTheme = localStorage.getItem('theme');
-      // DEFAULT TO LIGHT MODE per user request!
       if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
         document.documentElement.classList.remove('light');
@@ -1549,6 +2004,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
     // Startup
     initTheme();
+    loadDossiersQueue();
     loadHarnessSamples();
     loadAuditLogs();
   </script>
