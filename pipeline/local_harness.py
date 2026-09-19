@@ -517,8 +517,11 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         return;
       }
 
+      const file = fileInput.files[0];
+      currentFileUrl = URL.createObjectURL(file);
+
       const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
+      formData.append('file', file);
       formData.append('document_type', docType);
 
       const submitBtn = document.getElementById('submitBtn');
@@ -531,7 +534,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           body: formData,
         });
         const data = await res.json();
-        renderResult(data);
+        renderResult(data, currentFileUrl);
         loadAuditLogs();
       } catch (err) {
         alert('Pre-check error: ' + err.message);
@@ -541,7 +544,20 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       }
     });
 
-    function renderResult(data) {
+    function togglePreview() {
+      const container = document.getElementById('previewContainer');
+      const icon = document.getElementById('previewToggleIcon');
+      if (container.classList.contains('hidden')) {
+        container.classList.remove('hidden');
+        icon.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
+      } else {
+        container.classList.add('hidden');
+        icon.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+      }
+    }
+
+    function renderResult(data, fileUrl) {
+      currentResult = data;
       document.getElementById('emptyState').classList.add('hidden');
       const container = document.getElementById('resultContent');
       container.classList.remove('hidden');
@@ -550,10 +566,28 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       document.getElementById('resFileName').textContent = data.metadata.file_name;
       document.getElementById('resHash').textContent = data.metadata.file_hash_sha256.slice(0, 16) + '...';
       document.getElementById('resTime').textContent = data.metadata.processing_time_ms + 'ms';
+      document.getElementById('resModel').textContent = data.metadata.model_id;
       document.getElementById('resConfidence').textContent = Math.round(data.overall_confidence * 100) + '%';
+
+      // Update Document Preview
+      const previewBox = document.getElementById('previewContainer');
+      previewBox.classList.remove('hidden');
+      document.getElementById('previewToggleIcon').innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
+
+      if (fileUrl) {
+        if (data.metadata.file_name.toLowerCase().endsWith('.pdf') || data.metadata.mime_type === 'application/pdf') {
+          previewBox.innerHTML = `<iframe src="${fileUrl}" class="w-full h-80 rounded border border-slate-300 shadow-inner" frameborder="0"></iframe>`;
+        } else {
+          previewBox.innerHTML = `<img src="${fileUrl}" alt="Document Preview" class="max-h-80 rounded border border-slate-300 shadow-sm object-contain" />`;
+        }
+      } else {
+        previewBox.innerHTML = '<p class="text-xs text-slate-400">Document preview unavailable</p>';
+      }
 
       // Render Flags
       const flagsBox = document.getElementById('flagsContainer');
+      const overrideBox = document.getElementById('overrideBox');
+
       if (!data.flags || data.flags.length === 0) {
         flagsBox.innerHTML = `
           <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-xs flex items-center">
@@ -561,7 +595,9 @@ HTML_DASHBOARD = """<!DOCTYPE html>
             <div><b>Clean Pre-Check:</b> No missing fields, amount discrepancies, or format violations detected.</div>
           </div>
         `;
+        overrideBox.classList.add('hidden');
       } else {
+        overrideBox.classList.remove('hidden');
         flagsBox.innerHTML = data.flags.map(f => {
           const isBlocker = f.severity === 'BLOCKER';
           const badgeClass = isBlocker ? 'badge-blocker' : 'badge-warning';
@@ -572,9 +608,9 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               <div class="flex-1">
                 <div class="font-bold flex items-center justify-between">
                   <span>${f.code}</span>
-                  <span class="uppercase text-[10px] tracking-wider px-2 py-0.5 rounded bg-white/70">${f.severity}</span>
+                  <span class="uppercase text-[10px] tracking-wider px-2 py-0.5 rounded bg-white/80 border">${f.severity}</span>
                 </div>
-                <div class="mt-0.5">${f.message}</div>
+                <div class="mt-0.5 text-slate-800">${f.message}</div>
               </div>
             </div>
           `;
@@ -587,38 +623,43 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       const fields = data.fields;
 
       if (data.document_type === 'CLEARANCE_SHEET') {
-        // Clearance sheet has department sub-array
         rows.push(`
           <tr>
             <td class="py-2.5 px-3 font-semibold text-slate-800">employee_name</td>
             <td class="py-2.5 px-3">${fields.employee_name.raw_value || '—'}</td>
             <td class="py-2.5 px-3 font-mono">${fields.employee_name.normalized_value || '—'}</td>
             <td class="py-2.5 px-3 text-center">${Math.round(fields.employee_name.confidence * 100)}%</td>
-            <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-700">OK</span></td>
+            <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-700 font-bold">VERIFIED</span></td>
           </tr>
         `);
         for (const dept of fields.department_statuses) {
           const isHold = dept.has_outstanding_accountability.normalized_value;
-          const statusBadge = isHold ? '<span class="px-2 py-0.5 text-[10px] rounded bg-red-100 text-red-700">HOLD</span>' : '<span class="px-2 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-700">CLEARED</span>';
+          const isMissingSig = !dept.signature_present.normalized_value;
+          let statusBadge = '<span class="px-2 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-700 font-bold">CLEARED</span>';
+          if (isHold) {
+            statusBadge = '<span class="px-2 py-0.5 text-[10px] rounded bg-red-100 text-red-700 font-bold">HOLD</span>';
+          } else if (isMissingSig) {
+            statusBadge = '<span class="px-2 py-0.5 text-[10px] rounded bg-amber-100 text-amber-700 font-bold">MISSING SIG</span>';
+          }
+
           rows.push(`
-            <tr class="${isHold ? 'bg-red-50/50' : ''}">
+            <tr class="${isHold ? 'bg-red-50/40' : ''}">
               <td class="py-2.5 px-3 font-semibold text-slate-800">${dept.department} Dept Clearance</td>
               <td class="py-2.5 px-3">${dept.is_cleared.raw_value || '—'} (${dept.approver_name.raw_value || 'No Sig'})</td>
-              <td class="py-2.5 px-3 font-mono">${dept.accountability_notes.normalized_value || 'None'}</td>
+              <td class="py-2.5 px-3 font-mono text-slate-600">${dept.accountability_notes.normalized_value || 'None'}</td>
               <td class="py-2.5 px-3 text-center">${Math.round(dept.is_cleared.confidence * 100)}%</td>
               <td class="py-2.5 px-3 text-center">${statusBadge}</td>
             </tr>
           `);
         }
       } else {
-        // Flat fields for Quit Claim & Bank
         for (const [k, v] of Object.entries(fields)) {
           const isFlagged = v.is_flagged;
           const statusBadge = isFlagged 
             ? '<span class="px-2 py-0.5 text-[10px] rounded bg-red-100 text-red-700 font-bold">FLAGGED</span>'
             : '<span class="px-2 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-700 font-medium">VERIFIED</span>';
           rows.push(`
-            <tr class="${isFlagged ? 'bg-amber-50/50' : ''}">
+            <tr class="${isFlagged ? 'bg-amber-50/40' : ''}">
               <td class="py-2.5 px-3 font-semibold text-slate-800">${k}</td>
               <td class="py-2.5 px-3">${v.raw_value !== null ? v.raw_value : '<i>null</i>'}</td>
               <td class="py-2.5 px-3 font-mono text-slate-600">${v.normalized_value !== null ? String(v.normalized_value) : '<i>null</i>'}</td>
@@ -629,6 +670,43 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         }
       }
       tbody.innerHTML = rows.join('');
+    }
+
+    // Submit Human Decision
+    async function submitDecision(action) {
+      if (!currentResult) return;
+
+      const overrideNotes = document.getElementById('overrideNotes').value.trim();
+      const hasBlocker = currentResult.flags && currentResult.flags.some(f => f.severity === 'BLOCKER');
+
+      if (action === 'APPROVE' && hasBlocker && !overrideNotes) {
+        alert('Constitutional Requirement: You are approving a document with active BLOCKER flags. Please enter an approver override justification before submitting.');
+        document.getElementById('overrideNotes').focus();
+        return;
+      }
+
+      try {
+        const payload = {
+          document_id: currentResult.metadata.document_id,
+          approver_id: "USR-MARIA-SANTOS",
+          role: "HR_APPROVER",
+          action: action,
+          flags_reviewed: currentResult.flags ? currentResult.flags.map(f => f.code) : [],
+          override_justification: overrideNotes,
+        };
+
+        const res = await fetch('/api/approvals/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        alert(`Action recorded: ${action}! Successfully logged to immutable audit trail.`);
+        document.getElementById('overrideNotes').value = '';
+        loadAuditLogs();
+      } catch (err) {
+        alert('Failed to log approver action: ' + err.message);
+      }
     }
 
     // Startup
