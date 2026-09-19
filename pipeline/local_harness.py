@@ -738,169 +738,361 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               Cancel
             </button>
           </div>
-
         </form>
-
       </div>
-
     </section>
 
     <!-- ================================================================= -->
-    <!-- VIEW 2: ROLE-BASED APPROVER DESK (LARK ADMIN / APPROVER VIEW) -->
+    <!-- VIEW 2: ULTRA-REFINED APPLE APPROVER WORKSTATION -->
     <!-- ================================================================= -->
-    <section id="viewApprover" class="hidden space-y-6">
+    <section id="viewApprover" class="space-y-6">
       
-      <!-- Role Switcher & Sub-Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-apple-surfaceLight dark:bg-apple-surfaceDark p-5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm">
-        <div>
-          <h2 class="text-base font-bold text-neutral-900 dark:text-white flex items-center">
-            <i class="fa-solid fa-list-check mr-2 text-lark-blue"></i> Clearance Approver Review Desk
-          </h2>
-          <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Review submitted clearance dossiers and verify AI pre-check flags</p>
+      <!-- Top Apple Segmented Control Toolbar: Approver Personas + SLA Cockpit -->
+      <div class="bg-white/80 dark:bg-neutral-900/80 apple-glass p-4 sm:p-5 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] flex flex-col xl:flex-row xl:items-center justify-between gap-4 transition">
+        
+        <!-- Left: Interactive Approver Persona Switcher (Apple Pills) -->
+        <div class="flex flex-col space-y-2">
+          <div class="flex items-center space-x-2 text-[11px] uppercase tracking-wider font-bold text-neutral-400 dark:text-neutral-500">
+            <i class="fa-solid fa-id-badge text-apple-blue"></i>
+            <span>Active Approver Workspace</span>
+            <span class="text-[10px] lowercase font-normal text-neutral-400">(select to switch role perspective)</span>
+          </div>
+
+          <div class="flex flex-wrap items-center p-1 bg-neutral-200/60 dark:bg-neutral-800/80 rounded-2xl gap-1">
+            <button onclick="switchApproverRole('IT_APPROVER')" id="roleBtnIT" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm">
+              <div class="w-5 h-5 rounded-lg bg-blue-500/15 text-apple-blue flex items-center justify-center text-[10px]">
+                <i class="fa-solid fa-laptop-code"></i>
+              </div>
+              <div class="text-left">
+                <div class="leading-none">Alex Tan</div>
+                <div class="text-[9px] text-neutral-400 font-normal">IT Clearance</div>
+              </div>
+            </button>
+
+            <button onclick="switchApproverRole('FINANCE_APPROVER')" id="roleBtnFinance" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2">
+              <div class="w-5 h-5 rounded-lg bg-emerald-500/15 text-apple-green flex items-center justify-center text-[10px]">
+                <i class="fa-solid fa-money-check-dollar"></i>
+              </div>
+              <div class="text-left">
+                <div class="leading-none">Roberto Ong</div>
+                <div class="text-[9px] text-neutral-400 font-normal">Finance & Payroll</div>
+              </div>
+            </button>
+
+            <button onclick="switchApproverRole('HR_APPROVER')" id="roleBtnHR" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2">
+              <div class="w-5 h-5 rounded-lg bg-purple-500/15 text-apple-purple flex items-center justify-center text-[10px]">
+                <i class="fa-solid fa-user-tie"></i>
+              </div>
+              <div class="text-left">
+                <div class="leading-none">Grace Diaz</div>
+                <div class="text-[9px] text-neutral-400 font-normal">HR Operations</div>
+              </div>
+            </button>
+
+            <button onclick="switchApproverRole('ADMIN_APPROVER')" id="roleBtnAdmin" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2">
+              <div class="w-5 h-5 rounded-lg bg-amber-500/15 text-apple-amber flex items-center justify-center text-[10px]">
+                <i class="fa-solid fa-building-user"></i>
+              </div>
+              <div class="text-left">
+                <div class="leading-none">Elena Cruz</div>
+                <div class="text-[9px] text-neutral-400 font-normal">Facilities & Admin</div>
+              </div>
+            </button>
+          </div>
         </div>
 
-        <!-- Approver Role Selector -->
-        <div class="flex items-center space-x-2">
-          <span class="text-xs text-neutral-400 font-medium">Logged Role:</span>
-          <select id="approverRoleSelect" onchange="switchApproverRole(this.value)" class="text-xs font-semibold appearance-none bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-1.5 text-neutral-800 dark:text-neutral-200 focus:ring-2 focus:ring-lark-blue focus:outline-none cursor-pointer">
-            <option value="IT_APPROVER">IT Department Approver</option>
-            <option value="FINANCE_APPROVER">Finance & Payroll Approver</option>
-            <option value="HR_APPROVER">HR Exit Approver</option>
-            <option value="ADMIN_APPROVER">Facilities & Admin</option>
-          </select>
+        <!-- Middle: SLA Acceleration Tracker (Track B Primary Success Metric) -->
+        <div class="flex items-center space-x-3.5 px-4 py-2.5 rounded-2xl bg-neutral-100/80 dark:bg-neutral-800/60 border border-black/[0.04] dark:border-white/[0.06]">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-apple-green flex items-center justify-center text-sm font-bold shadow-sm">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">Turnaround SLA Tracker</span>
+              <span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-apple-green font-bold">-68% Velocity</span>
+            </div>
+            <div class="text-xs font-bold text-neutral-800 dark:text-neutral-200 mt-0.5">
+              Current: <span class="text-apple-green font-bold">4.2 Days</span>
+              <span class="text-neutral-400 font-normal ml-1">(Legacy Lark Form: 10–20 Days)</span>
+            </div>
+          </div>
         </div>
+
+        <!-- Right: Real-time Queue Counters -->
+        <div class="flex items-center space-x-2">
+          <div class="px-3.5 py-2 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-300 flex items-center space-x-1.5 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-apple-blue"></span>
+            <span><strong id="statPending" class="text-apple-blue font-bold">3</strong> Pending</span>
+          </div>
+          <div class="px-3.5 py-2 rounded-2xl bg-red-500/10 text-xs font-semibold text-apple-red flex items-center space-x-1.5 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-apple-red"></span>
+            <span><strong id="statFlagged" class="font-bold">2</strong> Flagged</span>
+          </div>
+          <div class="px-3.5 py-2 rounded-2xl bg-emerald-500/10 text-xs font-semibold text-apple-green flex items-center space-x-1.5 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-apple-green"></span>
+            <span><strong id="statCleared" class="font-bold">1</strong> Ready</span>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Approver Two-Column Review Deck -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Main Workstation Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        <!-- Left Deck: Pending Submissions Queue -->
-        <div class="lg:col-span-5 space-y-4">
-          <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                Pending Clearance Queue
-              </h3>
-              <span id="queueBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
-                3 submissions
+        <!-- Left Pane (4 cols): Master Queue with Search & Status Filter -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-5 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-3.5">
+            
+            <!-- Queue Header & Search -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+                  Clearance Queue
+                </h3>
+                <span class="w-1.5 h-1.5 rounded-full bg-apple-blue"></span>
+              </div>
+              <span id="queueCount" class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-500">
+                4 dossiers
               </span>
             </div>
-            
-            <div id="dossiersQueue" class="space-y-2.5">
-              <!-- Queue items populated by JS -->
+
+            <!-- Search Box with Apple Style -->
+            <div class="relative">
+              <input type="text" id="queueSearchInput" placeholder="Search employee, ID, branch..." oninput="filterQueue()" class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-neutral-900 rounded-xl pl-8 pr-12 py-2.5 outline-none transition shadow-inner" />
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-neutral-400 text-xs"></i>
+              <span class="absolute right-2.5 top-2.5 text-[10px] font-mono text-neutral-400 px-1.5 py-0.5 rounded bg-neutral-200/50 dark:bg-neutral-700/50">⌘K</span>
             </div>
+
+            <!-- Filter Segmented Tabs -->
+            <div class="flex items-center p-1 bg-neutral-100 dark:bg-neutral-800/60 rounded-xl text-[11px] font-medium text-neutral-500 space-x-1">
+              <button onclick="setQueueFilter('ALL')" id="filterAll" class="flex-1 py-1.5 rounded-lg font-bold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition">All</button>
+              <button onclick="setQueueFilter('FLAGGED')" id="filterFlagged" class="flex-1 py-1.5 rounded-lg hover:text-neutral-900 dark:hover:text-white transition">Action Needed</button>
+              <button onclick="setQueueFilter('CLEARED')" id="filterCleared" class="flex-1 py-1.5 rounded-lg hover:text-neutral-900 dark:hover:text-white transition">Ready</button>
+            </div>
+
+            <!-- Queue List -->
+            <div id="dossiersQueue" class="space-y-2.5 max-h-[640px] overflow-y-auto pr-1">
+              <!-- Rendered via JS -->
+            </div>
+
           </div>
         </div>
 
-        <!-- Right Deck: Active Clearance Review Details & AI Flags -->
-        <div class="lg:col-span-7 space-y-4">
+        <!-- Right Pane (8 cols): Workstation Details, AI Inspection & Document Viewer -->
+        <div class="lg:col-span-8 space-y-6">
           
-          <div id="approverEmptyCard" class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-12 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] text-center text-neutral-400 min-h-[460px] flex flex-col justify-center">
-            <i class="fa-regular fa-folder-open text-4xl mb-3 text-neutral-300 dark:text-neutral-600"></i>
-            <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Select a Dossier to Inspect</h4>
-            <p class="text-xs text-neutral-400 max-w-xs mx-auto mt-1">Click any pending employee in the queue to load the Lark application details, document preview, and AI pre-check flags.</p>
-          </div>
-
-          <div id="approverActiveCard" class="hidden bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-5">
+          <div id="approverActiveCard" class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-7 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] space-y-6 transition">
             
-            <!-- Employee Header -->
-            <div class="flex items-start justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-4">
-              <div>
-                <div class="flex items-center space-x-2">
-                  <span id="apprDossierId" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-500/10 text-lark-blue">DOS-2026-001</span>
-                  <h3 id="apprEmpName" class="text-base font-bold text-neutral-900 dark:text-white">Juan Dela Cruz</h3>
+            <!-- 1. Hero Dossier Identity Card with Apple Squircle Avatar -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/[0.06] dark:border-white/[0.08] pb-6">
+              <div class="flex items-center space-x-4">
+                <!-- Large Squircle Monogram Avatar -->
+                <div id="apprAvatar" class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 text-white font-bold text-xl flex items-center justify-center shadow-md tracking-tight shrink-0">
+                  JD
                 </div>
-                <p id="apprDeptRole" class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Information Technology · Senior Specialist</p>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <h3 id="apprEmpName" class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">Juan Dela Cruz</h3>
+                    <span id="apprEmpIdBadge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700">
+                      EMP-94812
+                    </span>
+                  </div>
+                  <p id="apprDeptRole" class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                    Information Technology · Senior Specialist
+                  </p>
+                  <p id="apprSubText" class="text-[11px] text-neutral-400 mt-0.5">
+                    Taguig HQ · Separation Date: 2026-08-31 (Resignation)
+                  </p>
+                </div>
               </div>
-              <div class="text-right">
-                <span id="apprStatusBadge" class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-apple-amber border border-amber-500/20">
-                  Pending Sign-Off
+
+              <!-- Top Right Status Badge & Quick Actions -->
+              <div class="flex flex-col items-start sm:items-end space-y-2">
+                <div class="flex items-center space-x-2">
+                  <span id="apprStatusBadge" class="text-xs font-bold px-3 py-1.5 rounded-full bg-red-500/10 text-apple-red border border-red-500/20 flex items-center space-x-1.5">
+                    <span id="apprPulseDot" class="w-2 h-2 rounded-full bg-apple-red apple-pulse-red"></span>
+                    <span id="apprStatusText">FLAGGED FOR REVIEW</span>
+                  </span>
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                  <button onclick="pingLarkEmployee()" class="px-3 py-1 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-lark-blue text-xs font-semibold border border-blue-500/20 transition flex items-center space-x-1.5" title="Direct Lark Bot Ping to Employee">
+                    <i class="fa-brands fa-rocketchat text-xs"></i>
+                    <span>Ping on Lark</span>
+                  </button>
+                  <span id="apprSlaText" class="text-[11px] font-medium text-neutral-400">
+                    <i class="fa-regular fa-clock mr-1"></i> Submitted 3 days ago
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Interactive 4-Stage Clearance Progress Pipeline -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3">
+              <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+                <span class="flex items-center space-x-2">
+                  <i class="fa-solid fa-list-check text-apple-blue"></i>
+                  <span>Clearance & Last Pay Progression</span>
                 </span>
+                <span id="pipelineStepLabel" class="text-apple-blue font-bold">Stage 1 of 4: Department Clearances</span>
+              </div>
+              
+              <div class="grid grid-cols-4 gap-2.5 text-center text-xs">
+                
+                <div id="step1Box" class="p-3 rounded-xl border border-lark-blue bg-blue-50/60 dark:bg-blue-950/30 text-lark-blue font-semibold transition">
+                  <div class="flex items-center justify-center space-x-1.5 mb-1">
+                    <i id="step1Icon" class="fa-solid fa-laptop-file text-sm"></i>
+                    <span class="text-[11px] font-bold">1. Clearances</span>
+                  </div>
+                  <div id="step1Status" class="text-[10px] text-apple-red font-bold">IT Hold</div>
+                </div>
+
+                <div id="step2Box" class="p-3 rounded-xl border border-black/[0.05] dark:border-white/[0.08] bg-white dark:bg-neutral-800 text-neutral-400 transition">
+                  <div class="flex items-center justify-center space-x-1.5 mb-1">
+                    <i class="fa-solid fa-calculator text-sm"></i>
+                    <span class="text-[11px] font-bold">2. Last Pay</span>
+                  </div>
+                  <div id="step2Status" class="text-[10px]">Pending</div>
+                </div>
+
+                <div id="step3Box" class="p-3 rounded-xl border border-black/[0.05] dark:border-white/[0.08] bg-white dark:bg-neutral-800 text-neutral-400 transition">
+                  <div class="flex items-center justify-center space-x-1.5 mb-1">
+                    <i class="fa-solid fa-file-contract text-sm"></i>
+                    <span class="text-[11px] font-bold">3. Quit Claim</span>
+                  </div>
+                  <div id="step3Status" class="text-[10px]">Pending</div>
+                </div>
+
+                <div id="step4Box" class="p-3 rounded-xl border border-black/[0.05] dark:border-white/[0.08] bg-white dark:bg-neutral-800 text-neutral-400 transition">
+                  <div class="flex items-center justify-center space-x-1.5 mb-1">
+                    <i class="fa-solid fa-money-check-dollar text-sm"></i>
+                    <span class="text-[11px] font-bold">4. Release</span>
+                  </div>
+                  <div id="step4Status" class="text-[10px]">Pending</div>
+                </div>
+
               </div>
             </div>
 
-            <!-- Application Metadata Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/40 text-xs border border-black/[0.04] dark:border-white/[0.06]">
-              <div>
-                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">Company</span>
-                <span id="apprCompany" class="font-medium text-neutral-800 dark:text-neutral-200">CMG Group</span>
-              </div>
-              <div>
-                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">Unit / Channel</span>
-                <span id="apprUnit" class="font-medium text-neutral-800 dark:text-neutral-200">HQ Operations</span>
-              </div>
-              <div>
-                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">Branch</span>
-                <span id="apprBranch" class="font-medium text-neutral-800 dark:text-neutral-200">Taguig HQ</span>
-              </div>
-              <div>
-                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">Hired Date</span>
-                <span id="apprDateHired" class="font-medium text-neutral-800 dark:text-neutral-200">2022-03-15</span>
-              </div>
-              <div>
-                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">EOC / Separation</span>
-                <span id="apprEocDate" class="font-medium text-neutral-800 dark:text-neutral-200">2026-08-31</span>
-              </div>
-              <div>
-                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">Separation Reason</span>
-                <span id="apprReason" class="font-medium text-neutral-800 dark:text-neutral-200">Resignation</span>
-              </div>
-            </div>
-
-            <!-- AI Pre-Check Flags for this dossier -->
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center">
-                  <i class="fa-solid fa-shield-halved mr-1.5 text-apple-blue"></i> AI Document Pre-Check Analysis
-                </h4>
-                <span id="apprFlagsCount" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red font-semibold">2 Flags</span>
-              </div>
-              <div id="apprFlagsList" class="space-y-2">
-                <!-- Injected flags -->
-              </div>
-            </div>
-
-            <!-- Attached Document Preview -->
-            <div class="border border-black/[0.06] dark:border-white/[0.08] rounded-xl overflow-hidden bg-neutral-50 dark:bg-neutral-900/50">
-              <div class="px-4 py-2 bg-neutral-100 dark:bg-neutral-800/60 flex items-center justify-between text-xs">
-                <span class="font-semibold text-neutral-700 dark:text-neutral-300">
-                  <i class="fa-regular fa-file-pdf mr-1.5 text-lark-blue"></i> Attached Document Preview: <span id="apprDocName" class="font-mono text-[11px]">doc.pdf</span>
-                </span>
-                <a id="apprDocLink" href="#" target="_blank" class="text-lark-blue hover:underline text-[11px]">Open Full <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[9px]"></i></a>
-              </div>
-              <div id="apprDocPreview" class="p-3 min-h-[220px] flex items-center justify-center">
-                <!-- Injected iframe or image -->
-              </div>
-            </div>
-
-            <!-- Human Approver Action Box -->
-            <div class="p-4 rounded-xl bg-gradient-to-r from-blue-500/5 to-indigo-500/5 border border-lark-blue/20 space-y-3">
+            <!-- 3. Apple Intelligence Pre-Check Card with Cupertino Iridescent Glow -->
+            <div class="relative p-5 rounded-2xl apple-intelligence-glow border border-purple-500/20 dark:border-purple-400/20 shadow-sm space-y-3.5 transition">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center">
-                  <i class="fa-solid fa-user-pen mr-1.5 text-lark-blue"></i> Approver Decision
-                </span>
-                <span class="text-[10px] text-neutral-400 font-mono">Role: <span id="currentRoleLabel" class="font-semibold text-neutral-700 dark:text-neutral-300">IT_APPROVER</span></span>
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-7 h-7 rounded-xl bg-gradient-to-tr from-purple-500 via-indigo-500 to-pink-500 text-white flex items-center justify-center text-xs shadow-md">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-bold tracking-tight text-neutral-900 dark:text-white uppercase">
+                      Apple Intelligence Pre-Check
+                    </h4>
+                    <p class="text-[10px] text-neutral-500 dark:text-neutral-400">Automated vision & document integrity audit</p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2 text-xs">
+                  <span class="text-neutral-500 text-[11px]">Audit Confidence:</span>
+                  <span id="apprConfidenceText" class="font-bold text-neutral-900 dark:text-white px-2.5 py-0.5 rounded-full bg-white/80 dark:bg-neutral-800 shadow-sm border border-black/[0.05]">95%</span>
+                </div>
               </div>
 
-              <!-- Required override box if flags exist -->
-              <div id="apprOverrideBox" class="hidden">
-                <label class="block text-[11px] font-medium text-apple-red mb-1">
-                  Override Justification <span class="text-apple-red">*</span>
+              <div id="apprFlagsList" class="space-y-2.5">
+                <!-- Injected Flags or Clean Verified state -->
+              </div>
+            </div>
+
+            <!-- 4. Dynamic Department Clearance Work Desk (Tailored per active persona!) -->
+            <div id="roleSpecificDesk" class="p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.06] dark:border-white/[0.08] space-y-3">
+              <!-- Dynamically populated via renderRoleWorkDesk() -->
+            </div>
+
+            <!-- 5. Tabbed Multi-Document Inspection Deck with Side-by-Side Extracted Inspector -->
+            <div class="border border-black/[0.06] dark:border-white/[0.08] rounded-2xl overflow-hidden bg-neutral-50/50 dark:bg-neutral-900/30">
+              
+              <!-- Document Tabs Header -->
+              <div class="px-4 py-2.5 bg-neutral-100/70 dark:bg-neutral-800/60 border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
+                <div id="docTabsBar" class="flex items-center space-x-1.5 text-xs">
+                  <!-- Injected Doc Tabs -->
+                </div>
+                <a id="apprDocLink" href="#" target="_blank" class="text-xs text-apple-blue hover:underline font-semibold flex items-center space-x-1">
+                  <span>Full Screen</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                </a>
+              </div>
+
+              <!-- Split Screen: Preview on Left, Live Extracted Inspector on Right -->
+              <div class="grid grid-cols-1 md:grid-cols-12 min-h-[300px]">
+                
+                <!-- Left (7 cols): Document Preview Frame -->
+                <div id="apprDocPreview" class="md:col-span-7 p-3 flex items-center justify-center bg-white dark:bg-neutral-950 border-r border-black/[0.06] dark:border-white/[0.08]">
+                  <!-- Injected iframe or image -->
+                </div>
+
+                <!-- Right (5 cols): Live Extracted Field Inspector -->
+                <div class="md:col-span-5 p-4 bg-neutral-50/80 dark:bg-neutral-900/60 flex flex-col justify-between space-y-3 text-xs">
+                  <div>
+                    <div class="flex items-center justify-between pb-2 border-b border-black/[0.05] dark:border-white/[0.06]">
+                      <span class="font-bold text-[11px] uppercase tracking-wider text-neutral-400">Extracted Inspector</span>
+                      <span id="docTypeInspectorBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-apple-blue">CLEARANCE_SHEET</span>
+                    </div>
+                    
+                    <div id="extractedFieldsInspector" class="mt-3 space-y-2 max-h-64 overflow-y-auto pr-1">
+                      <!-- Injected Key-Value Extracted Fields -->
+                    </div>
+                  </div>
+
+                  <div class="pt-2 border-t border-black/[0.05] dark:border-white/[0.06] text-[10px] text-neutral-400 flex items-center justify-between font-mono">
+                    <span id="docShaShort">SHA: a3f8...91c0</span>
+                    <span>Claude Vision 3.5</span>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- 6. Docked Apple Action Bar -->
+            <div class="p-5 rounded-2xl bg-neutral-100/70 dark:bg-neutral-800/80 apple-glass border border-black/[0.06] dark:border-white/[0.08] space-y-4 shadow-sm">
+              
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="flex items-center space-x-2">
+                  <div class="w-2.5 h-2.5 rounded-full bg-apple-green apple-pulse-green"></div>
+                  <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                    Signing Authority: <span id="currentRoleLabel" class="font-bold text-neutral-900 dark:text-white">Alex Tan (IT Clearance Lead)</span>
+                  </span>
+                </div>
+                <div class="flex items-center space-x-2 text-[10px] font-mono text-neutral-400">
+                  <i class="fa-solid fa-shield-halved text-apple-green"></i>
+                  <span>Constitutional Human Gate · Audit Logged</span>
+                </div>
+              </div>
+
+              <!-- Override Rationale Box -->
+              <div id="apprOverrideBox" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/20 space-y-1.5">
+                <label class="block text-xs font-bold text-apple-red flex items-center space-x-1.5">
+                  <i class="fa-solid fa-triangle-exclamation"></i>
+                  <span>Mandatory Approver Override Rationale</span>
                 </label>
-                <textarea id="apprOverrideNotes" rows="2" placeholder="Explain why approving despite active blocker flags (e.g., equipment returned physically without system update, waiver acknowledged)..." class="w-full text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-lg p-2 focus:ring-2 focus:ring-lark-blue focus:outline-none"></textarea>
+                <p class="text-[11px] text-neutral-600 dark:text-neutral-300">
+                  This clearance dossier contains active AI blocker flags. Explain why approval is permitted (e.g. equipment surrendered manually to security, replacement deduction applied, or notarization verified physically).
+                </p>
+                <textarea id="apprOverrideNotes" rows="2" placeholder="Enter override justification..." class="w-full text-xs bg-white dark:bg-neutral-900 border border-red-300 dark:border-red-900/50 rounded-xl p-2.5 focus:ring-2 focus:ring-apple-blue focus:outline-none transition"></textarea>
               </div>
 
-              <div class="flex items-center justify-end space-x-2 pt-1">
-                <button onclick="submitApproverDeskDecision('APPROVE')" class="px-4 py-2 bg-apple-green hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
-                  <i class="fa-solid fa-check mr-1.5"></i> Approve Clearance
+              <!-- Action CTAs -->
+              <div class="flex flex-wrap items-center justify-end gap-2.5 pt-1">
+                <button onclick="pingLarkEmployee()" class="px-4 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-100 text-xs font-semibold text-neutral-700 dark:text-neutral-200 shadow-sm active:scale-[0.98] transition flex items-center">
+                  <i class="fa-brands fa-rocketchat mr-2 text-lark-blue"></i> Lark Message
                 </button>
-                <button onclick="submitApproverDeskDecision('REQUEST_REVISION')" class="px-3.5 py-2 bg-apple-amber hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
-                  <i class="fa-solid fa-rotate-left mr-1.5"></i> Request Revision
+                <button onclick="submitApproverDeskDecision('REQUEST_REVISION')" class="px-4 py-2.5 bg-apple-amber hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-sm active:scale-[0.98] transition flex items-center">
+                  <i class="fa-solid fa-rotate-left mr-2"></i> Request Revision
                 </button>
-                <button onclick="submitApproverDeskDecision('REJECT')" class="px-3.5 py-2 bg-apple-red hover:bg-red-600 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
-                  <i class="fa-solid fa-ban mr-1.5"></i> Reject
+                <button onclick="submitApproverDeskDecision('REJECT')" class="px-4 py-2.5 bg-apple-red hover:bg-red-600 text-white text-xs font-bold rounded-xl shadow-sm active:scale-[0.98] transition flex items-center">
+                  <i class="fa-solid fa-ban mr-2"></i> Reject
+                </button>
+                <button onclick="submitApproverDeskDecision('APPROVE')" id="apprApproveBtn" class="px-5 py-2.5 bg-apple-green hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-sm active:scale-[0.98] transition flex items-center">
+                  <i class="fa-solid fa-check mr-2"></i> Approve Clearance Step
                 </button>
               </div>
+
             </div>
 
           </div>
@@ -912,84 +1104,54 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     </section>
 
     <!-- ================================================================= -->
-    <!-- VIEW 3: DEVELOPER HARNESS (ORIGINAL LOCAL TEST RUNNER) -->
+    <!-- VIEW 3: DEVELOPER HARNESS (TEST RUNNER) -->
     <!-- ================================================================= -->
     <section id="viewHarness" class="hidden space-y-6">
-      
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Left Column: Synthetic Fixtures & Direct Pre-check -->
         <div class="lg:col-span-4 space-y-6">
-          
           <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm">
             <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-3 flex items-center">
               <i class="fa-solid fa-flask mr-2 text-apple-amber"></i> Quick Test Fixtures
             </h3>
-            <p class="text-xs text-neutral-500 mb-3">1-click automated extraction & flagging test:</p>
-            <div id="harnessSamplesList" class="space-y-2">
-              <!-- Populated by JS -->
-            </div>
+            <div id="harnessSamplesList" class="space-y-2"></div>
           </div>
-
-          <!-- Audit Trail Quick Card -->
           <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm">
             <div class="flex items-center justify-between mb-3">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-400">
-                Recent Audit Trail
-              </h3>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-400">Recent Audit Trail</h3>
               <button onclick="loadAuditLogs()" class="text-xs text-lark-blue hover:underline"><i class="fa-solid fa-rotate-right"></i></button>
             </div>
-            <div id="harnessAuditContainer" class="max-h-72 overflow-y-auto space-y-2 text-xs">
-              <!-- Populated by JS -->
-            </div>
+            <div id="harnessAuditContainer" class="max-h-72 overflow-y-auto space-y-2 text-xs"></div>
           </div>
-
         </div>
-
-        <!-- Right Column: Raw JSON & Extracted Inspection -->
         <div class="lg:col-span-8 space-y-6">
           <div id="harnessResultCard" class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm min-h-[500px]">
             <div id="harnessEmptyState" class="text-center py-20 text-neutral-400">
-              <i class="fa-solid fa-terminal text-4xl mb-3 text-neutral-300 dark:text-neutral-600"></i>
+              <i class="fa-solid fa-terminal text-4xl mb-3 text-neutral-300"></i>
               <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Developer Diagnostic Output</h4>
-              <p class="text-xs text-neutral-400 max-w-sm mx-auto mt-1">Select any fixture on the left to run raw Pydantic schema validation and view rule execution logs.</p>
+              <p class="text-xs text-neutral-400 max-w-sm mx-auto mt-1">Select any fixture to view raw JSON extraction.</p>
             </div>
-
             <div id="harnessResultContent" class="hidden space-y-5">
               <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-4">
                 <div>
                   <span id="harnessDocType" class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-lark-blue">TYPE</span>
                   <h3 id="harnessFileName" class="text-sm font-bold text-neutral-900 dark:text-white mt-1">file.pdf</h3>
                 </div>
-                <div class="text-right">
-                  <span class="text-[10px] text-neutral-400 block">Overall Confidence</span>
-                  <span id="harnessConfidence" class="text-xl font-bold text-apple-green">95%</span>
-                </div>
+                <span id="harnessConfidence" class="text-xl font-bold text-apple-green">95%</span>
               </div>
-
-              <!-- Flags list -->
-              <div>
-                <h5 class="text-xs font-bold uppercase text-neutral-400 mb-2">Detected Flags</h5>
-                <div id="harnessFlagsBox" class="space-y-2"></div>
-              </div>
-
-              <!-- Raw JSON Viewer -->
-              <div>
-                <h5 class="text-xs font-bold uppercase text-neutral-400 mb-2">Pydantic Extracted JSON</h5>
-                <pre id="harnessJsonPre" class="p-4 rounded-xl bg-neutral-900 text-emerald-400 font-mono text-[11px] overflow-x-auto max-h-72"></pre>
-              </div>
+              <div id="harnessFlagsBox" class="space-y-2"></div>
+              <pre id="harnessJsonPre" class="p-4 rounded-xl bg-neutral-900 text-emerald-400 font-mono text-[11px] overflow-x-auto max-h-72"></pre>
             </div>
           </div>
         </div>
-
       </div>
-
     </section>
 
   </main>
 
   <script>
     let activeDossier = null;
+    let currentFilter = 'ALL';
+    let activeDocIndex = 0;
 
     // View Switcher
     function switchView(viewName) {
@@ -1001,11 +1163,12 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       const btnAppr = document.getElementById('tabBtnApprover');
       const btnHarn = document.getElementById('tabBtnHarness');
 
-      btnForm.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition";
-      btnAppr.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition";
-      btnHarn.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition";
-
+      const inactiveClass = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition";
       const activeClass = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition";
+
+      btnForm.className = inactiveClass;
+      btnAppr.className = inactiveClass;
+      btnHarn.className = inactiveClass;
 
       if (viewName === 'form') {
         document.getElementById('viewForm').classList.remove('hidden');
@@ -1020,7 +1183,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       }
     }
 
-    // Auto fill for demo
+    // Auto Fill
     function autoFillEmployee(name) {
       if (name.includes("Juan")) {
         document.getElementById('formDept').value = "Information Technology";
