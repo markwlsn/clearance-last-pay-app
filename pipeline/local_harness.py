@@ -593,22 +593,14 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     <!-- ================================================================= -->
     <section id="viewForm" class="hidden max-w-3xl mx-auto space-y-6">
       <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark rounded-2xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] border border-black/[0.06] dark:border-white/[0.08] transition">
-        
-        <!-- Header -->
         <div class="mb-6">
           <h2 class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">Application Details</h2>
         </div>
-
-        <!-- CMG Group SOA Records Banner (Exact from user screenshot) -->
         <div class="mb-6 p-3 rounded-lg bg-neutral-100/80 dark:bg-neutral-800/60 border border-neutral-200/70 dark:border-neutral-700/60 flex items-center space-x-2 text-xs text-neutral-700 dark:text-neutral-300">
           <i class="fa-solid fa-table-list text-lark-blue text-sm"></i>
           <span class="font-medium text-lark-blue hover:underline cursor-pointer">CMG Group SOA Records</span>
         </div>
-
-        <!-- Form Elements -->
         <form id="larkClearanceForm" class="space-y-5" onsubmit="handleLarkSubmit(event)">
-          
-          <!-- Row 1: Department -->
           <div>
             <label class="lark-label">Department<span class="lark-required">*</span></label>
             <select id="formDept" required class="lark-input">
@@ -621,8 +613,6 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               <option value="Marketing & Brand">Marketing & Brand</option>
             </select>
           </div>
-
-          <!-- Row 2: Employee Name -->
           <div>
             <label class="lark-label">Employee Name<span class="lark-required">*</span></label>
             <select id="formEmployeeName" required class="lark-input" onchange="autoFillEmployee(this.value)">
@@ -630,17 +620,13 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               <option value="Juan Dela Cruz">Juan Dela Cruz (EMP-94812)</option>
               <option value="Maria Santos">Maria Santos (EMP-10294)</option>
               <option value="Pedro Penduko">Pedro Penduko (EMP-88419)</option>
-              <option value="Custom">Other / Enter Manual...</option>
+              <option value="Elena Cruz">Elena Cruz (EMP-77102)</option>
             </select>
           </div>
-
-          <!-- Row 3: Date Hired -->
           <div>
             <label class="lark-label">Date Hired<span class="lark-required">*</span></label>
             <input type="date" id="formDateHired" required value="2026-09-21" class="lark-input" />
           </div>
-
-          <!-- Row 4: Job Level -->
           <div>
             <label class="lark-label">Job Level<span class="lark-required">*</span></label>
             <select id="formJobLevel" required class="lark-input">
@@ -654,8 +640,6 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               <option value="Senior Manager / Director">Senior Manager / Director</option>
             </select>
           </div>
-
-          <!-- Row 5: Company -->
           <div>
             <label class="lark-label">Company<span class="lark-required">*</span></label>
             <select id="formCompany" required class="lark-input">
@@ -666,8 +650,6 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               <option value="CMG Logistics Philippines">CMG Logistics Philippines</option>
             </select>
           </div>
-
-          <!-- Row 6: Unit / Channel -->
           <div>
             <label class="lark-label">Unit / Channel<span class="lark-required">*</span></label>
             <select id="formUnitChannel" required class="lark-input">
@@ -679,8 +661,6 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               <option value="B2B Wholesale">B2B Wholesale</option>
             </select>
           </div>
-
-          <!-- Row 7: Branch -->
           <div>
             <label class="lark-label">Branch<span class="lark-required">*</span></label>
             <div class="flex items-center space-x-2">
@@ -690,46 +670,35 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                 <option value="Cebu Distribution Center">Cebu Distribution Center</option>
                 <option value="Davao Regional Hub">Davao Regional Hub</option>
               </select>
-              <button type="button" onclick="alert('Add Branch modal simulated')" class="px-3.5 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-sm font-semibold transition" title="Add Branch">
+              <button type="button" onclick="alert('Add Branch modal')" class="px-3.5 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-sm font-semibold transition" title="Add Branch">
                 <i class="fa-solid fa-plus"></i>
               </button>
             </div>
           </div>
-
-          <!-- Row 8: Employee Status -->
           <div>
             <label class="lark-label">Employee Status<span class="lark-required">*</span></label>
             <select id="formEmployeeStatus" required class="lark-input">
-              <option value="" disabled selected>Select</option>
               <option value="Regular" selected>Regular</option>
               <option value="Probationary">Probationary</option>
               <option value="Project-Based">Project-Based</option>
               <option value="Fixed-Term Contract">Fixed-Term Contract</option>
             </select>
           </div>
-
-          <!-- Row 9: EOC/Separation Date -->
           <div>
             <label class="lark-label">EOC/Separation Date<span class="lark-required">*</span></label>
             <input type="date" id="formEocDate" required value="2026-09-21" class="lark-input" />
           </div>
-
-          <!-- Row 10: With Clearance Already? -->
           <div>
             <label class="lark-label">With Clearance Already?<span class="lark-required">*</span></label>
             <select id="formWithClearance" required class="lark-input">
-              <option value="" disabled selected>Select</option>
               <option value="Yes">Yes</option>
               <option value="No" selected>No</option>
               <option value="In Progress">In Progress</option>
             </select>
           </div>
-
-          <!-- Row 11: Reason for Separation -->
           <div>
             <label class="lark-label">Reason for Separation<span class="lark-required">*</span></label>
             <select id="formReasonSeparation" required class="lark-input">
-              <option value="" disabled selected>Select</option>
               <option value="Resignation" selected>Resignation</option>
               <option value="End of Contract">End of Contract</option>
               <option value="Retirement">Retirement</option>
@@ -737,91 +706,35 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               <option value="Mutual Separation">Mutual Separation</option>
             </select>
           </div>
-
-          <!-- Instruction Banner (Exact from user screenshot) -->
           <div class="p-3.5 rounded-lg bg-neutral-100/90 dark:bg-neutral-800/70 border border-neutral-200/80 dark:border-neutral-700 text-xs text-neutral-600 dark:text-neutral-300 flex items-start space-x-2">
             <i class="fa-solid fa-circle-info text-neutral-400 mt-0.5"></i>
             <span>If there are missing documents, please attach a notarized affidavit of loss.</span>
           </div>
-
-          <!-- Attachment 1: Accountability Form -->
           <div class="space-y-1.5">
-            <div class="flex items-center justify-between">
-              <label class="lark-label mb-0">Accountability Form</label>
-              <span id="aiTag1" class="hidden text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-500/10 text-lark-blue">
-                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Pre-Checked
-              </span>
-            </div>
+            <label class="lark-label mb-0">Accountability Form</label>
             <div class="flex items-center space-x-3">
-              <button type="button" onclick="document.getElementById('attachAccountability').click()" class="px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-xs font-semibold text-neutral-700 dark:text-neutral-200 shadow-sm transition flex items-center">
+              <button type="button" onclick="document.getElementById('attachAccountability').click()" class="px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-200 shadow-sm transition flex items-center">
                 <i class="fa-solid fa-arrow-up-from-bracket mr-2 text-neutral-400"></i> Upload attachment
               </button>
-              <input type="file" id="attachAccountability" class="hidden" onchange="handleFormAttachment(this, 'accountabilityFileName', 'CLEARANCE_SHEET', 'aiTag1')" />
+              <input type="file" id="attachAccountability" class="hidden" onchange="handleFormAttachment(this, 'accountabilityFileName')" />
               <span id="accountabilityFileName" class="text-xs text-neutral-500">clearance_sheet_valid.pdf (Pre-loaded sample)</span>
             </div>
-            <p class="text-[11px] text-neutral-400">Up to 9 attachments (50 MB each max)</p>
           </div>
-
-          <!-- Attachment 2: Valid Government ID -->
           <div class="space-y-1.5">
-            <div class="flex items-center justify-between">
-              <label class="lark-label mb-0">Valid Government ID<span class="lark-required">*</span></label>
-              <span id="aiTag2" class="hidden text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-500/10 text-lark-blue">
-                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Pre-Checked
-              </span>
-            </div>
+            <label class="lark-label mb-0">Valid Government ID<span class="lark-required">*</span></label>
             <div class="flex items-center space-x-3">
-              <button type="button" onclick="document.getElementById('attachId').click()" class="px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-xs font-semibold text-neutral-700 dark:text-neutral-200 shadow-sm transition flex items-center">
+              <button type="button" onclick="document.getElementById('attachId').click()" class="px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-200 shadow-sm transition flex items-center">
                 <i class="fa-solid fa-arrow-up-from-bracket mr-2 text-neutral-400"></i> Upload attachment
               </button>
-              <input type="file" id="attachId" class="hidden" onchange="handleFormAttachment(this, 'idFileName', 'BANK_ENROLLMENT', 'aiTag2')" />
+              <input type="file" id="attachId" class="hidden" onchange="handleFormAttachment(this, 'idFileName')" />
               <span id="idFileName" class="text-xs text-neutral-500">bank_gcash_valid.png (Pre-loaded proof)</span>
             </div>
-            <p class="text-[11px] text-neutral-400">Up to 9 attachments (50 MB each max)</p>
           </div>
-
-          <!-- Collapsible Approval Process Tree -->
-          <div class="border border-neutral-200 dark:border-neutral-700 rounded-xl overflow-hidden bg-neutral-50/50 dark:bg-neutral-800/30">
-            <div onclick="toggleApprovalTree()" class="p-3.5 bg-neutral-100/60 dark:bg-neutral-800/50 flex items-center justify-between cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
-              <span class="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center">
-                Approval Process
-              </span>
-              <span id="treeIcon" class="text-xs text-neutral-400"><i class="fa-solid fa-chevron-up"></i></span>
-            </div>
-            <div id="approvalTreeContent" class="p-4 space-y-3 text-xs">
-              <!-- Visual Node Stages -->
-              <div class="flex items-center space-x-3">
-                <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">1</div>
-                <div>
-                  <div class="font-semibold text-neutral-800 dark:text-neutral-200">Department Clearances (Parallel Nodes)</div>
-                  <div class="text-[11px] text-neutral-500">IT Asset Surrender · Admin Facilities · Immediate Supervisor</div>
-                </div>
-              </div>
-              <div class="w-0.5 h-3 bg-neutral-300 dark:bg-neutral-700 ml-3"></div>
-              <div class="flex items-center space-x-3">
-                <div class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] font-bold">2</div>
-                <div>
-                  <div class="font-semibold text-neutral-800 dark:text-neutral-200">Last Pay Computation (Finance & Payroll)</div>
-                  <div class="text-[11px] text-neutral-500">Tax computation, leave monetization, quit claim figure audit</div>
-                </div>
-              </div>
-              <div class="w-0.5 h-3 bg-neutral-300 dark:bg-neutral-700 ml-3"></div>
-              <div class="flex items-center space-x-3">
-                <div class="w-6 h-6 rounded-full bg-neutral-300 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 flex items-center justify-center text-[10px] font-bold">3</div>
-                <div>
-                  <div class="font-semibold text-neutral-800 dark:text-neutral-200">Final Release & Disbursement</div>
-                  <div class="text-[11px] text-neutral-500">Bank / E-Wallet transfer release confirmation</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Form Actions (Exact button arrangement from screenshot) -->
           <div class="pt-4 flex items-center space-x-3">
-            <button type="submit" id="larkSubmitBtn" class="px-6 py-2.5 bg-lark-blue hover:bg-lark-blueHover text-white text-xs font-semibold rounded-lg shadow-sm active:scale-[0.98] transition">
+            <button type="submit" id="larkSubmitBtn" class="px-6 py-2.5 bg-lark-blue hover:bg-lark-blueHover text-white text-xs font-semibold rounded-lg shadow-sm transition">
               Submit
             </button>
-            <button type="button" onclick="resetLarkForm()" class="px-5 py-2.5 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-xs font-semibold rounded-lg shadow-sm transition">
+            <button type="button" onclick="resetLarkForm()" class="px-5 py-2.5 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs font-semibold rounded-lg shadow-sm transition">
               Cancel
             </button>
           </div>
