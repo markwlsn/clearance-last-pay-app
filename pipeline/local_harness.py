@@ -825,133 +825,495 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                 <span class="font-semibold text-neutral-700 dark:text-neutral-300">
                   <i class="fa-regular fa-file-pdf mr-1.5 text-lark-blue"></i> Attached Document Preview: <span id="apprDocName" class="font-mono text-[11px]">doc.pdf</span>
                 </span>
-                <h3 id="resFileName" class="text-base font-semibold text-neutral-900 dark:text-white">quit_claim_valid.pdf</h3>
+                <a id="apprDocLink" href="#" target="_blank" class="text-lark-blue hover:underline text-[11px]">Open Full <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[9px]"></i></a>
               </div>
-              <p class="text-[11px] text-neutral-400 dark:text-neutral-500 mt-1 font-mono">
-                SHA-256: <span id="resHash" class="text-neutral-600 dark:text-neutral-300">...</span> · 
-                <span id="resTime" class="text-neutral-600 dark:text-neutral-300">0ms</span> · 
-                Model: <span id="resModel" class="text-neutral-600 dark:text-neutral-300">mock</span>
-              </p>
-            </div>
-            
-            <!-- Overall Confidence Metric -->
-            <div class="text-right">
-              <div class="text-[10px] uppercase font-bold tracking-wider text-neutral-400 dark:text-neutral-500">Extraction Confidence</div>
-              <div id="resConfidence" class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">95%</div>
-            </div>
-          </div>
-
-          <!-- Document Preview Accordion -->
-          <div class="border border-black/[0.06] dark:border-white/[0.08] rounded-xl overflow-hidden bg-neutral-50/50 dark:bg-neutral-900/40">
-            <div onclick="togglePreview()" class="px-4 py-2.5 bg-neutral-100/50 dark:bg-neutral-800/40 border-b border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between cursor-pointer hover:bg-neutral-100/80 dark:hover:bg-neutral-800/60 transition">
-              <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 flex items-center">
-                <i class="fa-regular fa-file-lines mr-2 text-neutral-500"></i> Visual Document Preview
-              </span>
-              <span id="previewToggleIcon" class="text-xs text-neutral-400"><i class="fa-solid fa-chevron-up"></i></span>
-            </div>
-            <div id="previewContainer" class="p-3 flex justify-center items-center min-h-[220px]">
-              <!-- Injected iframe or image -->
-            </div>
-          </div>
-
-          <!-- Pre-Check Discrepancy Flags Section -->
-          <div>
-            <div class="flex items-center justify-between mb-2.5">
-              <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center">
-                <i class="fa-solid fa-triangle-exclamation mr-1.5 text-neutral-400"></i> Pre-Check Discrepancy Flags
-              </h4>
-              <span id="flagsCountBadge" class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
-                0 detected
-              </span>
-            </div>
-            <div id="flagsContainer" class="space-y-2">
-              <!-- Flag items injected here -->
-            </div>
-          </div>
-
-          <!-- Structured Extracted Fields Table -->
-          <div>
-            <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-2.5 flex items-center">
-              <i class="fa-solid fa-list-check mr-1.5 text-neutral-400"></i> Extracted Fields & Normalized Data
-            </h4>
-            <div class="overflow-x-auto border border-black/[0.06] dark:border-white/[0.08] rounded-xl">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-neutral-50 dark:bg-neutral-800/60 text-neutral-500 dark:text-neutral-400 font-semibold border-b border-black/[0.06] dark:border-white/[0.08]">
-                  <tr>
-                    <th class="py-2.5 px-3.5">Field Name</th>
-                    <th class="py-2.5 px-3.5">Raw Extracted</th>
-                    <th class="py-2.5 px-3.5">Normalized Value</th>
-                    <th class="py-2.5 px-3 text-center">Confidence</th>
-                    <th class="py-2.5 px-3 text-center">Status</th>
-                  </tr>
-                </thead>
-                <tbody id="fieldsTableBody" class="divide-y divide-black/[0.04] dark:divide-white/[0.04]">
-                  <!-- Field rows injected here -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Human Approver Decision Gate (Cupertino Card) -->
-          <div class="bg-neutral-50 dark:bg-neutral-800/40 border border-black/[0.06] dark:border-white/[0.08] rounded-2xl p-5 space-y-4">
-            <div class="flex items-start justify-between">
-              <div>
-                <h5 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white flex items-center">
-                  <i class="fa-solid fa-signature mr-2 text-apple-blue"></i> Human Approver Decision Gate
-                </h5>
-                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                  AI pre-checks and flags discrepancies. An authorized human approver must confirm or reject the clearance step.
-                </p>
+              <div id="apprDocPreview" class="p-3 min-h-[220px] flex items-center justify-center">
+                <!-- Injected iframe or image -->
               </div>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-200/70 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300">
-                Audited
-              </span>
             </div>
 
-            <!-- Mandatory Override Box when Blockers Exist -->
-            <div id="overrideBox" class="hidden">
-              <label class="block text-xs font-medium text-apple-red mb-1">
-                Approver Override Justification <span class="text-apple-red">*</span>
-              </label>
-              <textarea id="overrideNotes" rows="2" placeholder="Required rationale if overriding active BLOCKER flags (e.g., physical signature verified manually, approved rounding adjustment)..." class="w-full text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl p-2.5 focus:ring-2 focus:ring-apple-blue focus:outline-none transition"></textarea>
-            </div>
-
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-3 border-t border-black/[0.06] dark:border-white/[0.08] gap-3">
-              <div class="text-[11px] text-neutral-500 dark:text-neutral-400">
-                Logged Approver: <span class="font-medium text-neutral-800 dark:text-neutral-200">Maria Santos (HR Approver)</span>
+            <!-- Human Approver Action Box -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-blue-500/5 to-indigo-500/5 border border-lark-blue/20 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center">
+                  <i class="fa-solid fa-user-pen mr-1.5 text-lark-blue"></i> Approver Decision
+                </span>
+                <span class="text-[10px] text-neutral-400 font-mono">Role: <span id="currentRoleLabel" class="font-semibold text-neutral-700 dark:text-neutral-300">IT_APPROVER</span></span>
               </div>
-              <div class="flex items-center space-x-2">
-                <button onclick="submitDecision('APPROVE')" id="approveBtn" class="px-4 py-2 bg-apple-green text-white hover:bg-emerald-600 text-xs font-semibold rounded-xl shadow-sm active:scale-[0.98] transition flex items-center">
+
+              <!-- Required override box if flags exist -->
+              <div id="apprOverrideBox" class="hidden">
+                <label class="block text-[11px] font-medium text-apple-red mb-1">
+                  Override Justification <span class="text-apple-red">*</span>
+                </label>
+                <textarea id="apprOverrideNotes" rows="2" placeholder="Explain why approving despite active blocker flags (e.g., equipment returned physically without system update, waiver acknowledged)..." class="w-full text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-lg p-2 focus:ring-2 focus:ring-lark-blue focus:outline-none"></textarea>
+              </div>
+
+              <div class="flex items-center justify-end space-x-2 pt-1">
+                <button onclick="submitApproverDeskDecision('APPROVE')" class="px-4 py-2 bg-apple-green hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
                   <i class="fa-solid fa-check mr-1.5"></i> Approve Clearance
                 </button>
-                <button onclick="submitDecision('REQUEST_REVISION')" class="px-3.5 py-2 bg-apple-amber text-white hover:bg-amber-600 text-xs font-semibold rounded-xl shadow-sm active:scale-[0.98] transition flex items-center">
+                <button onclick="submitApproverDeskDecision('REQUEST_REVISION')" class="px-3.5 py-2 bg-apple-amber hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
                   <i class="fa-solid fa-rotate-left mr-1.5"></i> Request Revision
                 </button>
-                <button onclick="submitDecision('REJECT')" class="px-3.5 py-2 bg-apple-red text-white hover:bg-red-600 text-xs font-semibold rounded-xl shadow-sm active:scale-[0.98] transition flex items-center">
+                <button onclick="submitApproverDeskDecision('REJECT')" class="px-3.5 py-2 bg-apple-red hover:bg-red-600 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
                   <i class="fa-solid fa-ban mr-1.5"></i> Reject
                 </button>
               </div>
             </div>
+
           </div>
 
         </div>
 
       </div>
 
-    </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 3: DEVELOPER HARNESS (ORIGINAL LOCAL TEST RUNNER) -->
+    <!-- ================================================================= -->
+    <section id="viewHarness" class="hidden space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Synthetic Fixtures & Direct Pre-check -->
+        <div class="lg:col-span-4 space-y-6">
+          
+          <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-3 flex items-center">
+              <i class="fa-solid fa-flask mr-2 text-apple-amber"></i> Quick Test Fixtures
+            </h3>
+            <p class="text-xs text-neutral-500 mb-3">1-click automated extraction & flagging test:</p>
+            <div id="harnessSamplesList" class="space-y-2">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Audit Trail Quick Card -->
+          <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-400">
+                Recent Audit Trail
+              </h3>
+              <button onclick="loadAuditLogs()" class="text-xs text-lark-blue hover:underline"><i class="fa-solid fa-rotate-right"></i></button>
+            </div>
+            <div id="harnessAuditContainer" class="max-h-72 overflow-y-auto space-y-2 text-xs">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Raw JSON & Extracted Inspection -->
+        <div class="lg:col-span-8 space-y-6">
+          <div id="harnessResultCard" class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm min-h-[500px]">
+            <div id="harnessEmptyState" class="text-center py-20 text-neutral-400">
+              <i class="fa-solid fa-terminal text-4xl mb-3 text-neutral-300 dark:text-neutral-600"></i>
+              <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Developer Diagnostic Output</h4>
+              <p class="text-xs text-neutral-400 max-w-sm mx-auto mt-1">Select any fixture on the left to run raw Pydantic schema validation and view rule execution logs.</p>
+            </div>
+
+            <div id="harnessResultContent" class="hidden space-y-5">
+              <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-4">
+                <div>
+                  <span id="harnessDocType" class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-lark-blue">TYPE</span>
+                  <h3 id="harnessFileName" class="text-sm font-bold text-neutral-900 dark:text-white mt-1">file.pdf</h3>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-neutral-400 block">Overall Confidence</span>
+                  <span id="harnessConfidence" class="text-xl font-bold text-apple-green">95%</span>
+                </div>
+              </div>
+
+              <!-- Flags list -->
+              <div>
+                <h5 class="text-xs font-bold uppercase text-neutral-400 mb-2">Detected Flags</h5>
+                <div id="harnessFlagsBox" class="space-y-2"></div>
+              </div>
+
+              <!-- Raw JSON Viewer -->
+              <div>
+                <h5 class="text-xs font-bold uppercase text-neutral-400 mb-2">Pydantic Extracted JSON</h5>
+                <pre id="harnessJsonPre" class="p-4 rounded-xl bg-neutral-900 text-emerald-400 font-mono text-[11px] overflow-x-auto max-h-72"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
 
   </main>
 
   <script>
-    let currentResult = null;
-    let currentFileUrl = null;
+    let activeDossier = null;
 
-    // Theme Management (Light / Dark)
+    // View Switcher
+    function switchView(viewName) {
+      document.getElementById('viewForm').classList.add('hidden');
+      document.getElementById('viewApprover').classList.add('hidden');
+      document.getElementById('viewHarness').classList.add('hidden');
+
+      const btnForm = document.getElementById('tabBtnForm');
+      const btnAppr = document.getElementById('tabBtnApprover');
+      const btnHarn = document.getElementById('tabBtnHarness');
+
+      btnForm.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition";
+      btnAppr.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition";
+      btnHarn.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition";
+
+      const activeClass = "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition";
+
+      if (viewName === 'form') {
+        document.getElementById('viewForm').classList.remove('hidden');
+        btnForm.className = activeClass;
+      } else if (viewName === 'approver') {
+        document.getElementById('viewApprover').classList.remove('hidden');
+        btnAppr.className = activeClass;
+        loadDossiersQueue();
+      } else if (viewName === 'harness') {
+        document.getElementById('viewHarness').classList.remove('hidden');
+        btnHarn.className = activeClass;
+      }
+    }
+
+    // Auto fill for demo
+    function autoFillEmployee(name) {
+      if (name.includes("Juan")) {
+        document.getElementById('formDept').value = "Information Technology";
+        document.getElementById('formJobLevel').value = "Specialist / Professional";
+        document.getElementById('formCompany').value = "CMG Group of Companies";
+        document.getElementById('formUnitChannel').value = "Corporate HQ";
+        document.getElementById('formBranch').value = "Taguig HQ - 24th Floor";
+      } else if (name.includes("Maria")) {
+        document.getElementById('formDept').value = "Finance & Accounting";
+        document.getElementById('formJobLevel').value = "Team Lead";
+        document.getElementById('formCompany').value = "CMG Retail Inc.";
+        document.getElementById('formUnitChannel').value = "Retail Stores Network";
+        document.getElementById('formBranch').value = "Makati Central Hub";
+      }
+    }
+
+    function toggleApprovalTree() {
+      const content = document.getElementById('approvalTreeContent');
+      const icon = document.getElementById('treeIcon');
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
+      } else {
+        content.classList.add('hidden');
+        icon.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+      }
+    }
+
+    // Attachment Handler on Form
+    async function handleFormAttachment(input, labelId, docType, tagId) {
+      if (!input.files.length) return;
+      const file = input.files[0];
+      document.getElementById(labelId).textContent = `${file.name} (${Math.round(file.size/1024)} KB)`;
+
+      // Run background pre-check
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('document_type', docType);
+
+      try {
+        const res = await fetch('/api/precheck', { method: 'POST', body: formData });
+        const data = await res.json();
+        const tag = document.getElementById(tagId);
+        tag.classList.remove('hidden');
+        if (data.flags && data.flags.length > 0) {
+          tag.className = "text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red border border-red-500/20";
+          tag.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i>${data.flags.length} Flag(s)`;
+        } else {
+          tag.className = "text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20";
+          tag.innerHTML = `<i class="fa-solid fa-check mr-1"></i>Pre-Check Passed`;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Handle Lark Submit
+    async function handleLarkSubmit(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('larkSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1.5"></i> Submitting to Lark...';
+
+      const payload = {
+        department: document.getElementById('formDept').value,
+        employee_name: document.getElementById('formEmployeeName').value,
+        date_hired: document.getElementById('formDateHired').value,
+        job_level: document.getElementById('formJobLevel').value,
+        company: document.getElementById('formCompany').value,
+        unit_channel: document.getElementById('formUnitChannel').value,
+        branch: document.getElementById('formBranch').value,
+        employee_status: document.getElementById('formEmployeeStatus').value,
+        eoc_date: document.getElementById('formEocDate').value,
+        with_clearance_already: document.getElementById('formWithClearance').value,
+        reason_for_separation: document.getElementById('formReasonSeparation').value,
+        accountability_form_name: document.getElementById('accountabilityFileName').textContent,
+        id_form_name: document.getElementById('idFileName').textContent,
+      };
+
+      try {
+        const res = await fetch('/api/clearance/submit', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        alert(`Application Submitted Successfully!\nInstance ID: ${data.dossier.dossier_id}\nRouting to Approvers in Lark Approval Flow.`);
+        switchView('approver');
+      } catch (err) {
+        alert('Submission failed: ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Submit';
+      }
+    }
+
+    function resetLarkForm() {
+      document.getElementById('larkClearanceForm').reset();
+    }
+
+    // Load Approver Queue
+    async function loadDossiersQueue() {
+      try {
+        const res = await fetch('/api/clearance/dossiers');
+        const dossiers = await res.json();
+        const container = document.getElementById('dossiersQueue');
+        document.getElementById('queueBadge').textContent = `${dossiers.length} submissions`;
+
+        container.innerHTML = dossiers.map(d => {
+          const hasFlags = d.ai_flags_count > 0;
+          const statusClass = d.overall_status === 'APPROVED' ? 'bg-emerald-500/10 text-apple-green' : (hasFlags ? 'bg-red-500/10 text-apple-red' : 'bg-amber-500/10 text-apple-amber');
+          return `
+            <div onclick="selectDossier('${d.dossier_id}')" class="p-3.5 rounded-xl bg-neutral-50 dark:bg-apple-elevatedDark hover:bg-blue-50/40 dark:hover:bg-neutral-700/50 border border-black/[0.04] dark:border-white/[0.06] cursor-pointer transition flex items-center justify-between group">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-[10px] font-mono font-bold text-neutral-400">${d.dossier_id}</span>
+                  <span class="text-xs font-bold text-neutral-800 dark:text-neutral-200 group-hover:text-lark-blue transition">${d.employee_name}</span>
+                </div>
+                <div class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">${d.department} · ${d.reason_for_separation}</div>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusClass}">
+                  ${d.overall_status}
+                </span>
+                <span class="text-[10px] text-neutral-400 block mt-0.5">${d.ai_flags_count} AI flags</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        if (dossiers.length && !activeDossier) {
+          selectDossier(dossiers[0].dossier_id);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function selectDossier(dossierId) {
+      try {
+        const res = await fetch('/api/clearance/dossiers');
+        const dossiers = await res.json();
+        const d = dossiers.find(item => item.dossier_id === dossierId);
+        if (!d) return;
+
+        activeDossier = d;
+        document.getElementById('approverEmptyCard').classList.add('hidden');
+        document.getElementById('approverActiveCard').classList.remove('hidden');
+
+        document.getElementById('apprDossierId').textContent = d.dossier_id;
+        document.getElementById('apprEmpName').textContent = d.employee_name;
+        document.getElementById('apprDeptRole').textContent = `${d.department} · ${d.job_level}`;
+        document.getElementById('apprCompany').textContent = d.company;
+        document.getElementById('apprUnit').textContent = d.unit_channel;
+        document.getElementById('apprBranch').textContent = d.branch;
+        document.getElementById('apprDateHired').textContent = d.date_hired;
+        document.getElementById('apprEocDate').textContent = d.eoc_date;
+        document.getElementById('apprReason').textContent = d.reason_for_separation;
+
+        const statusBadge = document.getElementById('apprStatusBadge');
+        statusBadge.textContent = d.overall_status.replace('_', ' ');
+
+        document.getElementById('apprDocName').textContent = d.sample_file;
+        document.getElementById('apprDocLink').href = `/samples/${d.sample_file}`;
+
+        // Preview rendering
+        const preview = document.getElementById('apprDocPreview');
+        if (d.sample_file.endsWith('.pdf')) {
+          preview.innerHTML = `<iframe src="/samples/${d.sample_file}" class="w-full h-80 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white" frameborder="0"></iframe>`;
+        } else {
+          preview.innerHTML = `<img src="/samples/${d.sample_file}" class="max-h-72 rounded-lg object-contain border border-neutral-200 dark:border-neutral-700 bg-white" />`;
+        }
+
+        // Run pre-check on that sample to load exact flags
+        const fileRes = await fetch(`/samples/${d.sample_file}`);
+        const blob = await fileRes.blob();
+        const formData = new FormData();
+        formData.append('file', blob, d.sample_file);
+        formData.append('document_type', d.sample_type);
+
+        const checkRes = await fetch('/api/precheck', { method: 'POST', body: formData });
+        const checkData = await checkRes.json();
+
+        const flagsList = document.getElementById('apprFlagsList');
+        const flagsCount = document.getElementById('apprFlagsCount');
+        const overrideBox = document.getElementById('apprOverrideBox');
+
+        if (!checkData.flags || checkData.flags.length === 0) {
+          flagsCount.textContent = "0 Flags (Clean)";
+          flagsCount.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-apple-green font-semibold";
+          flagsList.innerHTML = `
+            <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs flex items-center space-x-2">
+              <i class="fa-solid fa-check-circle text-apple-green"></i>
+              <span>All automated pre-checks passed cleanly. Zero accountabilities or format discrepancies detected.</span>
+            </div>
+          `;
+          overrideBox.classList.add('hidden');
+        } else {
+          flagsCount.textContent = `${checkData.flags.length} Flags Detected`;
+          flagsCount.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red font-semibold";
+          overrideBox.classList.remove('hidden');
+
+          flagsList.innerHTML = checkData.flags.map(f => `
+            <div class="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-neutral-800 dark:text-neutral-200 flex items-start space-x-2.5">
+              <i class="fa-solid fa-triangle-exclamation text-apple-red mt-0.5"></i>
+              <div class="flex-1">
+                <div class="font-bold flex items-center justify-between">
+                  <span>${f.code}</span>
+                  <span class="text-[9px] uppercase px-1.5 py-0.5 rounded bg-apple-red text-white font-mono">${f.severity}</span>
+                </div>
+                <div class="mt-0.5 text-neutral-600 dark:text-neutral-300">${f.message}</div>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function switchApproverRole(role) {
+      document.getElementById('currentRoleLabel').textContent = role;
+    }
+
+    async function submitApproverDeskDecision(action) {
+      if (!activeDossier) return;
+      const role = document.getElementById('approverRoleSelect').value;
+      const overrideNotes = document.getElementById('apprOverrideNotes').value.trim();
+
+      if (action === 'APPROVE' && activeDossier.ai_flags_count > 0 && !overrideNotes) {
+        alert('Approver Override Required: This clearance dossier has active blocker flags. Please provide an override explanation before finalizing approval.');
+        document.getElementById('apprOverrideNotes').focus();
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/approvals/action', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            document_id: activeDossier.dossier_id,
+            approver_id: "USR-CURRENT-APPROVER",
+            role: role,
+            action: action,
+            flags_reviewed: activeDossier.flags_summary || [],
+            override_justification: overrideNotes,
+          })
+        });
+        await res.json();
+        alert(`Dossier ${activeDossier.dossier_id} updated: ${action}!\nLogged permanently to audit trail.`);
+        document.getElementById('apprOverrideNotes').value = '';
+        loadDossiersQueue();
+      } catch (err) {
+        alert('Action failed: ' + err.message);
+      }
+    }
+
+    // Developer Harness Functions
+    async function loadHarnessSamples() {
+      try {
+        const res = await fetch('/api/samples');
+        const samples = await res.json();
+        const container = document.getElementById('harnessSamplesList');
+        container.innerHTML = samples.map(s => `
+          <button onclick="runHarnessTest('${s.file_name}', '${s.document_type}')" class="w-full text-left p-2.5 rounded-xl bg-neutral-50 dark:bg-apple-elevatedDark hover:bg-neutral-100 dark:hover:bg-neutral-700/60 border border-black/[0.04] dark:border-white/[0.06] text-xs flex justify-between items-center transition">
+            <div>
+              <span class="font-semibold text-neutral-800 dark:text-neutral-200 block">${s.file_name}</span>
+              <span class="text-[10px] text-neutral-500 uppercase">${s.document_type}</span>
+            </div>
+            <i class="fa-solid fa-play text-apple-blue text-xs"></i>
+          </button>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function runHarnessTest(fileName, docType) {
+      document.getElementById('harnessEmptyState').classList.add('hidden');
+      document.getElementById('harnessResultContent').classList.remove('hidden');
+
+      const fileRes = await fetch(`/samples/${fileName}`);
+      const blob = await fileRes.blob();
+      const formData = new FormData();
+      formData.append('file', blob, fileName);
+      formData.append('document_type', docType);
+
+      const res = await fetch('/api/precheck', { method: 'POST', body: formData });
+      const data = await res.json();
+
+      document.getElementById('harnessDocType').textContent = data.document_type;
+      document.getElementById('harnessFileName').textContent = data.metadata.file_name;
+      document.getElementById('harnessConfidence').textContent = Math.round(data.overall_confidence * 100) + '%';
+      document.getElementById('harnessJsonPre').textContent = JSON.stringify(data, null, 2);
+
+      const flagsBox = document.getElementById('harnessFlagsBox');
+      if (!data.flags.length) {
+        flagsBox.innerHTML = '<p class="text-xs text-apple-green font-semibold">0 Flags detected. Clean validation.</p>';
+      } else {
+        flagsBox.innerHTML = data.flags.map(f => `
+          <div class="p-2 rounded bg-red-500/10 text-apple-red text-xs">
+            <b>${f.code}</b> [${f.severity}]: ${f.message}
+          </div>
+        `).join('');
+      }
+      loadAuditLogs();
+    }
+
+    // Audit logs
+    async function loadAuditLogs() {
+      try {
+        const res = await fetch('/api/audit-logs');
+        const logs = await res.json();
+        const container = document.getElementById('harnessAuditContainer');
+        if (!container) return;
+        container.innerHTML = logs.map(l => `
+          <div class="p-2 rounded-lg bg-neutral-50 dark:bg-apple-elevatedDark border border-black/[0.04] dark:border-white/[0.06] text-[11px]">
+            <div class="flex justify-between font-semibold">
+              <span>${l.file_name || l.dossier_id}</span>
+              <span class="text-[10px] text-neutral-400">${l.action || l.document_type}</span>
+            </div>
+            <div class="text-[9px] text-neutral-400 font-mono mt-0.5">${l.timestamp.slice(11, 19)} · ${l.log_type}</div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Theme Switcher
     function initTheme() {
       const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      
-      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      // DEFAULT TO LIGHT MODE per user request!
+      if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
         document.documentElement.classList.remove('light');
         document.getElementById('themeIconSun').classList.remove('hidden');
@@ -981,357 +1343,9 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       }
     }
 
-    // Drag and Drop Handling
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-
-    dropZone.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropZone.classList.add('border-apple-blue', 'bg-blue-50/20');
-    });
-    dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('border-apple-blue', 'bg-blue-50/20');
-    });
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('border-apple-blue', 'bg-blue-50/20');
-      if (e.dataTransfer.files.length) {
-        fileInput.files = e.dataTransfer.files;
-        handleFileSelect(fileInput.files[0]);
-      }
-    });
-
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files.length) {
-        handleFileSelect(fileInput.files[0]);
-      }
-    });
-
-    function handleFileSelect(file) {
-      document.getElementById('fileLabel').innerHTML = `Selected: <b class="text-neutral-900 dark:text-white">${file.name}</b> (${Math.round(file.size / 1024)} KB)`;
-      const name = file.name.toLowerCase();
-      if (name.includes('quit') || name.includes('qc')) {
-        document.getElementById('docTypeSelect').value = 'QUIT_CLAIM';
-      } else if (name.includes('bank') || name.includes('gcash')) {
-        document.getElementById('docTypeSelect').value = 'BANK_ENROLLMENT';
-      } else if (name.includes('clearance')) {
-        document.getElementById('docTypeSelect').value = 'CLEARANCE_SHEET';
-      }
-    }
-
-    // Load Samples
-    async function loadSamples() {
-      try {
-        const res = await fetch('/api/samples');
-        const samples = await res.json();
-        const container = document.getElementById('samplesList');
-        if (!samples.length) {
-          container.innerHTML = '<p class="text-xs text-neutral-400">No samples found.</p>';
-          return;
-        }
-        container.innerHTML = samples.map(s => `
-          <button onclick="runSampleTest('${s.file_name}', '${s.document_type}', '${s.url}')" class="w-full text-left p-2.5 rounded-xl bg-neutral-50 dark:bg-apple-elevatedDark hover:bg-neutral-100 dark:hover:bg-neutral-700/60 border border-black/[0.04] dark:border-white/[0.06] transition text-xs flex items-center justify-between group">
-            <div>
-              <span class="font-medium text-neutral-800 dark:text-neutral-200 block group-hover:text-apple-blue transition">${s.file_name}</span>
-              <span class="text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">${s.document_type.replace('_', ' ')} · ${Math.round(s.size_bytes / 1024)} KB</span>
-            </div>
-            <i class="fa-solid fa-arrow-right text-[10px] text-neutral-300 dark:text-neutral-600 group-hover:text-apple-blue transition transform group-hover:translate-x-0.5"></i>
-          </button>
-        `).join('');
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // Load Audit Logs
-    async function loadAuditLogs() {
-      try {
-        const res = await fetch('/api/audit-logs');
-        const logs = await res.json();
-        const container = document.getElementById('auditLogContainer');
-        if (!logs.length) {
-          container.innerHTML = '<p class="text-xs text-neutral-400">No audit records logged yet.</p>';
-          return;
-        }
-        container.innerHTML = logs.map(l => {
-          if (l.log_type === 'HUMAN_DECISION') {
-            const isApproved = l.action === 'APPROVE';
-            return `
-              <div class="p-2.5 rounded-xl bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20 text-[11px]">
-                <div class="flex justify-between items-center font-semibold">
-                  <span class="text-apple-blue"><i class="fa-solid fa-signature mr-1 text-[10px]"></i>${l.action}</span>
-                  <span class="text-[10px] text-neutral-400 font-mono">${l.timestamp.slice(11, 19)}</span>
-                </div>
-                <div class="text-[10px] text-neutral-600 dark:text-neutral-400 mt-1 truncate">${l.override_justification || 'Standard human approval'}</div>
-                <div class="text-[9px] text-neutral-400 font-mono mt-0.5">Dossier: ${l.dossier_id} · ${l.role}</div>
-              </div>
-            `;
-          }
-
-          const hasFlags = l.flag_count > 0;
-          return `
-            <div class="p-2.5 rounded-xl bg-neutral-50 dark:bg-apple-elevatedDark border border-black/[0.04] dark:border-white/[0.06] text-[11px]">
-              <div class="flex justify-between items-center font-medium">
-                <span class="text-neutral-800 dark:text-neutral-200 truncate max-w-[150px]">${l.file_name}</span>
-                <span class="${hasFlags ? 'text-apple-red font-semibold' : 'text-apple-green font-medium'} text-[10px]">${l.flag_count} ${l.flag_count === 1 ? 'flag' : 'flags'}</span>
-              </div>
-              <div class="text-[10px] text-neutral-400 font-mono mt-0.5 flex justify-between">
-                <span>${l.timestamp.slice(11, 19)}</span>
-                <span>${l.file_hash_sha256.slice(0, 10)}...</span>
-              </div>
-            </div>
-          `;
-        }).join('');
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // Quick Test Sample
-    async function runSampleTest(fileName, docType, fileUrl) {
-      document.getElementById('emptyState').classList.add('hidden');
-      document.getElementById('resultContent').classList.add('hidden');
-      currentFileUrl = fileUrl;
-
-      try {
-        const fileRes = await fetch(fileUrl);
-        let blob;
-        if (!fileRes.ok) {
-          blob = new Blob(["sample content for " + fileName], { type: fileName.endsWith('.pdf') ? 'application/pdf' : 'image/png' });
-        } else {
-          blob = await fileRes.blob();
-        }
-
-        const formData = new FormData();
-        formData.append('file', blob, fileName);
-        formData.append('document_type', docType);
-
-        const res = await fetch('/api/precheck', {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await res.json();
-        renderResult(data, fileUrl);
-        loadAuditLogs();
-      } catch (err) {
-        alert("Extraction failed: " + err.message);
-      }
-    }
-
-    // Form Submit
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fileInput = document.getElementById('fileInput');
-      const docType = document.getElementById('docTypeSelect').value;
-      if (!fileInput.files.length) {
-        alert('Please select a file or drop one above.');
-        return;
-      }
-
-      const file = fileInput.files[0];
-      currentFileUrl = URL.createObjectURL(file);
-
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('document_type', docType);
-
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Analyzing...';
-
-      try {
-        const res = await fetch('/api/precheck', {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await res.json();
-        renderResult(data, currentFileUrl);
-        loadAuditLogs();
-      } catch (err) {
-        alert('Pre-check error: ' + err.message);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fa-solid fa-bolt mr-2"></i> Run AI Pre-Check';
-      }
-    });
-
-    function togglePreview() {
-      const container = document.getElementById('previewContainer');
-      const icon = document.getElementById('previewToggleIcon');
-      if (container.classList.contains('hidden')) {
-        container.classList.remove('hidden');
-        icon.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
-      } else {
-        container.classList.add('hidden');
-        icon.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
-      }
-    }
-
-    function renderResult(data, fileUrl) {
-      currentResult = data;
-      document.getElementById('emptyState').classList.add('hidden');
-      const container = document.getElementById('resultContent');
-      container.classList.remove('hidden');
-
-      document.getElementById('resDocType').textContent = data.document_type;
-      document.getElementById('resFileName').textContent = data.metadata.file_name;
-      document.getElementById('resHash').textContent = data.metadata.file_hash_sha256.slice(0, 16) + '...';
-      document.getElementById('resTime').textContent = data.metadata.processing_time_ms + 'ms';
-      document.getElementById('resModel').textContent = data.metadata.model_id;
-      document.getElementById('resConfidence').textContent = Math.round(data.overall_confidence * 100) + '%';
-
-      // Update Document Preview
-      const previewBox = document.getElementById('previewContainer');
-      previewBox.classList.remove('hidden');
-      document.getElementById('previewToggleIcon').innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
-
-      if (fileUrl) {
-        if (data.metadata.file_name.toLowerCase().endsWith('.pdf') || data.metadata.mime_type === 'application/pdf') {
-          previewBox.innerHTML = `<iframe src="${fileUrl}" class="w-full h-80 rounded-xl border border-black/[0.06] dark:border-white/[0.08] shadow-inner bg-white" frameborder="0"></iframe>`;
-        } else {
-          previewBox.innerHTML = `<img src="${fileUrl}" alt="Document Preview" class="max-h-80 rounded-xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm object-contain bg-white" />`;
-        }
-      } else {
-        previewBox.innerHTML = '<p class="text-xs text-neutral-400">Document preview unavailable</p>';
-      }
-
-      // Render Flags
-      const flagsBox = document.getElementById('flagsContainer');
-      const flagsCountBadge = document.getElementById('flagsCountBadge');
-      const overrideBox = document.getElementById('overrideBox');
-
-      if (!data.flags || data.flags.length === 0) {
-        flagsCountBadge.textContent = '0 detected (Clean)';
-        flagsCountBadge.className = 'text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20';
-        flagsBox.innerHTML = `
-          <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs flex items-center space-x-2.5">
-            <i class="fa-solid fa-circle-check text-apple-green text-sm"></i>
-            <div><b>Clean Verification:</b> All fields extracted cleanly with zero format violations, missing signatures, or discrepancies.</div>
-          </div>
-        `;
-        overrideBox.classList.add('hidden');
-      } else {
-        flagsCountBadge.textContent = `${data.flags.length} detected`;
-        flagsCountBadge.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red border border-red-500/20';
-        overrideBox.classList.remove('hidden');
-
-        flagsBox.innerHTML = data.flags.map(f => {
-          const isBlocker = f.severity === 'BLOCKER';
-          const bgClass = isBlocker ? 'bg-red-500/10 border-red-500/20 text-red-800 dark:text-red-300' : 'bg-amber-500/10 border-amber-500/20 text-amber-800 dark:text-amber-300';
-          const badgeClass = isBlocker ? 'bg-apple-red text-white' : 'bg-apple-amber text-white';
-          const icon = isBlocker ? 'fa-solid fa-circle-xmark text-apple-red' : 'fa-solid fa-triangle-exclamation text-apple-amber';
-
-          return `
-            <div class="p-3.5 rounded-xl border text-xs flex items-start space-x-3 ${bgClass}">
-              <i class="${icon} text-sm mt-0.5"></i>
-              <div class="flex-1">
-                <div class="font-bold flex items-center justify-between">
-                  <span>${f.code}</span>
-                  <span class="text-[9px] uppercase tracking-wider font-mono font-bold px-1.5 py-0.5 rounded ${badgeClass}">${f.severity}</span>
-                </div>
-                <div class="mt-0.5 text-neutral-700 dark:text-neutral-300 leading-relaxed">${f.message}</div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-
-      // Render Fields Table
-      const tbody = document.getElementById('fieldsTableBody');
-      const rows = [];
-      const fields = data.fields;
-
-      if (data.document_type === 'CLEARANCE_SHEET') {
-        rows.push(`
-          <tr class="hover:bg-neutral-50/50 dark:hover:bg-white/[0.02] transition">
-            <td class="py-2.5 px-3.5 font-semibold text-neutral-800 dark:text-neutral-200">employee_name</td>
-            <td class="py-2.5 px-3.5 text-neutral-600 dark:text-neutral-400">${fields.employee_name.raw_value || '—'}</td>
-            <td class="py-2.5 px-3.5 font-mono text-neutral-800 dark:text-neutral-200">${fields.employee_name.normalized_value || '—'}</td>
-            <td class="py-2.5 px-3 text-center">${Math.round(fields.employee_name.confidence * 100)}%</td>
-            <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">VERIFIED</span></td>
-          </tr>
-        `);
-        for (const dept of fields.department_statuses) {
-          const isHold = dept.has_outstanding_accountability.normalized_value;
-          const isMissingSig = !dept.signature_present.normalized_value;
-          let statusBadge = '<span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">CLEARED</span>';
-          if (isHold) {
-            statusBadge = '<span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-red-500/10 text-apple-red">HOLD</span>';
-          } else if (isMissingSig) {
-            statusBadge = '<span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-500/10 text-apple-amber">MISSING SIG</span>';
-          }
-
-          rows.push(`
-            <tr class="hover:bg-neutral-50/50 dark:hover:bg-white/[0.02] transition ${isHold ? 'bg-red-500/[0.03]' : ''}">
-              <td class="py-2.5 px-3.5 font-semibold text-neutral-800 dark:text-neutral-200">${dept.department} Clearance</td>
-              <td class="py-2.5 px-3.5 text-neutral-600 dark:text-neutral-400">${dept.is_cleared.raw_value || '—'} (${dept.approver_name.raw_value || 'No Sig'})</td>
-              <td class="py-2.5 px-3.5 font-mono text-neutral-700 dark:text-neutral-300">${dept.accountability_notes.normalized_value || 'None'}</td>
-              <td class="py-2.5 px-3 text-center">${Math.round(dept.is_cleared.confidence * 100)}%</td>
-              <td class="py-2.5 px-3 text-center">${statusBadge}</td>
-            </tr>
-          `);
-        }
-      } else {
-        for (const [k, v] of Object.entries(fields)) {
-          const isFlagged = v.is_flagged;
-          const statusBadge = isFlagged 
-            ? '<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-500/10 text-apple-red">FLAGGED</span>'
-            : '<span class="px-2 py-0.5 text-[10px] font-medium rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">VERIFIED</span>';
-          rows.push(`
-            <tr class="hover:bg-neutral-50/50 dark:hover:bg-white/[0.02] transition ${isFlagged ? 'bg-amber-500/[0.03]' : ''}">
-              <td class="py-2.5 px-3.5 font-semibold text-neutral-800 dark:text-neutral-200">${k}</td>
-              <td class="py-2.5 px-3.5 text-neutral-600 dark:text-neutral-400">${v.raw_value !== null ? v.raw_value : '<i class="text-neutral-300">null</i>'}</td>
-              <td class="py-2.5 px-3.5 font-mono text-neutral-700 dark:text-neutral-300">${v.normalized_value !== null ? String(v.normalized_value) : '<i class="text-neutral-300">null</i>'}</td>
-              <td class="py-2.5 px-3 text-center">${Math.round(v.confidence * 100)}%</td>
-              <td class="py-2.5 px-3 text-center">${statusBadge}</td>
-            </tr>
-          `);
-        }
-      }
-      tbody.innerHTML = rows.join('');
-    }
-
-    // Submit Human Decision
-    async function submitDecision(action) {
-      if (!currentResult) return;
-
-      const overrideNotes = document.getElementById('overrideNotes').value.trim();
-      const hasBlocker = currentResult.flags && currentResult.flags.some(f => f.severity === 'BLOCKER');
-
-      if (action === 'APPROVE' && hasBlocker && !overrideNotes) {
-        alert('Constitutional Requirement: You are approving a clearance with active BLOCKER flags. Please provide an approver override justification before proceeding.');
-        document.getElementById('overrideNotes').focus();
-        return;
-      }
-
-      try {
-        const payload = {
-          document_id: currentResult.metadata.document_id,
-          approver_id: "USR-MARIA-SANTOS",
-          role: "HR_APPROVER",
-          action: action,
-          flags_reviewed: currentResult.flags ? currentResult.flags.map(f => f.code) : [],
-          override_justification: overrideNotes,
-        };
-
-        const res = await fetch('/api/approvals/action', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        alert(`Decision recorded: ${action}!\nSuccessfully appended to immutable audit log.`);
-        document.getElementById('overrideNotes').value = '';
-        loadAuditLogs();
-      } catch (err) {
-        alert('Failed to log approver action: ' + err.message);
-      }
-    }
-
-    // Initialize Theme and Data
+    // Startup
     initTheme();
-    loadSamples();
+    loadHarnessSamples();
     loadAuditLogs();
   </script>
 </body>
