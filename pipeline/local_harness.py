@@ -1,5 +1,6 @@
 """Local test harness for Clearance & Last Pay document pre-check pipeline.
-Supports both CLI batch processing and an interactive local browser dashboard.
+Supports both CLI batch processing and an interactive local browser dashboard
+designed with an Apple minimalist aesthetic and full Light/Dark mode support.
 """
 import argparse
 import os
@@ -19,8 +20,8 @@ from pipeline.models import DocumentType, ExtractionResult
 
 app = FastAPI(
     title="Clearance & Last Pay — Document Pre-Check Local Harness",
-    description="Local test runner and visualizer for AI document extraction pre-checks.",
-    version="1.0.0",
+    description="Apple-minimalist local test runner and visualizer for AI document extraction pre-checks.",
+    version="1.1.0",
 )
 
 # Shared singletons on app state
@@ -149,128 +150,248 @@ def get_audit_logs(limit: int = 30):
 
 @app.get("/", response_class=HTMLResponse)
 def index_page():
-    """Interactive local dashboard for document extraction testing."""
+    """Interactive Apple-minimalist dashboard for document extraction testing."""
     return HTML_DASHBOARD
 
 
 HTML_DASHBOARD = """<!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clearance & Last Pay — AI Document Pre-Check Test Harness</title>
+  <title>Clearance & Last Pay — AI Document Pre-Check</title>
+  
+  <!-- Tailwind CSS CDN with dark mode config -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: [
+              '-apple-system',
+              'BlinkMacSystemFont',
+              '"SF Pro Display"',
+              '"SF Pro Text"',
+              '"Helvetica Neue"',
+              'Arial',
+              'sans-serif'
+            ],
+            mono: [
+              '"SF Mono"',
+              'Menlo',
+              'Monaco',
+              'Consolas',
+              'monospace'
+            ],
+          },
+          colors: {
+            apple: {
+              blue: '#0071E3',
+              blueHover: '#0077ED',
+              green: '#34C759',
+              amber: '#FF9500',
+              red: '#FF3B30',
+              canvasLight: '#F5F5F7',
+              surfaceLight: '#FFFFFF',
+              canvasDark: '#000000',
+              surfaceDark: '#1C1C1E',
+              elevatedDark: '#2C2C2E',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  
+  <!-- SF Pro / FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
   <style>
-    .badge-blocker { background-color: #FEE2E2; color: #991B1B; border: 1px solid #F87171; }
-    .badge-warning { background-color: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
-    .badge-success { background-color: #DCFCE7; color: #166534; border: 1px solid #86EFAC; }
+    /* Apple smooth scroll and subpixel antialiasing */
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Subtle custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(140, 140, 145, 0.3);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(140, 140, 145, 0.5);
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen">
-  <!-- Top Navigation -->
-  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow">
-          <i class="fa-solid fa-file-shield text-lg"></i>
+<body class="bg-apple-canvasLight dark:bg-apple-canvasDark text-neutral-900 dark:text-neutral-100 min-h-screen transition-colors duration-300">
+  
+  <!-- Apple Frosted Glass Header -->
+  <header class="sticky top-0 z-50 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Product Title -->
+      <div class="flex items-center space-x-3.5">
+        <div class="w-8 h-8 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 flex items-center justify-center shadow-sm">
+          <i class="fa-solid fa-file-shield text-sm"></i>
         </div>
         <div>
-          <h1 class="text-base font-bold tracking-tight">Clearance & Last Pay — AI Pre-Check Harness</h1>
-          <p class="text-[11px] text-slate-400">Milestone 1 Validation · Spec-Driven Development Phase 6</p>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-sm font-semibold tracking-tight">Clearance & Last Pay</h1>
+            <span class="text-[11px] px-2 py-0.5 rounded-full font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-black/[0.04] dark:border-white/[0.06]">
+              Milestone 1
+            </span>
+          </div>
+          <p class="text-[11px] text-neutral-500 dark:text-neutral-400">AI Document Pre-Check & Human Verification Gate</p>
         </div>
       </div>
-      <div class="flex items-center space-x-3">
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-          <i class="fa-solid fa-shield-halved mr-1.5 text-amber-400"></i> Constitutional Guardrail: Human Sign-Off Mandatory
-        </span>
+
+      <!-- Right Controls: Guardrail & Theme Switcher -->
+      <div class="flex items-center space-x-4">
+        <!-- Guardrail Badge -->
+        <div class="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+          <i class="fa-solid fa-user-check text-[11px]"></i>
+          <span>Human Sign-Off Mandatory</span>
+        </div>
+
+        <!-- Light / Dark Mode Segmented Toggle -->
+        <button id="themeToggle" onclick="toggleTheme()" class="relative p-2 w-9 h-9 rounded-full bg-neutral-200/70 dark:bg-neutral-800 hover:bg-neutral-300/70 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 transition flex items-center justify-center focus:outline-none" title="Toggle Light / Dark Mode">
+          <i id="themeIconSun" class="fa-solid fa-sun text-sm hidden"></i>
+          <i id="themeIconMoon" class="fa-solid fa-moon text-sm"></i>
+        </button>
       </div>
+
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <!-- Left Column: Upload & Sample Selection -->
+  <!-- Main Content Layout -->
+  <main class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- Left Column (4 cols): Ingestion & Synthetic Samples -->
     <div class="lg:col-span-4 space-y-6">
-      <!-- Upload Card -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center">
-          <i class="fa-solid fa-cloud-arrow-up mr-2 text-blue-600"></i> Upload Document
-        </h2>
+      
+      <!-- Upload Document Card -->
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] border border-black/[0.05] dark:border-white/[0.08] transition">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+            Document Ingestion
+          </h2>
+          <span class="text-[11px] text-apple-blue font-medium cursor-pointer hover:underline" onclick="document.getElementById('fileInput').click()">Browse</span>
+        </div>
 
         <form id="uploadForm" class="space-y-4">
+          <!-- Document Type Selector (Cupertino Segmented Feel) -->
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Document Type</label>
-            <select id="docTypeSelect" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
-              <option value="QUIT_CLAIM">Quit Claim Form (PDF)</option>
-              <option value="BANK_ENROLLMENT">Bank / E-Wallet Proof (Image/PDF)</option>
-              <option value="CLEARANCE_SHEET">Department Clearance Sheet (PDF)</option>
-            </select>
+            <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Document Target Type</label>
+            <div class="relative">
+              <select id="docTypeSelect" class="w-full text-xs font-medium appearance-none bg-neutral-100 dark:bg-apple-elevatedDark border border-transparent dark:border-white/[0.05] rounded-xl px-3.5 py-2.5 text-neutral-800 dark:text-neutral-200 focus:ring-2 focus:ring-apple-blue focus:outline-none transition cursor-pointer">
+                <option value="QUIT_CLAIM">Quit Claim Form (PDF)</option>
+                <option value="BANK_ENROLLMENT">Bank / E-Wallet Proof (Image/PDF)</option>
+                <option value="CLEARANCE_SHEET">Department Clearance Sheet (PDF)</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-neutral-400">
+                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+              </div>
+            </div>
           </div>
 
-          <!-- Drag and Drop Dropzone -->
-          <div id="dropZone" class="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-5 text-center transition cursor-pointer bg-slate-50 hover:bg-blue-50/50">
+          <!-- Minimalist Drag and Drop Area -->
+          <div id="dropZone" class="border border-dashed border-neutral-300 dark:border-neutral-700 hover:border-apple-blue dark:hover:border-apple-blue rounded-xl p-6 text-center transition cursor-pointer bg-neutral-50/50 dark:bg-neutral-800/30 hover:bg-blue-50/20 dark:hover:bg-blue-950/10">
             <input type="file" id="fileInput" class="hidden" />
-            <i class="fa-solid fa-file-arrow-up text-3xl text-slate-400 mb-2"></i>
-            <p id="fileLabel" class="text-xs font-medium text-slate-700">Drag & drop document here or <span class="text-blue-600 underline">browse</span></p>
-            <p class="text-[10px] text-slate-400 mt-1">Supports PDF, PNG, JPG</p>
+            <div class="w-10 h-10 mx-auto mb-2.5 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400 dark:text-neutral-500">
+              <i class="fa-solid fa-arrow-up-from-bracket text-sm"></i>
+            </div>
+            <p id="fileLabel" class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+              Drop file here, or <span class="text-apple-blue font-medium">browse</span>
+            </p>
+            <p class="text-[11px] text-neutral-400 dark:text-neutral-500 mt-1">PDF, PNG, JPG up to 25MB</p>
           </div>
 
-          <button type="submit" id="submitBtn" class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center justify-center">
-            <i class="fa-solid fa-bolt mr-2"></i> Run AI Pre-Check
+          <!-- Execute Button (Apple Solid Pill) -->
+          <button type="submit" id="submitBtn" class="w-full py-2.5 px-4 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 text-xs font-semibold rounded-xl shadow-sm active:scale-[0.99] transition flex items-center justify-center">
+            <i class="fa-solid fa-bolt mr-2 text-xs"></i> Run AI Pre-Check
           </button>
         </form>
       </div>
 
-      <!-- Quick Test Synthetic Samples -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center">
-          <i class="fa-solid fa-flask-vial mr-2 text-indigo-600"></i> Synthetic Test Samples
-        </h2>
-        <p class="text-[11px] text-slate-500 mb-3">Click any fixture to test edge-case detection instantly:</p>
+      <!-- Quick Test Synthetic Samples Card -->
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] border border-black/[0.05] dark:border-white/[0.08] transition">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+            Synthetic Test Fixtures
+          </h2>
+          <span class="text-[10px] px-2 py-0.5 rounded-md font-mono bg-neutral-100 dark:bg-neutral-800 text-neutral-500">6 samples</span>
+        </div>
+        <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mb-3.5">
+          Select any verified or edge-case document to test discrepancy detection:
+        </p>
         <div id="samplesList" class="space-y-2">
-          <p class="text-xs text-slate-400">Loading samples...</p>
+          <p class="text-xs text-neutral-400">Loading samples...</p>
         </div>
       </div>
 
-      <!-- Audit Trail Card -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center">
-            <i class="fa-solid fa-list-check mr-2 text-emerald-600"></i> Immutable Audit Trail
+      <!-- Immutable Audit Trail Card -->
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] border border-black/[0.05] dark:border-white/[0.08] transition">
+        <div class="flex items-center justify-between mb-3.5">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+            Immutable Audit Trail
           </h2>
-          <button onclick="loadAuditLogs()" class="text-xs text-blue-600 hover:underline"><i class="fa-solid fa-rotate-right mr-1"></i>Refresh</button>
+          <button onclick="loadAuditLogs()" class="text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 transition" title="Refresh logs">
+            <i class="fa-solid fa-arrow-rotate-right"></i>
+          </button>
         </div>
-        <div id="auditLogContainer" class="max-h-72 overflow-y-auto space-y-2 text-xs pr-1">
-          <p class="text-slate-400">Loading audit trail...</p>
+        <div id="auditLogContainer" class="max-h-64 overflow-y-auto space-y-2 text-xs pr-1">
+          <p class="text-neutral-400">Loading audit trail...</p>
         </div>
       </div>
+
     </div>
 
-    <!-- Right Column: Results & Flags Visualizer -->
+    <!-- Right Column (8 cols): Document Preview & Pre-Check Results -->
     <div class="lg:col-span-8 space-y-6">
-      <!-- Active Result Card -->
-      <div id="resultCard" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 min-h-[500px]">
-        <div class="text-center py-20 text-slate-400" id="emptyState">
-          <i class="fa-solid fa-magnifying-glass-chart text-5xl mb-3 text-slate-300"></i>
-          <h3 class="text-base font-semibold text-slate-700">No Document Pre-Checked Yet</h3>
-          <p class="text-xs max-w-sm mx-auto mt-1 text-slate-400">Select a synthetic fixture on the left or upload a file to view AI-extracted fields, discrepancy flags, and approver actions.</p>
+      
+      <!-- Main Display Card -->
+      <div id="resultCard" class="bg-apple-surfaceLight dark:bg-apple-surfaceDark rounded-2xl p-7 shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] border border-black/[0.05] dark:border-white/[0.08] min-h-[560px] flex flex-col justify-between transition">
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="my-auto py-20 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800/80 flex items-center justify-center text-neutral-400 dark:text-neutral-500">
+            <i class="fa-regular fa-folder-open text-2xl"></i>
+          </div>
+          <h3 class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">No Document Analyzed Yet</h3>
+          <p class="text-xs text-neutral-400 dark:text-neutral-500 max-w-sm mx-auto mt-1.5 leading-relaxed">
+            Select a synthetic test sample on the left, or upload a document to trigger the AI extraction and rule verification engine.
+          </p>
         </div>
 
+        <!-- Result Content (Visible upon inspection) -->
         <div id="resultContent" class="hidden space-y-6">
+          
           <!-- Summary Header -->
-          <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-4 gap-4">
+          <div class="flex flex-wrap items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-5 gap-4">
             <div>
-              <div class="flex items-center space-x-2">
-                <span id="resDocType" class="px-2.5 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200">DOC</span>
-                <h3 id="resFileName" class="text-base font-bold text-slate-900">file.pdf</h3>
+              <div class="flex items-center space-x-2.5">
+                <span id="resDocType" class="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-black/[0.04] dark:border-white/[0.06]">
+                  QUIT_CLAIM
+                </span>
+                <h3 id="resFileName" class="text-base font-semibold text-neutral-900 dark:text-white">quit_claim_valid.pdf</h3>
               </div>
-              <p class="text-xs text-slate-400 mt-1">
-                Hash: <span id="resHash" class="font-mono text-slate-600">...</span> · 
-                Time: <span id="resTime" class="font-semibold text-slate-700">0ms</span> · 
-                Model: <span id="resModel" class="font-mono text-slate-600">mock</span>
+              <p class="text-[11px] text-neutral-400 dark:text-neutral-500 mt-1 font-mono">
+                SHA-256: <span id="resHash" class="text-neutral-600 dark:text-neutral-300">...</span> · 
+                <span id="resTime" class="text-neutral-600 dark:text-neutral-300">0ms</span> · 
+                Model: <span id="resModel" class="text-neutral-600 dark:text-neutral-300">mock</span>
               </p>
             </div>
+            
+            <!-- Overall Confidence Metric -->
             <div class="text-right">
               <div class="text-xs text-slate-500 font-medium">Overall AI Confidence</div>
               <div id="resConfidence" class="text-2xl font-black text-blue-600">95%</div>
