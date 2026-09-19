@@ -1189,6 +1189,46 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                 <textarea id="apprOverrideNotes" rows="2" placeholder="Enter override justification..." class="w-full text-xs bg-white dark:bg-neutral-900 border border-red-300 dark:border-red-900/50 rounded-xl p-2.5 focus:ring-2 focus:ring-apple-blue focus:outline-none transition"></textarea>
               </div>
 
+              <!-- Anti-Idle & SLA Acceleration Velocity Bar -->
+              <div class="p-3.5 rounded-2xl bg-white/80 dark:bg-neutral-900/60 border border-black/[0.04] dark:border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-7 h-7 rounded-xl bg-amber-500/15 text-apple-amber flex items-center justify-center text-xs shrink-0 shadow-sm">
+                    <i class="fa-solid fa-stopwatch"></i>
+                  </div>
+                  <div>
+                    <div class="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 flex items-center space-x-1.5">
+                      <span>SLA Urgency Cap:</span>
+                      <span id="apprUrgencyTag" class="text-apple-amber font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/10">18h Remaining</span>
+                      <span class="text-[9px] text-neutral-400 font-normal">(48h node max)</span>
+                    </div>
+                    <div class="text-[10px] text-neutral-400">Proactively nudge signers or open huddles to keep clearance velocity high.</div>
+                  </div>
+                </div>
+
+                <!-- Anti-Idle Action Buttons -->
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <button onclick="nudgePendingSigner()" class="px-2.5 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-[11px] font-semibold transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Dispatches instant Lark Bot reminder to the current signer holding up this ticket">
+                    <i class="fa-solid fa-bell text-apple-amber text-[10px]"></i>
+                    <span>Nudge Signer</span>
+                  </button>
+
+                  <button onclick="openLarkHuddle()" class="px-2.5 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-lark-blue text-[11px] font-semibold border border-blue-500/20 transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Instant 3-way Lark group chat with Employee, Dept Head, and HR for 5-minute alignment">
+                    <i class="fa-solid fa-users text-[10px]"></i>
+                    <span>Lark Huddle</span>
+                  </button>
+
+                  <button onclick="escalateTicket()" class="px-2.5 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-apple-red text-[11px] font-semibold border border-red-500/20 transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Escalates idle ticket to Division VP / HR Director">
+                    <i class="fa-solid fa-arrow-up-right-dots text-[10px]"></i>
+                    <span>Escalate to VP</span>
+                  </button>
+
+                  <button onclick="delegateTicket()" class="px-2.5 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-[11px] font-semibold transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Reassign ticket to designated backup or OIC">
+                    <i class="fa-solid fa-user-gear text-[10px]"></i>
+                    <span>Delegate</span>
+                  </button>
+                </div>
+              </div>
+
               <!-- Action CTAs -->
               <div class="flex flex-wrap items-center justify-end gap-2.5 pt-1">
                 <button onclick="pingLarkEmployee()" class="px-4 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-100 text-xs font-semibold text-neutral-700 dark:text-neutral-200 shadow-sm active:scale-[0.98] transition flex items-center">
@@ -1518,6 +1558,96 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         showDynamicToast("Lark Workplace Card Sent", `Direct reminder dispatched to ${activeDossier.employee_name}.`, "info");
       } catch (err) {
         showDynamicToast("Notification Failed", err.message, "error");
+      }
+    }
+
+    async function nudgePendingSigner() {
+      if (!activeDossier) return;
+      const target = currentApproverRole === 'IT_APPROVER' ? 'Alex Tan (IT Helpdesk)' :
+                     currentApproverRole === 'FINANCE_APPROVER' ? 'Roberto Ong (Finance Lead)' :
+                     currentApproverRole === 'HR_APPROVER' ? 'Grace Diaz (HR Operations)' : 'Elena Cruz (Facilities Admin)';
+      try {
+        const res = await fetch('/api/approvals/nudge', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            dossier_id: activeDossier.dossier_id,
+            target_role: currentApproverRole,
+            target_name: target,
+            sender_role: "CLEARANCE_WORKSTATION",
+            reason: `Urgent sign-off requested for ${activeDossier.employee_name} (${activeDossier.dossier_id}). Approaching 48h SLA limit.`
+          })
+        });
+        await res.json();
+        showDynamicToast("Lark Nudge Dispatched", `Sent priority alert to ${target} on Lark mobile/desktop.`, "info");
+      } catch (err) {
+        showDynamicToast("Nudge Failed", err.message, "error");
+      }
+    }
+
+    async function openLarkHuddle() {
+      if (!activeDossier) return;
+      try {
+        const res = await fetch('/api/approvals/huddle', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            dossier_id: activeDossier.dossier_id,
+            employee_name: activeDossier.employee_name,
+            sender_role: currentApproverRole,
+            topic: `Resolve clearance flags: ${activeDossier.flags_summary && activeDossier.flags_summary.length ? activeDossier.flags_summary.join(', ') : 'Standard Final Pay Handover'}`
+          })
+        });
+        const data = await res.json();
+        showDynamicToast("Lark Huddle Room Active", `Group chat created with ${activeDossier.employee_name}, Dept Head & HR.`, "info");
+      } catch (err) {
+        showDynamicToast("Huddle Failed", err.message, "error");
+      }
+    }
+
+    async function escalateTicket() {
+      if (!activeDossier) return;
+      const vpTarget = "Maria Consuelo (Division VP) & HR Director";
+      try {
+        const res = await fetch('/api/approvals/escalate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            dossier_id: activeDossier.dossier_id,
+            employee_name: activeDossier.employee_name,
+            escalate_to: vpTarget,
+            sender_role: currentApproverRole,
+            hours_idle: 36
+          })
+        });
+        await res.json();
+        showDynamicToast("Priority Escalation Sent", `Notice sent to ${vpTarget}. SLA breach prevented.`, "error");
+      } catch (err) {
+        showDynamicToast("Escalation Failed", err.message, "error");
+      }
+    }
+
+    function delegateTicket() {
+      if (!activeDossier) return;
+      const backupOIC = "Carlo Mendoza (Designated OIC / Peer Lead)";
+      showDynamicToast("Clearance Delegated", `Ticket temporarily routed to ${backupOIC} for sign-off.`, "info");
+    }
+
+    async function batchApproveCleanDossiers() {
+      try {
+        const res = await fetch('/api/approvals/batch-approve-clean', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'}
+        });
+        const data = await res.json();
+        if (data.approved_count === 0) {
+          showDynamicToast("No Action Needed", "All clean dossiers are already signed off.", "info");
+        } else {
+          showDynamicToast("Fast-Track Complete!", `Signed off ${data.approved_count} verified clean dossier(s) with 0 flags!`, "success");
+          await loadDossiersQueue();
+        }
+      } catch (err) {
+        showDynamicToast("Batch Action Failed", err.message, "error");
       }
     }
 
