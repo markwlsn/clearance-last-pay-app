@@ -584,16 +584,16 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         const samples = await res.json();
         const container = document.getElementById('samplesList');
         if (!samples.length) {
-          container.innerHTML = '<p class="text-xs text-slate-400">No samples found.</p>';
+          container.innerHTML = '<p class="text-xs text-neutral-400">No samples found.</p>';
           return;
         }
         container.innerHTML = samples.map(s => `
-          <button onclick="runSampleTest('${s.file_name}', '${s.document_type}', '${s.url}')" class="w-full text-left p-2.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-lg transition text-xs flex items-center justify-between">
+          <button onclick="runSampleTest('${s.file_name}', '${s.document_type}', '${s.url}')" class="w-full text-left p-2.5 rounded-xl bg-neutral-50 dark:bg-apple-elevatedDark hover:bg-neutral-100 dark:hover:bg-neutral-700/60 border border-black/[0.04] dark:border-white/[0.06] transition text-xs flex items-center justify-between group">
             <div>
-              <span class="font-semibold text-slate-800 block">${s.file_name}</span>
-              <span class="text-[10px] text-slate-500 uppercase">${s.document_type.replace('_', ' ')} · ${Math.round(s.size_bytes / 1024)} KB</span>
+              <span class="font-medium text-neutral-800 dark:text-neutral-200 block group-hover:text-apple-blue transition">${s.file_name}</span>
+              <span class="text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">${s.document_type.replace('_', ' ')} · ${Math.round(s.size_bytes / 1024)} KB</span>
             </div>
-            <i class="fa-solid fa-play text-blue-500 text-xs"></i>
+            <i class="fa-solid fa-arrow-right text-[10px] text-neutral-300 dark:text-neutral-600 group-hover:text-apple-blue transition transform group-hover:translate-x-0.5"></i>
           </button>
         `).join('');
       } catch (err) {
@@ -608,32 +608,35 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         const logs = await res.json();
         const container = document.getElementById('auditLogContainer');
         if (!logs.length) {
-          container.innerHTML = '<p class="text-xs text-slate-400">No audit records logged yet.</p>';
+          container.innerHTML = '<p class="text-xs text-neutral-400">No audit records logged yet.</p>';
           return;
         }
         container.innerHTML = logs.map(l => {
           if (l.log_type === 'HUMAN_DECISION') {
             const isApproved = l.action === 'APPROVE';
             return `
-              <div class="p-2 border border-blue-200 rounded-lg bg-blue-50/60 font-mono text-[11px]">
-                <div class="flex justify-between font-bold text-slate-800">
-                  <span class="text-blue-700"><i class="fa-solid fa-user-check mr-1"></i>${l.action}</span>
-                  <span class="text-[10px] text-slate-500">${l.role}</span>
+              <div class="p-2.5 rounded-xl bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20 text-[11px]">
+                <div class="flex justify-between items-center font-semibold">
+                  <span class="text-apple-blue"><i class="fa-solid fa-signature mr-1 text-[10px]"></i>${l.action}</span>
+                  <span class="text-[10px] text-neutral-400 font-mono">${l.timestamp.slice(11, 19)}</span>
                 </div>
-                <div class="text-[10px] text-slate-600 mt-0.5 truncate">${l.override_justification || 'Standard approval without override'}</div>
-                <div class="text-[9px] text-slate-400 mt-0.5">${l.timestamp.slice(11, 19)} · Dossier: ${l.dossier_id}</div>
+                <div class="text-[10px] text-neutral-600 dark:text-neutral-400 mt-1 truncate">${l.override_justification || 'Standard human approval'}</div>
+                <div class="text-[9px] text-neutral-400 font-mono mt-0.5">Dossier: ${l.dossier_id} · ${l.role}</div>
               </div>
             `;
           }
 
           const hasFlags = l.flag_count > 0;
           return `
-            <div class="p-2 border border-slate-200 rounded-lg bg-slate-50 font-mono text-[11px]">
-              <div class="flex justify-between font-semibold text-slate-700">
-                <span class="truncate max-w-[140px]">${l.file_name}</span>
-                <span class="${hasFlags ? 'text-red-600 font-bold' : 'text-emerald-600'}">${l.flag_count} flags</span>
+            <div class="p-2.5 rounded-xl bg-neutral-50 dark:bg-apple-elevatedDark border border-black/[0.04] dark:border-white/[0.06] text-[11px]">
+              <div class="flex justify-between items-center font-medium">
+                <span class="text-neutral-800 dark:text-neutral-200 truncate max-w-[150px]">${l.file_name}</span>
+                <span class="${hasFlags ? 'text-apple-red font-semibold' : 'text-apple-green font-medium'} text-[10px]">${l.flag_count} ${l.flag_count === 1 ? 'flag' : 'flags'}</span>
               </div>
-              <div class="text-[10px] text-slate-400 truncate mt-0.5">${l.timestamp.slice(11, 19)} · ${l.file_hash_sha256.slice(0, 12)}...</div>
+              <div class="text-[10px] text-neutral-400 font-mono mt-0.5 flex justify-between">
+                <span>${l.timestamp.slice(11, 19)}</span>
+                <span>${l.file_hash_sha256.slice(0, 10)}...</span>
+              </div>
             </div>
           `;
         }).join('');
@@ -679,7 +682,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       const fileInput = document.getElementById('fileInput');
       const docType = document.getElementById('docTypeSelect').value;
       if (!fileInput.files.length) {
-        alert('Please choose a file to upload');
+        alert('Please select a file or drop one above.');
         return;
       }
 
@@ -692,7 +695,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Analyzing...';
+      submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Analyzing...';
 
       try {
         const res = await fetch('/api/precheck', {
@@ -742,41 +745,49 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
       if (fileUrl) {
         if (data.metadata.file_name.toLowerCase().endsWith('.pdf') || data.metadata.mime_type === 'application/pdf') {
-          previewBox.innerHTML = `<iframe src="${fileUrl}" class="w-full h-80 rounded border border-slate-300 shadow-inner" frameborder="0"></iframe>`;
+          previewBox.innerHTML = `<iframe src="${fileUrl}" class="w-full h-80 rounded-xl border border-black/[0.06] dark:border-white/[0.08] shadow-inner bg-white" frameborder="0"></iframe>`;
         } else {
-          previewBox.innerHTML = `<img src="${fileUrl}" alt="Document Preview" class="max-h-80 rounded border border-slate-300 shadow-sm object-contain" />`;
+          previewBox.innerHTML = `<img src="${fileUrl}" alt="Document Preview" class="max-h-80 rounded-xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm object-contain bg-white" />`;
         }
       } else {
-        previewBox.innerHTML = '<p class="text-xs text-slate-400">Document preview unavailable</p>';
+        previewBox.innerHTML = '<p class="text-xs text-neutral-400">Document preview unavailable</p>';
       }
 
       // Render Flags
       const flagsBox = document.getElementById('flagsContainer');
+      const flagsCountBadge = document.getElementById('flagsCountBadge');
       const overrideBox = document.getElementById('overrideBox');
 
       if (!data.flags || data.flags.length === 0) {
+        flagsCountBadge.textContent = '0 detected (Clean)';
+        flagsCountBadge.className = 'text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20';
         flagsBox.innerHTML = `
-          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-xs flex items-center">
-            <i class="fa-solid fa-circle-check mr-2 text-base text-emerald-600"></i>
-            <div><b>Clean Pre-Check:</b> No missing fields, amount discrepancies, or format violations detected.</div>
+          <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs flex items-center space-x-2.5">
+            <i class="fa-solid fa-circle-check text-apple-green text-sm"></i>
+            <div><b>Clean Verification:</b> All fields extracted cleanly with zero format violations, missing signatures, or discrepancies.</div>
           </div>
         `;
         overrideBox.classList.add('hidden');
       } else {
+        flagsCountBadge.textContent = `${data.flags.length} detected`;
+        flagsCountBadge.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red border border-red-500/20';
         overrideBox.classList.remove('hidden');
+
         flagsBox.innerHTML = data.flags.map(f => {
           const isBlocker = f.severity === 'BLOCKER';
-          const badgeClass = isBlocker ? 'badge-blocker' : 'badge-warning';
-          const icon = isBlocker ? 'fa-solid fa-circle-xmark text-red-600' : 'fa-solid fa-triangle-exclamation text-amber-600';
+          const bgClass = isBlocker ? 'bg-red-500/10 border-red-500/20 text-red-800 dark:text-red-300' : 'bg-amber-500/10 border-amber-500/20 text-amber-800 dark:text-amber-300';
+          const badgeClass = isBlocker ? 'bg-apple-red text-white' : 'bg-apple-amber text-white';
+          const icon = isBlocker ? 'fa-solid fa-circle-xmark text-apple-red' : 'fa-solid fa-triangle-exclamation text-apple-amber';
+
           return `
-            <div class="p-3 rounded-lg text-xs flex items-start space-x-3 ${badgeClass}">
-              <i class="${icon} text-base mt-0.5"></i>
+            <div class="p-3.5 rounded-xl border text-xs flex items-start space-x-3 ${bgClass}">
+              <i class="${icon} text-sm mt-0.5"></i>
               <div class="flex-1">
                 <div class="font-bold flex items-center justify-between">
                   <span>${f.code}</span>
-                  <span class="uppercase text-[10px] tracking-wider px-2 py-0.5 rounded bg-white/80 border">${f.severity}</span>
+                  <span class="text-[9px] uppercase tracking-wider font-mono font-bold px-1.5 py-0.5 rounded ${badgeClass}">${f.severity}</span>
                 </div>
-                <div class="mt-0.5 text-slate-800">${f.message}</div>
+                <div class="mt-0.5 text-neutral-700 dark:text-neutral-300 leading-relaxed">${f.message}</div>
               </div>
             </div>
           `;
@@ -790,29 +801,29 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
       if (data.document_type === 'CLEARANCE_SHEET') {
         rows.push(`
-          <tr>
-            <td class="py-2.5 px-3 font-semibold text-slate-800">employee_name</td>
-            <td class="py-2.5 px-3">${fields.employee_name.raw_value || '—'}</td>
-            <td class="py-2.5 px-3 font-mono">${fields.employee_name.normalized_value || '—'}</td>
+          <tr class="hover:bg-neutral-50/50 dark:hover:bg-white/[0.02] transition">
+            <td class="py-2.5 px-3.5 font-semibold text-neutral-800 dark:text-neutral-200">employee_name</td>
+            <td class="py-2.5 px-3.5 text-neutral-600 dark:text-neutral-400">${fields.employee_name.raw_value || '—'}</td>
+            <td class="py-2.5 px-3.5 font-mono text-neutral-800 dark:text-neutral-200">${fields.employee_name.normalized_value || '—'}</td>
             <td class="py-2.5 px-3 text-center">${Math.round(fields.employee_name.confidence * 100)}%</td>
-            <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-700 font-bold">VERIFIED</span></td>
+            <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">VERIFIED</span></td>
           </tr>
         `);
         for (const dept of fields.department_statuses) {
           const isHold = dept.has_outstanding_accountability.normalized_value;
           const isMissingSig = !dept.signature_present.normalized_value;
-          let statusBadge = '<span class="px-2 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-700 font-bold">CLEARED</span>';
+          let statusBadge = '<span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">CLEARED</span>';
           if (isHold) {
-            statusBadge = '<span class="px-2 py-0.5 text-[10px] rounded bg-red-100 text-red-700 font-bold">HOLD</span>';
+            statusBadge = '<span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-red-500/10 text-apple-red">HOLD</span>';
           } else if (isMissingSig) {
-            statusBadge = '<span class="px-2 py-0.5 text-[10px] rounded bg-amber-100 text-amber-700 font-bold">MISSING SIG</span>';
+            statusBadge = '<span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-500/10 text-apple-amber">MISSING SIG</span>';
           }
 
           rows.push(`
-            <tr class="${isHold ? 'bg-red-50/40' : ''}">
-              <td class="py-2.5 px-3 font-semibold text-slate-800">${dept.department} Dept Clearance</td>
-              <td class="py-2.5 px-3">${dept.is_cleared.raw_value || '—'} (${dept.approver_name.raw_value || 'No Sig'})</td>
-              <td class="py-2.5 px-3 font-mono text-slate-600">${dept.accountability_notes.normalized_value || 'None'}</td>
+            <tr class="hover:bg-neutral-50/50 dark:hover:bg-white/[0.02] transition ${isHold ? 'bg-red-500/[0.03]' : ''}">
+              <td class="py-2.5 px-3.5 font-semibold text-neutral-800 dark:text-neutral-200">${dept.department} Clearance</td>
+              <td class="py-2.5 px-3.5 text-neutral-600 dark:text-neutral-400">${dept.is_cleared.raw_value || '—'} (${dept.approver_name.raw_value || 'No Sig'})</td>
+              <td class="py-2.5 px-3.5 font-mono text-neutral-700 dark:text-neutral-300">${dept.accountability_notes.normalized_value || 'None'}</td>
               <td class="py-2.5 px-3 text-center">${Math.round(dept.is_cleared.confidence * 100)}%</td>
               <td class="py-2.5 px-3 text-center">${statusBadge}</td>
             </tr>
@@ -822,13 +833,13 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         for (const [k, v] of Object.entries(fields)) {
           const isFlagged = v.is_flagged;
           const statusBadge = isFlagged 
-            ? '<span class="px-2 py-0.5 text-[10px] rounded bg-red-100 text-red-700 font-bold">FLAGGED</span>'
-            : '<span class="px-2 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-700 font-medium">VERIFIED</span>';
+            ? '<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-500/10 text-apple-red">FLAGGED</span>'
+            : '<span class="px-2 py-0.5 text-[10px] font-medium rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">VERIFIED</span>';
           rows.push(`
-            <tr class="${isFlagged ? 'bg-amber-50/40' : ''}">
-              <td class="py-2.5 px-3 font-semibold text-slate-800">${k}</td>
-              <td class="py-2.5 px-3">${v.raw_value !== null ? v.raw_value : '<i>null</i>'}</td>
-              <td class="py-2.5 px-3 font-mono text-slate-600">${v.normalized_value !== null ? String(v.normalized_value) : '<i>null</i>'}</td>
+            <tr class="hover:bg-neutral-50/50 dark:hover:bg-white/[0.02] transition ${isFlagged ? 'bg-amber-500/[0.03]' : ''}">
+              <td class="py-2.5 px-3.5 font-semibold text-neutral-800 dark:text-neutral-200">${k}</td>
+              <td class="py-2.5 px-3.5 text-neutral-600 dark:text-neutral-400">${v.raw_value !== null ? v.raw_value : '<i class="text-neutral-300">null</i>'}</td>
+              <td class="py-2.5 px-3.5 font-mono text-neutral-700 dark:text-neutral-300">${v.normalized_value !== null ? String(v.normalized_value) : '<i class="text-neutral-300">null</i>'}</td>
               <td class="py-2.5 px-3 text-center">${Math.round(v.confidence * 100)}%</td>
               <td class="py-2.5 px-3 text-center">${statusBadge}</td>
             </tr>
@@ -846,7 +857,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       const hasBlocker = currentResult.flags && currentResult.flags.some(f => f.severity === 'BLOCKER');
 
       if (action === 'APPROVE' && hasBlocker && !overrideNotes) {
-        alert('Constitutional Requirement: You are approving a document with active BLOCKER flags. Please enter an approver override justification before submitting.');
+        alert('Constitutional Requirement: You are approving a clearance with active BLOCKER flags. Please provide an approver override justification before proceeding.');
         document.getElementById('overrideNotes').focus();
         return;
       }
@@ -867,7 +878,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           body: JSON.stringify(payload),
         });
         const data = await res.json();
-        alert(`Action recorded: ${action}! Successfully logged to immutable audit trail.`);
+        alert(`Decision recorded: ${action}!\nSuccessfully appended to immutable audit log.`);
         document.getElementById('overrideNotes').value = '';
         loadAuditLogs();
       } catch (err) {
@@ -875,7 +886,8 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       }
     }
 
-    // Startup
+    // Initialize Theme and Data
+    initTheme();
     loadSamples();
     loadAuditLogs();
   </script>
