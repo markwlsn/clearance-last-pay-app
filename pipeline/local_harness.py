@@ -420,16 +420,27 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- Right Controls: Guardrail & Theme Switcher -->
-      <div class="flex items-center space-x-4">
-        <!-- Guardrail Badge -->
-        <div class="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-          <i class="fa-solid fa-user-check text-[11px]"></i>
-          <span>Human Sign-Off Mandatory</span>
+      <!-- Center Segmented View Switcher -->
+      <nav class="hidden md:flex items-center p-1 bg-neutral-200/60 dark:bg-neutral-800 rounded-xl space-x-1">
+        <button id="tabBtnForm" onclick="switchView('form')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition">
+          <i class="fa-regular fa-pen-to-square mr-1.5 text-lark-blue"></i> Requester Form
+        </button>
+        <button id="tabBtnApprover" onclick="switchView('approver')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition">
+          <i class="fa-solid fa-user-check mr-1.5 text-apple-green"></i> Approver Review Desk
+        </button>
+        <button id="tabBtnHarness" onclick="switchView('harness')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition">
+          <i class="fa-solid fa-flask-vial mr-1.5 text-apple-amber"></i> Developer Harness
+        </button>
+      </nav>
+
+      <!-- Right Actions: Guardrail & Theme Switcher -->
+      <div class="flex items-center space-x-3.5">
+        <div class="hidden lg:flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+          <i class="fa-solid fa-shield-halved text-[11px]"></i>
+          <span>Human Sign-Off Required</span>
         </div>
 
-        <!-- Light / Dark Mode Segmented Toggle -->
-        <button id="themeToggle" onclick="toggleTheme()" class="relative p-2 w-9 h-9 rounded-full bg-neutral-200/70 dark:bg-neutral-800 hover:bg-neutral-300/70 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 transition flex items-center justify-center focus:outline-none" title="Toggle Light / Dark Mode">
+        <button id="themeToggle" onclick="toggleTheme()" class="p-2 w-9 h-9 rounded-full bg-neutral-200/70 dark:bg-neutral-800 hover:bg-neutral-300/70 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 transition flex items-center justify-center focus:outline-none" title="Toggle Light / Dark Mode">
           <i id="themeIconSun" class="fa-solid fa-sun text-sm hidden"></i>
           <i id="themeIconMoon" class="fa-solid fa-moon text-sm"></i>
         </button>
@@ -438,115 +449,381 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     </div>
   </header>
 
-  <!-- Main Content Layout -->
-  <main class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-    
-    <!-- Left Column (4 cols): Ingestion & Synthetic Samples -->
-    <div class="lg:col-span-4 space-y-6">
+  <!-- Mobile View Selector Bar -->
+  <div class="md:hidden bg-white dark:bg-neutral-900 border-b border-black/[0.06] dark:border-white/[0.08] px-4 py-2 flex justify-around">
+    <button onclick="switchView('form')" class="text-xs font-semibold text-lark-blue py-1">Requester Form</button>
+    <button onclick="switchView('approver')" class="text-xs font-medium text-neutral-500 py-1">Approver Desk</button>
+    <button onclick="switchView('harness')" class="text-xs font-medium text-neutral-500 py-1">Dev Harness</button>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- ================================================================= -->
+    <!-- VIEW 1: REQUESTER FORM (LARK APPROVAL RECREATION) -->
+    <!-- ================================================================= -->
+    <section id="viewForm" class="max-w-3xl mx-auto space-y-6">
       
-      <!-- Upload Document Card -->
-      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] border border-black/[0.05] dark:border-white/[0.08] transition">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-            Document Ingestion
-          </h2>
-          <span class="text-[11px] text-apple-blue font-medium cursor-pointer hover:underline" onclick="document.getElementById('fileInput').click()">Browse</span>
+      <!-- Main Lark Form Container Card -->
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark rounded-2xl p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] border border-black/[0.06] dark:border-white/[0.08] transition">
+        
+        <!-- Header -->
+        <div class="mb-6">
+          <h2 class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">Application Details</h2>
         </div>
 
-        <form id="uploadForm" class="space-y-4">
-          <!-- Document Type Selector (Cupertino Segmented Feel) -->
+        <!-- CMG Group SOA Records Banner (Exact from user screenshot) -->
+        <div class="mb-6 p-3 rounded-lg bg-neutral-100/80 dark:bg-neutral-800/60 border border-neutral-200/70 dark:border-neutral-700/60 flex items-center space-x-2 text-xs text-neutral-700 dark:text-neutral-300">
+          <i class="fa-solid fa-table-list text-lark-blue text-sm"></i>
+          <span class="font-medium text-lark-blue hover:underline cursor-pointer">CMG Group SOA Records</span>
+        </div>
+
+        <!-- Form Elements -->
+        <form id="larkClearanceForm" class="space-y-5" onsubmit="handleLarkSubmit(event)">
+          
+          <!-- Row 1: Department -->
           <div>
-            <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Document Target Type</label>
-            <div class="relative">
-              <select id="docTypeSelect" class="w-full text-xs font-medium appearance-none bg-neutral-100 dark:bg-apple-elevatedDark border border-transparent dark:border-white/[0.05] rounded-xl px-3.5 py-2.5 text-neutral-800 dark:text-neutral-200 focus:ring-2 focus:ring-apple-blue focus:outline-none transition cursor-pointer">
-                <option value="QUIT_CLAIM">Quit Claim Form (PDF)</option>
-                <option value="BANK_ENROLLMENT">Bank / E-Wallet Proof (Image/PDF)</option>
-                <option value="CLEARANCE_SHEET">Department Clearance Sheet (PDF)</option>
+            <label class="lark-label">Department<span class="lark-required">*</span></label>
+            <select id="formDept" required class="lark-input">
+              <option value="" disabled selected>Select</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Finance & Accounting">Finance & Accounting</option>
+              <option value="Human Resources">Human Resources</option>
+              <option value="Logistics & Supply Chain">Logistics & Supply Chain</option>
+              <option value="Retail Operations">Retail Operations</option>
+              <option value="Marketing & Brand">Marketing & Brand</option>
+            </select>
+          </div>
+
+          <!-- Row 2: Employee Name -->
+          <div>
+            <label class="lark-label">Employee Name<span class="lark-required">*</span></label>
+            <select id="formEmployeeName" required class="lark-input" onchange="autoFillEmployee(this.value)">
+              <option value="" disabled selected>Select</option>
+              <option value="Juan Dela Cruz">Juan Dela Cruz (EMP-94812)</option>
+              <option value="Maria Santos">Maria Santos (EMP-10294)</option>
+              <option value="Pedro Penduko">Pedro Penduko (EMP-88419)</option>
+              <option value="Custom">Other / Enter Manual...</option>
+            </select>
+          </div>
+
+          <!-- Row 3: Date Hired -->
+          <div>
+            <label class="lark-label">Date Hired<span class="lark-required">*</span></label>
+            <input type="date" id="formDateHired" required value="2026-09-21" class="lark-input" />
+          </div>
+
+          <!-- Row 4: Job Level -->
+          <div>
+            <label class="lark-label">Job Level<span class="lark-required">*</span></label>
+            <select id="formJobLevel" required class="lark-input">
+              <option value="" disabled selected>Select</option>
+              <option value="Rank & File">Rank & File</option>
+              <option value="Junior Associate">Junior Associate</option>
+              <option value="Senior Associate">Senior Associate</option>
+              <option value="Specialist / Professional">Specialist / Professional</option>
+              <option value="Team Lead">Team Lead</option>
+              <option value="Manager">Manager</option>
+              <option value="Senior Manager / Director">Senior Manager / Director</option>
+            </select>
+          </div>
+
+          <!-- Row 5: Company -->
+          <div>
+            <label class="lark-label">Company<span class="lark-required">*</span></label>
+            <select id="formCompany" required class="lark-input">
+              <option value="" disabled selected>Select</option>
+              <option value="CMG Group of Companies">CMG Group of Companies</option>
+              <option value="CMG Retail Inc.">CMG Retail Inc.</option>
+              <option value="CMG Distribution Corp.">CMG Distribution Corp.</option>
+              <option value="CMG Logistics Philippines">CMG Logistics Philippines</option>
+            </select>
+          </div>
+
+          <!-- Row 6: Unit / Channel -->
+          <div>
+            <label class="lark-label">Unit / Channel<span class="lark-required">*</span></label>
+            <select id="formUnitChannel" required class="lark-input">
+              <option value="" disabled selected>Select</option>
+              <option value="Corporate HQ">Corporate HQ</option>
+              <option value="E-Commerce Fulfillment">E-Commerce Fulfillment</option>
+              <option value="Retail Stores Network">Retail Stores Network</option>
+              <option value="Regional Logistics Hub">Regional Logistics Hub</option>
+              <option value="B2B Wholesale">B2B Wholesale</option>
+            </select>
+          </div>
+
+          <!-- Row 7: Branch -->
+          <div>
+            <label class="lark-label">Branch<span class="lark-required">*</span></label>
+            <div class="flex items-center space-x-2">
+              <select id="formBranch" required class="lark-input flex-1">
+                <option value="Taguig HQ - 24th Floor" selected>Taguig HQ - 24th Floor</option>
+                <option value="Makati Central Hub">Makati Central Hub</option>
+                <option value="Cebu Distribution Center">Cebu Distribution Center</option>
+                <option value="Davao Regional Hub">Davao Regional Hub</option>
               </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-neutral-400">
-                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+              <button type="button" onclick="alert('Add Branch modal simulated')" class="px-3.5 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-sm font-semibold transition" title="Add Branch">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 8: Employee Status -->
+          <div>
+            <label class="lark-label">Employee Status<span class="lark-required">*</span></label>
+            <select id="formEmployeeStatus" required class="lark-input">
+              <option value="" disabled selected>Select</option>
+              <option value="Regular" selected>Regular</option>
+              <option value="Probationary">Probationary</option>
+              <option value="Project-Based">Project-Based</option>
+              <option value="Fixed-Term Contract">Fixed-Term Contract</option>
+            </select>
+          </div>
+
+          <!-- Row 9: EOC/Separation Date -->
+          <div>
+            <label class="lark-label">EOC/Separation Date<span class="lark-required">*</span></label>
+            <input type="date" id="formEocDate" required value="2026-09-21" class="lark-input" />
+          </div>
+
+          <!-- Row 10: With Clearance Already? -->
+          <div>
+            <label class="lark-label">With Clearance Already?<span class="lark-required">*</span></label>
+            <select id="formWithClearance" required class="lark-input">
+              <option value="" disabled selected>Select</option>
+              <option value="Yes">Yes</option>
+              <option value="No" selected>No</option>
+              <option value="In Progress">In Progress</option>
+            </select>
+          </div>
+
+          <!-- Row 11: Reason for Separation -->
+          <div>
+            <label class="lark-label">Reason for Separation<span class="lark-required">*</span></label>
+            <select id="formReasonSeparation" required class="lark-input">
+              <option value="" disabled selected>Select</option>
+              <option value="Resignation" selected>Resignation</option>
+              <option value="End of Contract">End of Contract</option>
+              <option value="Retirement">Retirement</option>
+              <option value="Redundancy / Restructuring">Redundancy / Restructuring</option>
+              <option value="Mutual Separation">Mutual Separation</option>
+            </select>
+          </div>
+
+          <!-- Instruction Banner (Exact from user screenshot) -->
+          <div class="p-3.5 rounded-lg bg-neutral-100/90 dark:bg-neutral-800/70 border border-neutral-200/80 dark:border-neutral-700 text-xs text-neutral-600 dark:text-neutral-300 flex items-start space-x-2">
+            <i class="fa-solid fa-circle-info text-neutral-400 mt-0.5"></i>
+            <span>If there are missing documents, please attach a notarized affidavit of loss.</span>
+          </div>
+
+          <!-- Attachment 1: Accountability Form -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="lark-label mb-0">Accountability Form</label>
+              <span id="aiTag1" class="hidden text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-500/10 text-lark-blue">
+                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Pre-Checked
+              </span>
+            </div>
+            <div class="flex items-center space-x-3">
+              <button type="button" onclick="document.getElementById('attachAccountability').click()" class="px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-xs font-semibold text-neutral-700 dark:text-neutral-200 shadow-sm transition flex items-center">
+                <i class="fa-solid fa-arrow-up-from-bracket mr-2 text-neutral-400"></i> Upload attachment
+              </button>
+              <input type="file" id="attachAccountability" class="hidden" onchange="handleFormAttachment(this, 'accountabilityFileName', 'CLEARANCE_SHEET', 'aiTag1')" />
+              <span id="accountabilityFileName" class="text-xs text-neutral-500">clearance_sheet_valid.pdf (Pre-loaded sample)</span>
+            </div>
+            <p class="text-[11px] text-neutral-400">Up to 9 attachments (50 MB each max)</p>
+          </div>
+
+          <!-- Attachment 2: Valid Government ID -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="lark-label mb-0">Valid Government ID<span class="lark-required">*</span></label>
+              <span id="aiTag2" class="hidden text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-500/10 text-lark-blue">
+                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Pre-Checked
+              </span>
+            </div>
+            <div class="flex items-center space-x-3">
+              <button type="button" onclick="document.getElementById('attachId').click()" class="px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-xs font-semibold text-neutral-700 dark:text-neutral-200 shadow-sm transition flex items-center">
+                <i class="fa-solid fa-arrow-up-from-bracket mr-2 text-neutral-400"></i> Upload attachment
+              </button>
+              <input type="file" id="attachId" class="hidden" onchange="handleFormAttachment(this, 'idFileName', 'BANK_ENROLLMENT', 'aiTag2')" />
+              <span id="idFileName" class="text-xs text-neutral-500">bank_gcash_valid.png (Pre-loaded proof)</span>
+            </div>
+            <p class="text-[11px] text-neutral-400">Up to 9 attachments (50 MB each max)</p>
+          </div>
+
+          <!-- Collapsible Approval Process Tree -->
+          <div class="border border-neutral-200 dark:border-neutral-700 rounded-xl overflow-hidden bg-neutral-50/50 dark:bg-neutral-800/30">
+            <div onclick="toggleApprovalTree()" class="p-3.5 bg-neutral-100/60 dark:bg-neutral-800/50 flex items-center justify-between cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+              <span class="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center">
+                Approval Process
+              </span>
+              <span id="treeIcon" class="text-xs text-neutral-400"><i class="fa-solid fa-chevron-up"></i></span>
+            </div>
+            <div id="approvalTreeContent" class="p-4 space-y-3 text-xs">
+              <!-- Visual Node Stages -->
+              <div class="flex items-center space-x-3">
+                <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">1</div>
+                <div>
+                  <div class="font-semibold text-neutral-800 dark:text-neutral-200">Department Clearances (Parallel Nodes)</div>
+                  <div class="text-[11px] text-neutral-500">IT Asset Surrender · Admin Facilities · Immediate Supervisor</div>
+                </div>
+              </div>
+              <div class="w-0.5 h-3 bg-neutral-300 dark:bg-neutral-700 ml-3"></div>
+              <div class="flex items-center space-x-3">
+                <div class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] font-bold">2</div>
+                <div>
+                  <div class="font-semibold text-neutral-800 dark:text-neutral-200">Last Pay Computation (Finance & Payroll)</div>
+                  <div class="text-[11px] text-neutral-500">Tax computation, leave monetization, quit claim figure audit</div>
+                </div>
+              </div>
+              <div class="w-0.5 h-3 bg-neutral-300 dark:bg-neutral-700 ml-3"></div>
+              <div class="flex items-center space-x-3">
+                <div class="w-6 h-6 rounded-full bg-neutral-300 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 flex items-center justify-center text-[10px] font-bold">3</div>
+                <div>
+                  <div class="font-semibold text-neutral-800 dark:text-neutral-200">Final Release & Disbursement</div>
+                  <div class="text-[11px] text-neutral-500">Bank / E-Wallet transfer release confirmation</div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Minimalist Drag and Drop Area -->
-          <div id="dropZone" class="border border-dashed border-neutral-300 dark:border-neutral-700 hover:border-apple-blue dark:hover:border-apple-blue rounded-xl p-6 text-center transition cursor-pointer bg-neutral-50/50 dark:bg-neutral-800/30 hover:bg-blue-50/20 dark:hover:bg-blue-950/10">
-            <input type="file" id="fileInput" class="hidden" />
-            <div class="w-10 h-10 mx-auto mb-2.5 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400 dark:text-neutral-500">
-              <i class="fa-solid fa-arrow-up-from-bracket text-sm"></i>
-            </div>
-            <p id="fileLabel" class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
-              Drop file here, or <span class="text-apple-blue font-medium">browse</span>
-            </p>
-            <p class="text-[11px] text-neutral-400 dark:text-neutral-500 mt-1">PDF, PNG, JPG up to 25MB</p>
+          <!-- Form Actions (Exact button arrangement from screenshot) -->
+          <div class="pt-4 flex items-center space-x-3">
+            <button type="submit" id="larkSubmitBtn" class="px-6 py-2.5 bg-lark-blue hover:bg-lark-blueHover text-white text-xs font-semibold rounded-lg shadow-sm active:scale-[0.98] transition">
+              Submit
+            </button>
+            <button type="button" onclick="resetLarkForm()" class="px-5 py-2.5 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-xs font-semibold rounded-lg shadow-sm transition">
+              Cancel
+            </button>
           </div>
 
-          <!-- Execute Button (Apple Solid Pill) -->
-          <button type="submit" id="submitBtn" class="w-full py-2.5 px-4 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 text-xs font-semibold rounded-xl shadow-sm active:scale-[0.99] transition flex items-center justify-center">
-            <i class="fa-solid fa-bolt mr-2 text-xs"></i> Run AI Pre-Check
-          </button>
         </form>
+
       </div>
 
-      <!-- Quick Test Synthetic Samples Card -->
-      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] border border-black/[0.05] dark:border-white/[0.08] transition">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-            Synthetic Test Fixtures
-          </h2>
-          <span class="text-[10px] px-2 py-0.5 rounded-md font-mono bg-neutral-100 dark:bg-neutral-800 text-neutral-500">6 samples</span>
-        </div>
-        <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mb-3.5">
-          Select any verified or edge-case document to test discrepancy detection:
-        </p>
-        <div id="samplesList" class="space-y-2">
-          <p class="text-xs text-neutral-400">Loading samples...</p>
-        </div>
-      </div>
+    </section>
 
-      <!-- Immutable Audit Trail Card -->
-      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] border border-black/[0.05] dark:border-white/[0.08] transition">
-        <div class="flex items-center justify-between mb-3.5">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-            Immutable Audit Trail
-          </h2>
-          <button onclick="loadAuditLogs()" class="text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 transition" title="Refresh logs">
-            <i class="fa-solid fa-arrow-rotate-right"></i>
-          </button>
-        </div>
-        <div id="auditLogContainer" class="max-h-64 overflow-y-auto space-y-2 text-xs pr-1">
-          <p class="text-neutral-400">Loading audit trail...</p>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Right Column (8 cols): Document Preview & Pre-Check Results -->
-    <div class="lg:col-span-8 space-y-6">
+    <!-- ================================================================= -->
+    <!-- VIEW 2: ROLE-BASED APPROVER DESK (LARK ADMIN / APPROVER VIEW) -->
+    <!-- ================================================================= -->
+    <section id="viewApprover" class="hidden space-y-6">
       
-      <!-- Main Display Card -->
-      <div id="resultCard" class="bg-apple-surfaceLight dark:bg-apple-surfaceDark rounded-2xl p-7 shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] border border-black/[0.05] dark:border-white/[0.08] min-h-[560px] flex flex-col justify-between transition">
-        
-        <!-- Empty State -->
-        <div id="emptyState" class="my-auto py-20 text-center">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800/80 flex items-center justify-center text-neutral-400 dark:text-neutral-500">
-            <i class="fa-regular fa-folder-open text-2xl"></i>
-          </div>
-          <h3 class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">No Document Analyzed Yet</h3>
-          <p class="text-xs text-neutral-400 dark:text-neutral-500 max-w-sm mx-auto mt-1.5 leading-relaxed">
-            Select a synthetic test sample on the left, or upload a document to trigger the AI extraction and rule verification engine.
-          </p>
+      <!-- Role Switcher & Sub-Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-apple-surfaceLight dark:bg-apple-surfaceDark p-5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm">
+        <div>
+          <h2 class="text-base font-bold text-neutral-900 dark:text-white flex items-center">
+            <i class="fa-solid fa-list-check mr-2 text-lark-blue"></i> Clearance Approver Review Desk
+          </h2>
+          <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Review submitted clearance dossiers and verify AI pre-check flags</p>
         </div>
 
-        <!-- Result Content (Visible upon inspection) -->
-        <div id="resultContent" class="hidden space-y-6">
+        <!-- Approver Role Selector -->
+        <div class="flex items-center space-x-2">
+          <span class="text-xs text-neutral-400 font-medium">Logged Role:</span>
+          <select id="approverRoleSelect" onchange="switchApproverRole(this.value)" class="text-xs font-semibold appearance-none bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-1.5 text-neutral-800 dark:text-neutral-200 focus:ring-2 focus:ring-lark-blue focus:outline-none cursor-pointer">
+            <option value="IT_APPROVER">IT Department Approver</option>
+            <option value="FINANCE_APPROVER">Finance & Payroll Approver</option>
+            <option value="HR_APPROVER">HR Exit Approver</option>
+            <option value="ADMIN_APPROVER">Facilities & Admin</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Approver Two-Column Review Deck -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Deck: Pending Submissions Queue -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+                Pending Clearance Queue
+              </h3>
+              <span id="queueBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+                3 submissions
+              </span>
+            </div>
+            
+            <div id="dossiersQueue" class="space-y-2.5">
+              <!-- Queue items populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Deck: Active Clearance Review Details & AI Flags -->
+        <div class="lg:col-span-7 space-y-4">
           
-          <!-- Summary Header -->
-          <div class="flex flex-wrap items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-5 gap-4">
+          <div id="approverEmptyCard" class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-12 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] text-center text-neutral-400 min-h-[460px] flex flex-col justify-center">
+            <i class="fa-regular fa-folder-open text-4xl mb-3 text-neutral-300 dark:text-neutral-600"></i>
+            <h4 class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Select a Dossier to Inspect</h4>
+            <p class="text-xs text-neutral-400 max-w-xs mx-auto mt-1">Click any pending employee in the queue to load the Lark application details, document preview, and AI pre-check flags.</p>
+          </div>
+
+          <div id="approverActiveCard" class="hidden bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-5">
+            
+            <!-- Employee Header -->
+            <div class="flex items-start justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-4">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span id="apprDossierId" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-500/10 text-lark-blue">DOS-2026-001</span>
+                  <h3 id="apprEmpName" class="text-base font-bold text-neutral-900 dark:text-white">Juan Dela Cruz</h3>
+                </div>
+                <p id="apprDeptRole" class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Information Technology · Senior Specialist</p>
+              </div>
+              <div class="text-right">
+                <span id="apprStatusBadge" class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-apple-amber border border-amber-500/20">
+                  Pending Sign-Off
+                </span>
+              </div>
+            </div>
+
+            <!-- Application Metadata Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/40 text-xs border border-black/[0.04] dark:border-white/[0.06]">
+              <div>
+                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">Company</span>
+                <span id="apprCompany" class="font-medium text-neutral-800 dark:text-neutral-200">CMG Group</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">Unit / Channel</span>
+                <span id="apprUnit" class="font-medium text-neutral-800 dark:text-neutral-200">HQ Operations</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">Branch</span>
+                <span id="apprBranch" class="font-medium text-neutral-800 dark:text-neutral-200">Taguig HQ</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">Hired Date</span>
+                <span id="apprDateHired" class="font-medium text-neutral-800 dark:text-neutral-200">2022-03-15</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">EOC / Separation</span>
+                <span id="apprEocDate" class="font-medium text-neutral-800 dark:text-neutral-200">2026-08-31</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-neutral-400 uppercase font-semibold block">Separation Reason</span>
+                <span id="apprReason" class="font-medium text-neutral-800 dark:text-neutral-200">Resignation</span>
+              </div>
+            </div>
+
+            <!-- AI Pre-Check Flags for this dossier -->
             <div>
-              <div class="flex items-center space-x-2.5">
-                <span id="resDocType" class="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-black/[0.04] dark:border-white/[0.06]">
-                  QUIT_CLAIM
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center">
+                  <i class="fa-solid fa-shield-halved mr-1.5 text-apple-blue"></i> AI Document Pre-Check Analysis
+                </h4>
+                <span id="apprFlagsCount" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red font-semibold">2 Flags</span>
+              </div>
+              <div id="apprFlagsList" class="space-y-2">
+                <!-- Injected flags -->
+              </div>
+            </div>
+
+            <!-- Attached Document Preview -->
+            <div class="border border-black/[0.06] dark:border-white/[0.08] rounded-xl overflow-hidden bg-neutral-50 dark:bg-neutral-900/50">
+              <div class="px-4 py-2 bg-neutral-100 dark:bg-neutral-800/60 flex items-center justify-between text-xs">
+                <span class="font-semibold text-neutral-700 dark:text-neutral-300">
+                  <i class="fa-regular fa-file-pdf mr-1.5 text-lark-blue"></i> Attached Document Preview: <span id="apprDocName" class="font-mono text-[11px]">doc.pdf</span>
                 </span>
                 <h3 id="resFileName" class="text-base font-semibold text-neutral-900 dark:text-white">quit_claim_valid.pdf</h3>
               </div>
