@@ -326,6 +326,15 @@ HTML_DASHBOARD = """<!DOCTYPE html>
             mono: ['"SF Mono"', 'Menlo', 'Monaco', 'monospace'],
           },
           colors: {
+            lark: {
+              blue: '#3370FF',
+              blueHover: '#295ECC',
+              border: '#DEE0E3',
+              bgGray: '#F5F6F7',
+              textDark: '#1F2329',
+              textMuted: '#646A73',
+              redStar: '#F54A45',
+            },
             apple: {
               blue: '#0071E3',
               blueHover: '#0077ED',
@@ -344,52 +353,70 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     };
   </script>
   
-  <!-- SF Pro / FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   
   <style>
-    /* Apple smooth scroll and subpixel antialiasing */
-    html {
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
+    html { -webkit-font-smoothing: antialiased; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: rgba(140, 140, 145, 0.3); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(140, 140, 145, 0.5); }
     
-    /* Subtle custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    /* Lark custom select and input styles with Apple touch */
+    .lark-input {
+      width: 100%;
+      font-size: 13px;
+      color: #1F2329;
+      background-color: #FFFFFF;
+      border: 1px solid #DEE0E3;
+      border-radius: 8px;
+      padding: 9px 12px;
+      outline: none;
+      transition: all 0.2s ease;
     }
-    ::-webkit-scrollbar-track {
-      background: transparent;
+    .dark .lark-input {
+      color: #F5F5F7;
+      background-color: #1C1C1E;
+      border-color: rgba(255, 255, 255, 0.12);
     }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(140, 140, 145, 0.3);
-      border-radius: 9999px;
+    .lark-input:focus {
+      border-color: #3370FF;
+      box-shadow: 0 0 0 2px rgba(51, 112, 255, 0.15);
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(140, 140, 145, 0.5);
+    .lark-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1F2329;
+      margin-bottom: 6px;
+    }
+    .dark .lark-label {
+      color: #E5E5EA;
+    }
+    .lark-required {
+      color: #F54A45;
+      margin-left: 2px;
     }
   </style>
 </head>
 <body class="bg-apple-canvasLight dark:bg-apple-canvasDark text-neutral-900 dark:text-neutral-100 min-h-screen transition-colors duration-300">
   
-  <!-- Apple Frosted Glass Header -->
-  <header class="sticky top-0 z-50 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
+  <!-- Apple Frosted Glass Top Navigation -->
+  <header class="sticky top-0 z-50 bg-white/85 dark:bg-neutral-900/85 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       
-      <!-- Brand & Product Title -->
+      <!-- Brand & Title -->
       <div class="flex items-center space-x-3.5">
-        <div class="w-8 h-8 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 flex items-center justify-center shadow-sm">
-          <i class="fa-solid fa-file-shield text-sm"></i>
+        <div class="w-8 h-8 rounded-xl bg-lark-blue text-white flex items-center justify-center shadow-sm">
+          <i class="fa-solid fa-file-signature text-sm"></i>
         </div>
         <div>
           <div class="flex items-center space-x-2">
-            <h1 class="text-sm font-semibold tracking-tight">Clearance & Last Pay</h1>
-            <span class="text-[11px] px-2 py-0.5 rounded-full font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-black/[0.04] dark:border-white/[0.06]">
-              Milestone 1
+            <h1 class="text-sm font-semibold tracking-tight">Clearance & Last Pay Approval</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-500/10 text-lark-blue border border-blue-500/20">
+              Lark Companion
             </span>
           </div>
-          <p class="text-[11px] text-neutral-500 dark:text-neutral-400">AI Document Pre-Check & Human Verification Gate</p>
+          <p class="text-[11px] text-neutral-500 dark:text-neutral-400">CMG Group of Companies · Automated Pre-Checks</p>
         </div>
       </div>
 
