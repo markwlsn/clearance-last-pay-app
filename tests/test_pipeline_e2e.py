@@ -199,6 +199,7 @@ def test_split_escrow_disbursement(client):
 
 def test_transaction_comments(client):
     """Verifies Centralized Transaction Discussion thread posting and audit logging."""
+    # Approver post
     resp = client.post("/api/approvals/transaction-comment", json={
         "dossier_id": "DOS-2026-001",
         "author": "Alex Tan (IT Clearance Lead)",

@@ -339,6 +339,13 @@ app.state.dossiers = [
                 "role": "HR_APPROVER",
                 "text": "Split escrow option ready to disburse ₱48,500.00 immediately to Maria Clara to prevent DOLE 30-day compliance delay.",
                 "timestamp": "2026-09-18T16:00:00Z"
+            },
+            {
+                "id": "cmt-203",
+                "author": "Maria Clara Santos",
+                "role": "REQUESTER",
+                "text": "Agreeing to the split escrow release of ₱48,500.00 while Finance and HR resolve the ₱3,500 adapter dispute.",
+                "timestamp": "2026-09-18T16:30:00Z"
             }
         ],
         "docs": [
@@ -435,6 +442,13 @@ app.state.dossiers = [
                 "role": "FINANCE_APPROVER",
                 "text": "GCash number is truncated to 6 digits (091712). Sent Lark reminder requesting valid screenshot.",
                 "timestamp": "2026-09-20T13:20:00Z"
+            },
+            {
+                "id": "cmt-302",
+                "author": "Pedro Penduko",
+                "role": "REQUESTER",
+                "text": "Uploaded new screenshot of GCash with full 11-digit mobile number (0917-882-9412).",
+                "timestamp": "2026-09-20T14:00:00Z"
             }
         ],
         "docs": [
@@ -531,6 +545,13 @@ app.state.dossiers = [
                 "role": "HR_APPROVER",
                 "text": "All departmental clearances complete with 0 AI flags. Automated fast-track release approved.",
                 "timestamp": "2026-09-20T17:05:00Z"
+            },
+            {
+                "id": "cmt-402",
+                "author": "Elena Cruz",
+                "role": "REQUESTER",
+                "text": "Received the COE and acknowledged receipt of final pay. Thank you HR and Admin team!",
+                "timestamp": "2026-09-20T17:15:00Z"
             }
         ],
         "docs": [
@@ -811,10 +832,17 @@ def nudge_pending_signer(req: NudgeRequest):
 
 @app.post("/api/approvals/transaction-comment")
 def post_transaction_comment(req: TransactionCommentRequest):
-    """Appends an in-dossier transparency comment/update for all stakeholders to see."""
+    """Appends an in-dossier transparency comment/update strictly restricted to the requesting user and approvers."""
     dossier = next((d for d in app.state.dossiers if d["dossier_id"] == req.dossier_id), None)
     if not dossier:
         raise HTTPException(status_code=404, detail="Dossier not found")
+
+    allowed_roles = {"REQUESTER", "EMPLOYEE", "IT_APPROVER", "FINANCE_APPROVER", "HR_APPROVER", "ADMIN_APPROVER"}
+    if req.role not in allowed_roles:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied: Clearance transaction discussion is strictly restricted to the requesting employee and authorized approvers only."
+        )
 
     new_comment = {
         "id": f"cmt-{uuid.uuid4().hex[:6]}",
@@ -1504,13 +1532,20 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- Approver Persona Switcher Bar -->
+      <!-- Persona Perspective Switcher Bar (Requester & Approvers) -->
       <div class="bg-white/80 dark:bg-neutral-900/80 apple-glass px-5 py-3.5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
         <div class="flex items-center space-x-2 text-[11px] uppercase tracking-wider font-bold text-neutral-400 dark:text-neutral-500">
           <i class="fa-solid fa-id-badge text-apple-blue"></i>
-          <span>Active Approver Perspective:</span>
+          <span>Active Perspective:</span>
         </div>
         <div class="flex flex-wrap items-center p-1 bg-neutral-200/60 dark:bg-neutral-800/80 rounded-2xl gap-1">
+          <!-- Requesting Employee Perspective -->
+          <button onclick="switchApproverRole('REQUESTER')" id="roleBtnRequester" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2">
+            <div class="w-4 h-4 rounded-md bg-sky-500/15 text-sky-500 flex items-center justify-center text-[9px]"><i class="fa-solid fa-user"></i></div>
+            <span id="roleLabelRequesterName">Juan Dela Cruz (Requester)</span>
+          </button>
+          <div class="w-px h-4 bg-neutral-300 dark:bg-neutral-700 mx-0.5"></div>
+          <!-- Clearance Approvers Perspectives -->
           <button onclick="switchApproverRole('IT_APPROVER')" id="roleBtnIT" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm">
             <div class="w-4 h-4 rounded-md bg-blue-500/15 text-apple-blue flex items-center justify-center text-[9px]"><i class="fa-solid fa-laptop-code"></i></div>
             <span>Alex Tan (IT)</span>
@@ -1806,9 +1841,9 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
             </div>
 
-            <!-- 5b. Centralized Transaction Discussion Thread (Transparent Audit Chat) -->
+            <!-- 5b. Centralized Transaction Discussion Thread (Scoped: Requester & Approvers Only) -->
             <div class="p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3.5">
-              <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
                 <div class="flex items-center space-x-2.5">
                   <div class="w-7 h-7 rounded-xl bg-purple-500/15 text-apple-purple flex items-center justify-center text-xs shadow-sm">
                     <i class="fa-solid fa-comments"></i>
@@ -1817,7 +1852,9 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                     <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
                       Centralized Transaction Discussion
                     </h4>
-                    <p class="text-[10px] text-neutral-500 dark:text-neutral-400">Transparent in-dossier thread · Shared across Employee, IT, Facilities, Finance & HR</p>
+                    <p id="transactionScopeText" class="text-[10px] text-neutral-500 dark:text-neutral-400">
+                      Confidential thread · Restricted strictly to <strong id="threadRequesterName" class="text-neutral-800 dark:text-neutral-200">Juan Dela Cruz (Requester)</strong> & Clearance Approvers only
+                    </p>
                   </div>
                 </div>
                 <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-apple-green flex items-center space-x-1">
