@@ -310,9 +310,9 @@ def test_three_portals_rendered(client):
     assert resp.status_code == 200
     html = resp.text
     # 3 Dedicated Portals
-    assert "viewRequesterPortal" in html
-    assert "viewApproverDesk" in html
-    assert "viewAdminDashboard" in html
+    assert "viewUserEnd" in html
+    assert "viewApproverEnd" in html
+    assert "viewAdminEnd" in html
     # Simulation clutter removed
     assert "viewHarness" not in html
 

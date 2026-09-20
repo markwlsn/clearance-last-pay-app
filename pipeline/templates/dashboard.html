@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clearance & Last Pay — Lark Companion App</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Clearance & Last Pay — CMG Group</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -129,59 +132,84 @@
     </div>
   </div>
   
-  <!-- Apple Frosted Glass Top Navigation Bar (3 Dedicated Ends) -->
+  <!-- Top Navigation Header -->
   <header class="sticky top-0 z-50 bg-white/85 dark:bg-neutral-900/85 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
       
       <!-- Brand & Title -->
-      <div class="flex items-center space-x-3 shrink-0">
-        <div class="w-8 h-8 rounded-xl bg-lark-blue text-white flex items-center justify-center shadow-sm">
+      <a href="/" onclick="navigateToPortal('gateway', event)" class="flex items-center space-x-3 shrink-0 group">
+        <div class="w-8 h-8 rounded-xl bg-lark-blue text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
           <i class="fa-solid fa-file-signature text-sm"></i>
         </div>
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="text-sm font-semibold tracking-tight">Clearance & Last Pay</h1>
-            <span class="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-500/10 text-lark-blue border border-blue-500/20">
-              Lark Companion
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-500/10 text-lark-blue border border-blue-500/20">
+              CMG Enterprise
             </span>
           </div>
-          <p class="text-[11px] text-neutral-500 dark:text-neutral-400">CMG Group of Companies · Human-in-the-Loop</p>
+          <p class="text-[11px] text-neutral-500 dark:text-neutral-400">DOLE 30-Day Compliance · Automated Pre-Checks</p>
         </div>
+      </a>
+
+      <!-- Center: Active Portal Badge Indicator -->
+      <div id="activePortalIndicator" class="hidden sm:flex items-center">
+        <!-- Injected via JS based on active portal -->
       </div>
 
-      <!-- Center 3-End Segmented Navigation -->
-      <nav class="flex items-center p-1 bg-neutral-200/70 dark:bg-neutral-800/80 rounded-2xl space-x-1 shadow-inner">
-        <!-- End 1: User / Requester Portal -->
-        <button id="tabBtnRequester" onclick="switchPortal('requester')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1.5">
-          <i class="fa-regular fa-user text-sky-500"></i>
-          <span class="hidden md:inline">User End (Requester)</span>
-          <span class="md:hidden">Requester</span>
-        </button>
-        <!-- End 2: Approver Desk -->
-        <button id="tabBtnApprover" onclick="switchPortal('approver')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition flex items-center space-x-1.5">
-          <i class="fa-solid fa-user-check text-apple-green"></i>
-          <span class="hidden md:inline">Approver Dashboard</span>
-          <span class="md:hidden">Approver</span>
-        </button>
-        <!-- End 3: Admin Dashboard -->
-        <button id="tabBtnAdmin" onclick="switchPortal('admin')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1.5">
-          <i class="fa-solid fa-shield-halved text-apple-purple"></i>
-          <span class="hidden md:inline">Admin Dashboard</span>
-          <span class="md:hidden">Admin</span>
-        </button>
-      </nav>
+      <!-- Right: Enterprise Portal Dropdown & Theme Toggle -->
+      <div class="flex items-center space-x-3 shrink-0">
+        
+        <!-- Portal Selector Dropdown -->
+        <div class="relative">
+          <button onclick="togglePortalDropdown()" id="portalDropdownBtn" class="px-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200/80 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-semibold border border-black/[0.06] dark:border-white/[0.08] transition flex items-center space-x-2 shadow-sm">
+            <span id="currentPortalLabel">👤 User End</span>
+            <i class="fa-solid fa-chevron-down text-[10px] text-neutral-400"></i>
+          </button>
 
-      <!-- Right Controls: Guardrail & Theme Switcher -->
-      <div class="flex items-center space-x-2.5 shrink-0">
-        <div class="hidden lg:flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-          <i class="fa-solid fa-shield-check text-[11px]"></i>
-          <span>DOLE Compliant</span>
+          <!-- Dropdown Menu -->
+          <div id="portalDropdownMenu" class="hidden absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-apple-surfaceDark border border-black/[0.08] dark:border-white/[0.1] shadow-2xl p-2 z-50 space-y-1">
+            <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Select Dedicated End:</div>
+            
+            <a href="/user" onclick="navigateToPortal('user', event)" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-neutral-800 dark:text-neutral-200 group">
+              <div class="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-500 flex items-center justify-center text-xs group-hover:scale-110 transition"><i class="fa-solid fa-user"></i></div>
+              <div>
+                <div class="font-bold">User End</div>
+                <div class="text-[10px] text-neutral-400">Requesting & timeline monitor</div>
+              </div>
+            </a>
+
+            <a href="/approver" onclick="navigateToPortal('approver', event)" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-neutral-800 dark:text-neutral-200 group">
+              <div class="w-7 h-7 rounded-lg bg-emerald-500/15 text-apple-green flex items-center justify-center text-xs group-hover:scale-110 transition"><i class="fa-solid fa-user-check"></i></div>
+              <div>
+                <div class="font-bold">Approver End</div>
+                <div class="text-[10px] text-neutral-400">Department turn-based reviews</div>
+              </div>
+            </a>
+
+            <a href="/admin" onclick="navigateToPortal('admin', event)" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-neutral-800 dark:text-neutral-200 group">
+              <div class="w-7 h-7 rounded-lg bg-purple-500/15 text-apple-purple flex items-center justify-center text-xs group-hover:scale-110 transition"><i class="fa-solid fa-shield-halved"></i></div>
+              <div>
+                <div class="font-bold">Admin End</div>
+                <div class="text-[10px] text-neutral-400">5 Pending · 5 Review · 5 Release</div>
+              </div>
+            </a>
+
+            <div class="pt-1 border-t border-black/[0.04] dark:border-white/[0.06]">
+              <a href="/" onclick="navigateToPortal('gateway', event)" class="flex items-center space-x-2 px-3 py-2 rounded-xl text-xs font-semibold text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition">
+                <i class="fa-solid fa-grip text-xs text-neutral-400"></i>
+                <span>Portal Gateway</span>
+              </a>
+            </div>
+          </div>
         </div>
 
-        <button id="themeToggle" onclick="toggleTheme()" class="p-2 w-9 h-9 rounded-full bg-neutral-200/70 dark:bg-neutral-800 hover:bg-neutral-300/70 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 transition flex items-center justify-center focus:outline-none" title="Toggle Light / Dark Mode">
+        <!-- Light / Dark Mode Switcher -->
+        <button id="themeToggle" onclick="toggleTheme()" class="p-2 w-9 h-9 rounded-full bg-neutral-200/70 dark:bg-neutral-800 hover:bg-neutral-300/70 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 transition flex items-center justify-center focus:outline-none" title="Toggle Theme">
           <i id="themeIconSun" class="fa-solid fa-sun text-sm hidden"></i>
           <i id="themeIconMoon" class="fa-solid fa-moon text-sm"></i>
         </button>
+
       </div>
 
     </div>
@@ -190,11 +218,95 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
     <!-- ================================================================= -->
-    <!-- END 1: USER / REQUESTER PORTAL (REQUESTING & MONITORING TIMELINE) -->
+    <!-- PORTAL GATEWAY: 3 DEDICATED DESTINATIONS                         -->
     <!-- ================================================================= -->
-    <section id="viewRequesterPortal" class="hidden space-y-6">
+    <section id="viewGateway" class="space-y-8 py-8">
       
-      <!-- Requester Tester Account Switcher & File Action Bar -->
+      <div class="max-w-2xl mx-auto text-center space-y-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-apple-blue bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full">
+          CMG Enterprise Clearance Suite
+        </span>
+        <h2 class="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
+          Choose Your Dedicated End
+        </h2>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+          Access the clearance pipeline tailored specifically to your role.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto pt-4">
+        
+        <!-- 1. USER END CARD -->
+        <div onclick="navigateToPortal('user')" class="p-8 rounded-3xl bg-white dark:bg-apple-surfaceDark border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:border-sky-500/40 hover:shadow-xl cursor-pointer transition flex flex-col justify-between group select-none">
+          <div class="space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-sky-500/15 text-sky-500 flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-sm">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">Employee Portal</span>
+              <h3 class="text-xl font-bold text-neutral-900 dark:text-white mt-0.5 group-hover:text-sky-500 transition">User End</h3>
+            </div>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+              Lodge clearance applications, track concrete hardware and key turnover milestones, view whose turn is next, and communicate directly with approvers.
+            </p>
+          </div>
+          <div class="mt-8 pt-4 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs font-bold text-sky-600 dark:text-sky-400">
+            <span>Enter User End</span>
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition"></i>
+          </div>
+        </div>
+
+        <!-- 2. APPROVER END CARD -->
+        <div onclick="navigateToPortal('approver')" class="p-8 rounded-3xl bg-white dark:bg-apple-surfaceDark border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:border-apple-green/40 hover:shadow-xl cursor-pointer transition flex flex-col justify-between group select-none">
+          <div class="space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-500/15 text-apple-green flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-sm">
+              <i class="fa-solid fa-user-check"></i>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Department Review Desk</span>
+              <h3 class="text-xl font-bold text-neutral-900 dark:text-white mt-0.5 group-hover:text-apple-green transition">Approver End</h3>
+            </div>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+              Designed for IT, Admin, Finance, and HR leads. Clear indicators showing whose turn it is to approve whom, 1-click turn-advancing sign-offs, and escrow resolution.
+            </p>
+          </div>
+          <div class="mt-8 pt-4 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs font-bold text-apple-green">
+            <span>Enter Approver End</span>
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition"></i>
+          </div>
+        </div>
+
+        <!-- 3. ADMIN END CARD -->
+        <div onclick="navigateToPortal('admin')" class="p-8 rounded-3xl bg-white dark:bg-apple-surfaceDark border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:border-apple-purple/40 hover:shadow-xl cursor-pointer transition flex flex-col justify-between group select-none">
+          <div class="space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-purple-500/15 text-apple-purple flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-sm">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Executive Oversight</span>
+              <h3 class="text-xl font-bold text-neutral-900 dark:text-white mt-0.5 group-hover:text-apple-purple transition">Admin End</h3>
+            </div>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+              Executive command center tracking company-wide pipeline partitioned into 5 Pending, 5 For Review, and 5 Ready for Release with DOLE SLA velocity metrics.
+            </p>
+          </div>
+          <div class="mt-8 pt-4 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs font-bold text-apple-purple">
+            <span>Enter Admin End</span>
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition"></i>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================================================= -->
+    <!-- 1️⃣ USER END: EMPLOYEE REQUESTING & TIMELINE MONITORING            -->
+    <!-- ================================================================= -->
+    <section id="viewUserEnd" class="hidden space-y-6">
+      
+      <!-- User End Header & Switch Account Bar -->
       <div class="bg-white/80 dark:bg-neutral-900/80 apple-glass p-4 sm:p-5 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div class="flex items-center space-x-3">
           <div class="w-10 h-10 rounded-2xl bg-sky-500/15 text-sky-500 flex items-center justify-center text-base shadow-sm shrink-0">
@@ -202,8 +314,8 @@
           </div>
           <div>
             <div class="flex items-center space-x-2">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">Requesting Employee Perspective</span>
-              <span class="text-[10px] px-2 py-0.2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 font-mono">15 Tester Accounts</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">User End</span>
+              <span class="text-[10px] px-2 py-0.2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 font-mono">15 Employee Accounts</span>
             </div>
             <h2 class="text-sm font-bold text-neutral-900 dark:text-white">Clearance Request & Hand-Off Timeline Monitor</h2>
           </div>
@@ -211,9 +323,9 @@
 
         <div class="flex flex-wrap items-center gap-2.5">
           <div class="flex items-center space-x-2">
-            <label for="requesterAccountSelect" class="text-xs font-semibold text-neutral-500 shrink-0">Switch Account:</label>
-            <select id="requesterAccountSelect" onchange="onSelectRequesterTesterAccount(this.value)" class="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white border border-black/[0.06] dark:border-white/[0.08] rounded-xl px-3 py-2 outline-none font-medium transition cursor-pointer">
-              <!-- Populated via JS with 15 Tester Accounts grouped by Pending, For Review, Ready for Release -->
+            <label for="userAccountSelect" class="text-xs font-semibold text-neutral-500 shrink-0">Switch Account:</label>
+            <select id="userAccountSelect" onchange="onSelectUserAccount(this.value)" class="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white border border-black/[0.06] dark:border-white/[0.08] rounded-xl px-3 py-2 outline-none font-medium transition cursor-pointer">
+              <!-- Populated via JS with 15 Tester Accounts -->
             </select>
           </div>
 
@@ -224,133 +336,128 @@
         </div>
       </div>
 
-      <!-- Active Requester Dossier Container -->
-      <div id="requesterDossierContainer" class="space-y-6">
-        
-        <!-- Requester Hero Profile Card -->
-        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col md:flex-row md:items-center justify-between gap-5">
-          <div class="flex items-start space-x-4">
-            <div id="reqAvatar" class="w-16 h-16 rounded-3xl bg-neutral-200/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 text-xl font-bold flex items-center justify-center shadow-inner shrink-0">
-              JD
-            </div>
-            <div>
-              <div class="flex flex-wrap items-center gap-2">
-                <h3 id="reqEmpName" class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">Juan Dela Cruz</h3>
-                <span id="reqEmpIdBadge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">
-                  EMP-94812
-                </span>
-                <span id="reqStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-apple-amber uppercase">
-                  PENDING
-                </span>
-              </div>
-              <div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
-                <span id="reqDeptTitle"><i class="fa-solid fa-briefcase mr-1.5 text-neutral-400"></i>Information Technology · Senior Specialist</span>
-                <span id="reqBranch"><i class="fa-solid fa-building mr-1.5 text-neutral-400"></i>Taguig HQ - 24th Floor</span>
-                <span id="reqEocDate"><i class="fa-solid fa-calendar-check mr-1.5 text-neutral-400"></i>EOC: 2026-08-31</span>
-              </div>
-            </div>
+      <!-- Active Employee Profile Card -->
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col md:flex-row md:items-center justify-between gap-5">
+        <div class="flex items-start space-x-4">
+          <div id="userAvatar" class="w-16 h-16 rounded-3xl bg-neutral-200/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 text-xl font-bold flex items-center justify-center shadow-inner shrink-0">
+            JD
           </div>
-
-          <div class="flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 pt-3 md:pt-0 border-black/[0.05]">
-            <span class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">Clearance Dossier</span>
-            <span id="reqDossierId" class="text-sm font-mono font-bold text-apple-blue">DOS-2026-001</span>
-            <span id="reqCategoryBadge" class="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 mt-0.5">Pending Asset Turnover</span>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h3 id="userEmpName" class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">Juan Dela Cruz</h3>
+              <span id="userEmpIdBadge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">
+                EMP-94812
+              </span>
+              <span id="userStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-apple-amber uppercase">
+                PENDING
+              </span>
+            </div>
+            <div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+              <span id="userDeptTitle"><i class="fa-solid fa-briefcase mr-1.5 text-neutral-400"></i>Information Technology · Senior Specialist</span>
+              <span id="userBranch"><i class="fa-solid fa-building mr-1.5 text-neutral-400"></i>Taguig HQ - 24th Floor</span>
+              <span id="userEocDate"><i class="fa-solid fa-calendar-check mr-1.5 text-neutral-400"></i>EOC: 2026-08-31</span>
+            </div>
           </div>
         </div>
 
-        <!-- "Whose Turn" Prominent Notification Banner -->
-        <div id="reqWhoseTurnCard" class="p-5 rounded-3xl bg-blue-50/70 dark:bg-blue-950/25 border border-apple-blue/30 shadow-sm flex items-start space-x-4">
-          <div class="w-10 h-10 rounded-2xl bg-apple-blue/15 text-apple-blue flex items-center justify-center text-lg shrink-0 mt-0.5">
-            <i class="fa-solid fa-clock-rotate-left apple-pulse-blue"></i>
+        <div class="flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 pt-3 md:pt-0 border-black/[0.05]">
+          <span class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">Clearance Dossier</span>
+          <span id="userDossierId" class="text-sm font-mono font-bold text-apple-blue">DOS-2026-001</span>
+          <span id="userCategoryBadge" class="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 mt-0.5">Pending Asset Turnover</span>
+        </div>
+      </div>
+
+      <!-- "Whose Turn" Prominent Notification Banner -->
+      <div id="userWhoseTurnCard" class="p-5 rounded-3xl bg-blue-50/70 dark:bg-blue-950/25 border border-apple-blue/30 shadow-sm flex items-start space-x-4">
+        <div class="w-10 h-10 rounded-2xl bg-apple-blue/15 text-apple-blue flex items-center justify-center text-lg shrink-0 mt-0.5">
+          <i class="fa-solid fa-clock-rotate-left apple-pulse-blue"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-bold text-apple-blue uppercase tracking-wider" id="userCurrentPhaseTitle">Current Phase: Stage 1 - Asset Hand-Off</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-apple-blue text-white" id="userWhoseTurnHolderBadge">Turn: IT Clearance (Alex Tan)</span>
           </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-bold text-apple-blue uppercase tracking-wider" id="reqCurrentPhaseTitle">Current Phase: Stage 1 - Asset Hand-Off</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-apple-blue text-white" id="reqWhoseTurnHolderBadge">Turn: IT Clearance (Alex Tan)</span>
+          <p id="userWhoseTurnActionText" class="text-xs text-neutral-700 dark:text-neutral-200 font-medium mt-1">
+            Alex Tan (IT Clearance Lead) is currently inspecting your Lenovo ThinkPad T14s serial number and sanitizing corporate data.
+          </p>
+        </div>
+      </div>
+
+      <!-- Linear Clearance Workflow Stepper (4 Stages) -->
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-400">Clearance Linear Workflow Progress</h4>
+          <span id="userWorkflowStepSummary" class="text-xs font-bold text-neutral-700 dark:text-neutral-300">Stage 1 of 4 in progress</span>
+        </div>
+        <div id="userWorkflowStepper" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Hand-Off & Milestone Activity Timeline -->
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-5">
+        <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-apple-green flex items-center justify-center text-sm shadow-sm">
+              <i class="fa-solid fa-timeline"></i>
             </div>
-            <p id="reqWhoseTurnActionText" class="text-xs text-neutral-700 dark:text-neutral-200 font-medium mt-1">
-              Alex Tan (IT Clearance Lead) is currently inspecting your Lenovo ThinkPad T14s serial number and sanitizing corporate data.
+            <div>
+              <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Hand-Off & Milestone Timeline</h4>
+              <p class="text-[11px] text-neutral-400">Chronological verification of company hardware, keys, and payroll audits</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono text-neutral-400">Auto-Logged</span>
+        </div>
+
+        <div id="userTimelineContainer" class="relative pl-6 space-y-6 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200 dark:before:bg-neutral-800">
+          <!-- Timeline items rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Centralized Confidential Transaction Discussion (Requester & Approvers Only) -->
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06] gap-2">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Centralized Transaction Discussion</h4>
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">
+                🔒 Requester & Approvers Only
+              </span>
+            </div>
+            <p class="text-[11px] text-neutral-400 mt-0.5" id="userDiscussionSubtitle">
+              Confidential thread · Restricted strictly to Juan Dela Cruz & Clearance Approvers
             </p>
           </div>
-        </div>
-
-        <!-- Linear Clearance Workflow Stepper (4 Stages) -->
-        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
-          <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-400">Clearance Linear Workflow Progress</h4>
-            <span id="reqWorkflowStepSummary" class="text-xs font-bold text-neutral-700 dark:text-neutral-300">Stage 1 of 4 in progress</span>
-          </div>
-          <div id="reqWorkflowStepper" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-            <!-- Rendered via JS -->
+          <div id="userAuthorizedBadges" class="flex flex-wrap items-center gap-1.5 text-[10px]">
+            <!-- Populated via JS -->
           </div>
         </div>
 
-        <!-- Hand-Off & Milestone Activity Timeline -->
-        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-5">
-          <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
-            <div class="flex items-center space-x-2.5">
-              <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-apple-green flex items-center justify-center text-sm shadow-sm">
-                <i class="fa-solid fa-timeline"></i>
-              </div>
-              <div>
-                <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Hand-Off & Milestone Timeline</h4>
-                <p class="text-[11px] text-neutral-400">Chronological verification of company hardware, keys, and payroll audits</p>
-              </div>
-            </div>
-            <span class="text-[10px] font-mono text-neutral-400">Auto-Logged</span>
-          </div>
-
-          <div id="reqTimelineContainer" class="relative pl-6 space-y-6 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200 dark:before:bg-neutral-800">
-            <!-- Timeline items rendered via JS -->
-          </div>
+        <!-- Message Thread Box -->
+        <div id="userCommentsContainer" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+          <!-- Comments rendered via JS -->
         </div>
 
-        <!-- Centralized Confidential Transaction Discussion (Requester & Approvers Only) -->
-        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06] gap-2">
-            <div>
-              <div class="flex items-center space-x-2">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Centralized Transaction Discussion</h4>
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">
-                  🔒 Requester & Approvers Only
-                </span>
-              </div>
-              <p class="text-[11px] text-neutral-400 mt-0.5" id="reqDiscussionSubtitle">
-                Confidential thread · Restricted strictly to Juan Dela Cruz & Clearance Approvers
-              </p>
-            </div>
-            <!-- Dynamic participant badges -->
-            <div id="reqAuthorizedBadges" class="flex flex-wrap items-center gap-1.5 text-[10px]">
-              <!-- Populated via JS -->
-            </div>
-          </div>
-
-          <!-- Message Thread Box -->
-          <div id="reqCommentsContainer" class="space-y-3 max-h-80 overflow-y-auto pr-1">
-            <!-- Comments rendered via JS -->
-          </div>
-
-          <!-- Requester Comment Input -->
-          <div class="pt-2 border-t border-black/[0.05] dark:border-white/[0.06] space-y-2">
-            <textarea id="reqCommentInput" rows="2" placeholder="Post an update or reply to your clearance approvers..." class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-neutral-900 rounded-2xl p-3 outline-none transition"></textarea>
-            <div class="flex items-center justify-between">
-              <span class="text-[10px] text-neutral-400">Posting as: <strong id="reqPostingAsName">Juan Dela Cruz (Requester)</strong></span>
-              <button onclick="postRequesterComment()" class="px-4 py-2 rounded-xl bg-apple-blue hover:bg-apple-blueHover text-white text-xs font-bold shadow-sm transition active:scale-95 flex items-center space-x-1.5">
-                <i class="fa-solid fa-paper-plane text-xs"></i>
-                <span>Post Note to Approvers</span>
-              </button>
-            </div>
+        <!-- Comment Input -->
+        <div class="pt-2 border-t border-black/[0.05] dark:border-white/[0.06] space-y-2">
+          <textarea id="userCommentInput" rows="2" placeholder="Post an update or reply to your clearance approvers..." class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-neutral-900 rounded-2xl p-3 outline-none transition"></textarea>
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-neutral-400">Posting as: <strong id="userPostingAsName">Juan Dela Cruz (Requester)</strong></span>
+            <button onclick="postUserComment()" class="px-4 py-2 rounded-xl bg-apple-blue hover:bg-apple-blueHover text-white text-xs font-bold shadow-sm transition active:scale-95 flex items-center space-x-1.5">
+              <i class="fa-solid fa-paper-plane text-xs"></i>
+              <span>Post Note to Approvers</span>
+            </button>
           </div>
         </div>
-
       </div>
+
     </section>
 
 
     <!-- ================================================================= -->
-    <!-- END 2: APPROVER DASHBOARD (WHOSE TURN TO APPROVE WHOM)            -->
+    <!-- 2️⃣ APPROVER END: DEPARTMENT TURN-BASED REVIEW DESK               -->
     <!-- ================================================================= -->
-    <section id="viewApproverDesk" class="space-y-6">
+    <section id="viewApproverEnd" class="hidden space-y-6">
       
       <!-- Approver Persona Switcher Bar -->
       <div class="bg-white/80 dark:bg-neutral-900/80 apple-glass px-5 py-4 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -360,7 +467,7 @@
           </div>
           <div>
             <div class="flex items-center space-x-2">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Approver Clearance Desk</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Approver End</span>
               <span class="text-[10px] px-2 py-0.2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 font-mono">Sign-Off Authority</span>
             </div>
             <h2 class="text-sm font-bold text-neutral-900 dark:text-white">Active Approver Role & Review Workstation</h2>
@@ -407,15 +514,13 @@
             </div>
           </div>
 
-          <!-- 3 Filter Pills: Action Required by You vs All vs Flagged -->
+          <!-- Filter Tabs -->
           <div class="flex flex-wrap items-center gap-2">
-            <!-- Search Input -->
             <div class="relative w-full sm:w-56">
               <input type="text" id="apprQueueSearch" placeholder="Search employee, ID, branch..." oninput="renderApproverQueue()" class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-neutral-900 rounded-xl pl-8 pr-3 py-1.5 outline-none transition" />
               <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-neutral-400 text-xs"></i>
             </div>
 
-            <!-- Segmented Filter -->
             <div class="flex items-center p-1 bg-neutral-100 dark:bg-neutral-800/60 rounded-xl text-[11px] font-medium space-x-1">
               <button id="filterMyTurnBtn" onclick="setApproverQueueFilter('MY_TURN')" class="px-3 py-1 rounded-lg font-bold bg-white dark:bg-apple-elevatedDark text-apple-blue shadow-sm transition flex items-center space-x-1">
                 <span>⚡ Action Required by You</span>
@@ -475,7 +580,7 @@
             </div>
           </div>
 
-          <!-- Linear Turn Progression Sequence: [IT] -> [Admin] -> [Finance] -> [HR] -->
+          <!-- Linear Turn Progression Sequence -->
           <div class="pt-3 border-t border-black/[0.05] dark:border-white/[0.06]">
             <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-2">
               <span>Linear Department Approval Sequence</span>
@@ -487,7 +592,7 @@
           </div>
         </div>
 
-        <!-- Inspection Tabs: Documents & AI Flags vs Hand-Off Timeline -->
+        <!-- Inspection Tabs -->
         <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-5">
           <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
             <div class="flex items-center p-1 bg-neutral-100 dark:bg-neutral-800/60 rounded-xl space-x-1 text-xs font-semibold">
@@ -501,7 +606,6 @@
             <span class="text-[11px] text-neutral-400">Interactive Pre-Check Audit</span>
           </div>
 
-          <!-- Documents Panel -->
           <div id="apprPanelDocs" class="space-y-4">
             <div id="apprDocsList" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <!-- Rendered via JS -->
@@ -511,7 +615,6 @@
             </div>
           </div>
 
-          <!-- Timeline Panel -->
           <div id="apprPanelTimeline" class="hidden space-y-4">
             <div id="apprTimelineList" class="relative pl-6 space-y-5 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200 dark:before:bg-neutral-800">
               <!-- Timeline items rendered via JS -->
@@ -519,7 +622,7 @@
           </div>
         </div>
 
-        <!-- Approver Decision Dock (Approve & Pass Turn / Flag / Split Escrow) -->
+        <!-- Approver Decision Dock -->
         <div class="bg-white/90 dark:bg-neutral-900/90 apple-glass p-5 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="flex items-center space-x-3">
             <div id="dockTurnIcon" class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-apple-green flex items-center justify-center text-lg shadow-sm shrink-0">
@@ -553,7 +656,7 @@
           </div>
         </div>
 
-        <!-- Centralized Transaction Discussion Thread in Approver Desk -->
+        <!-- Centralized Transaction Discussion in Approver End -->
         <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06] gap-2">
             <div>
@@ -593,9 +696,9 @@
 
 
     <!-- ================================================================= -->
-    <!-- END 3: ADMIN DASHBOARD (EXECUTIVE STATUS OVERVIEW)                 -->
+    <!-- 3️⃣ ADMIN END: EXECUTIVE OVERSIGHT (5 PENDING, 5 REVIEW, 5 RELEASE)-->
     <!-- ================================================================= -->
-    <section id="viewAdminDashboard" class="hidden space-y-6">
+    <section id="viewAdminEnd" class="hidden space-y-6">
       
       <!-- Executive KPI Header & 5 Metrics -->
       <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 sm:p-7 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-5">
@@ -605,8 +708,8 @@
               <i class="fa-solid fa-gauge-high"></i>
             </div>
             <div>
-              <h2 class="text-base font-bold text-neutral-900 dark:text-white tracking-tight">Admin Executive Clearance Dashboard</h2>
-              <p class="text-[11px] text-neutral-500 dark:text-neutral-400">Company-wide clearance pipeline tracking across 15 seeded tester accounts</p>
+              <h2 class="text-base font-bold text-neutral-900 dark:text-white tracking-tight">Admin End — Executive Oversight</h2>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-400">Real-time status oversight across 15 seeded accounts (5 Pending, 5 For Review, 5 Ready for Release)</p>
             </div>
           </div>
           <div class="flex items-center space-x-2 text-xs">
@@ -617,9 +720,8 @@
           </div>
         </div>
 
-        <!-- 5 Interactive Metric KPI Cards -->
+        <!-- 5 Metric KPI Cards -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
-          <!-- Total Requests -->
           <div onclick="setAdminBucketFilter('ALL')" class="p-4 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-blue/50 cursor-pointer transition shadow-sm group">
             <div class="flex items-center justify-between text-neutral-400 mb-1">
               <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-blue transition">Total Requests</span>
@@ -632,7 +734,6 @@
             <div class="text-[10px] text-neutral-400 mt-1 truncate">All tester dossiers</div>
           </div>
 
-          <!-- 5 Pending -->
           <div onclick="setAdminBucketFilter('PENDING')" class="p-4 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-amber/50 cursor-pointer transition shadow-sm group">
             <div class="flex items-center justify-between text-neutral-400 mb-1">
               <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-amber transition">5 Pending</span>
@@ -645,7 +746,6 @@
             <div class="text-[10px] text-neutral-400 mt-1 truncate">Standard turnover underway</div>
           </div>
 
-          <!-- 5 For Review -->
           <div onclick="setAdminBucketFilter('FOR_REVIEW')" class="p-4 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-red/50 cursor-pointer transition shadow-sm group">
             <div class="flex items-center justify-between text-neutral-400 mb-1">
               <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-red transition">5 For Review</span>
