@@ -771,3 +771,196 @@ def get_initial_dossiers() -> List[Dict[str, Any]]:
             "sample_file": "clearance_missing_it.pdf",
             "sample_type": "CLEARANCE_SHEET",
             "ai_flags_count": 1,
+            "flags_summary": ["FLAG_ACCOUNTABILITY_NOTED"],
+            "routing_mode": "SEQUENTIAL",
+            "assigned_signer": "Alex Tan (IT Clearance Lead)",
+            "nodes": {
+                "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "FLAGGED", "summary": "MacBook Pro returned without 85W MagSafe charger"},
+                "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Taguig basement parking transponder returned"},
+                "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "PENDING", "summary": "Awaiting charger deduction clearance"},
+                "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "LOCKED", "summary": "Awaiting IT resolution"}
+            },
+            "escrow_details": None,
+            "timeline": [
+                {
+                    "milestone": "Clearance Request Lodged",
+                    "actor": "Antonio Luna (Employee)",
+                    "date": "2026-09-18 08:00 AM",
+                    "status": "COMPLETED",
+                    "details": "Managerial clearance submitted for Taguig HQ Operations.",
+                    "icon": "fa-file-lines"
+                },
+                {
+                    "milestone": "Laptop Hardware Turnover",
+                    "actor": "Alex Tan (IT Clearance Lead)",
+                    "date": "2026-09-18 10:30 AM",
+                    "status": "IN_PROGRESS",
+                    "details": "MacBook Pro 16\" (M2 Max) surrendered. Charger absent; replacement cost of ₱3,200 noted for deduction.",
+                    "icon": "fa-laptop"
+                },
+                {
+                    "milestone": "Facilities & Parking Tag Turnover",
+                    "actor": "Elena Cruz (Facilities Lead)",
+                    "date": "2026-09-18 02:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Executive basement parking transponder tag surrendered.",
+                    "icon": "fa-key"
+                },
+                {
+                    "milestone": "Finance & Payroll Audit",
+                    "actor": "Roberto Ong (Finance Lead)",
+                    "date": "Pending Turn",
+                    "status": "PENDING",
+                    "details": "Will execute once charger deduction is agreed upon.",
+                    "icon": "fa-calculator"
+                },
+                {
+                    "milestone": "HR Final Pay Release & COE",
+                    "actor": "Grace Diaz (HR Operations)",
+                    "date": "Pending Release",
+                    "status": "PENDING",
+                    "details": "Final release to BPI bank account.",
+                    "icon": "fa-money-bill-transfer"
+                }
+            ],
+            "comments": [
+                {
+                    "id": "cmt-801",
+                    "author": "Alex Tan",
+                    "role": "IT_APPROVER",
+                    "text": "MacBook Pro M2 Max body in mint condition. 85W MagSafe charger was not included. Standard deduction is ₱3,200.",
+                    "timestamp": "2026-09-18T11:00:00Z"
+                },
+                {
+                    "id": "cmt-802",
+                    "author": "Antonio Luna",
+                    "role": "REQUESTER",
+                    "text": "I may have left the charger at our Cebu branch office. If not found by Monday, please proceed with the deduction.",
+                    "timestamp": "2026-09-18T13:45:00Z"
+                }
+            ],
+            "docs": [
+                {"title": "Clearance Sign-Off Sheet", "file": "clearance_missing_it.pdf", "type": "CLEARANCE_SHEET", "has_flags": True},
+                {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
+                {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+            ]
+        },
+        {
+            "dossier_id": "DOS-2026-009",
+            "employee_name": "Teresa Magbanua",
+            "employee_id": "EMP-27411",
+            "department": "Retail Operations",
+            "company": "CMG Retail Inc.",
+            "unit_channel": "Retail Stores Network",
+            "job_level": "Store Manager",
+            "branch": "Iloilo Branch Hub",
+            "date_hired": "2021-05-18",
+            "eoc_date": "2026-09-20",
+            "employee_status": "Regular",
+            "reason_for_separation": "Resignation",
+            "with_clearance_already": "In Progress",
+            "category": "FOR_REVIEW",
+            "current_stage": "STAGE_2_FINANCE",
+            "stage_name": "Stage 2: Finance & Payroll Audit",
+            "stage_step": 2,
+            "current_turn_node": "FINANCE",
+            "current_turn_name": "Roberto Ong (Finance Lead)",
+            "current_turn_role": "FINANCE_APPROVER",
+            "current_turn_action": "Action Needed from Finance: Unliquidated branch store petty cash advance (₱8,500.00) requires liquidation receipts or payroll offset.",
+            "overall_status": "FLAGGED",
+            "submitted_at": "2026-09-19T10:00:00Z",
+            "sample_file": "clearance_sheet_valid.pdf",
+            "sample_type": "CLEARANCE_SHEET",
+            "ai_flags_count": 1,
+            "flags_summary": ["FLAG_ACCOUNTABILITY_NOTED"],
+            "routing_mode": "SEQUENTIAL",
+            "assigned_signer": "Roberto Ong (Finance & Payroll Lead)",
+            "nodes": {
+                "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "CLEARED", "summary": "Store POS supervisor privileges revoked"},
+                "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Iloilo store safe combination surrendered"},
+                "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "FLAGGED", "summary": "₱8,500 unliquidated store petty cash advance"},
+                "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "LOCKED", "summary": "Awaiting Finance liquidation"}
+            },
+            "escrow_details": None,
+            "timeline": [
+                {
+                    "milestone": "Clearance Request Lodged",
+                    "actor": "Teresa Magbanua (Employee)",
+                    "date": "2026-09-19 10:00 AM",
+                    "status": "COMPLETED",
+                    "details": "Clearance form submitted for Iloilo Retail Branch.",
+                    "icon": "fa-file-lines"
+                },
+                {
+                    "milestone": "POS Account Turnover",
+                    "actor": "Alex Tan (IT Clearance Lead)",
+                    "date": "2026-09-19 11:30 AM",
+                    "status": "COMPLETED",
+                    "details": "POS cashier overrides and inventory tablets turned over.",
+                    "icon": "fa-laptop"
+                },
+                {
+                    "milestone": "Store Keys & Safe Combination",
+                    "actor": "Elena Cruz (Facilities Lead)",
+                    "date": "2026-09-19 03:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Store keys, alarm PIN, and safe lock combo transferred to incoming OIC.",
+                    "icon": "fa-key"
+                },
+                {
+                    "milestone": "Petty Cash Reconciliation",
+                    "actor": "Roberto Ong (Finance Lead)",
+                    "date": "2026-09-20 09:00 AM",
+                    "status": "IN_PROGRESS",
+                    "details": "₱8,500.00 emergency store maintenance cash advance outstanding since Aug 28.",
+                    "icon": "fa-calculator"
+                },
+                {
+                    "milestone": "HR Final Pay Release & COE",
+                    "actor": "Grace Diaz (HR Operations)",
+                    "date": "Pending Release",
+                    "status": "PENDING",
+                    "details": "Final payout release to BDO account.",
+                    "icon": "fa-money-bill-transfer"
+                }
+            ],
+            "comments": [
+                {
+                    "id": "cmt-901",
+                    "author": "Roberto Ong",
+                    "role": "FINANCE_APPROVER",
+                    "text": "Please provide official receipts for the ₱8,500 store aircon repair, or we will offset it against your 13th month pay.",
+                    "timestamp": "2026-09-20T09:15:00Z"
+                },
+                {
+                    "id": "cmt-902",
+                    "author": "Teresa Magbanua",
+                    "role": "REQUESTER",
+                    "text": "I have the aircon repair OR and supplier voucher. Uploading scanned PDF now.",
+                    "timestamp": "2026-09-20T11:00:00Z"
+                }
+            ],
+            "docs": [
+                {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": True},
+                {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
+                {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+            ]
+        },
+        {
+            "dossier_id": "DOS-2026-010",
+            "employee_name": "Emilio Aguinaldo",
+            "employee_id": "EMP-71932",
+            "department": "Legal & Governance",
+            "company": "CMG Group of Companies",
+            "unit_channel": "Corporate HQ",
+            "job_level": "Senior Legal Officer",
+            "branch": "Taguig HQ - 24th Floor",
+            "date_hired": "2020-03-01",
+            "eoc_date": "2026-09-19",
+            "employee_status": "Regular",
+            "reason_for_separation": "Resignation",
+            "with_clearance_already": "In Progress",
+            "category": "FOR_REVIEW",
+            "current_stage": "STAGE_3_QUITCLAIM",
+            "stage_name": "Stage 3: Quit Claim & Waiver",
+            "stage_step": 3,

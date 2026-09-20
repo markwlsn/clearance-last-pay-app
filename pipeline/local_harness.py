@@ -578,6 +578,16 @@ def sign_department_node(req: NodeSignRequest):
         target["category"] = "FOR_RELEASE"
         target["stage_step"] = 4
 
+    if "timeline" in target:
+        target["timeline"].append({
+            "milestone": f"{req.node_key} Clearance Cleared",
+            "actor": f"{req.approver_name} ({req.role})",
+            "date": datetime.now(timezone.utc).strftime("%Y-%m-%d %I:%M %p"),
+            "status": "COMPLETED",
+            "details": f"Node {req.node_key} signed as {req.action}. Notes: {req.notes or 'Turnover verified.'}",
+            "icon": "fa-check"
+        })
+
     entry = app.state.audit_logger.log_human_action(
         dossier_id=req.dossier_id,
         approver_id=req.approver_name,

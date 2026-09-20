@@ -952,3 +952,241 @@
       vAdmin.classList.add('hidden');
 
       bReq.className = inactiveStyle;
+      bAppr.className = inactiveStyle;
+      bAdmin.className = inactiveStyle;
+
+      if (portal === 'requester') {
+        vReq.classList.remove('hidden');
+        bReq.className = activeStyle;
+        renderRequesterPortal();
+      } else if (portal === 'approver') {
+        vAppr.classList.remove('hidden');
+        bAppr.className = activeStyle;
+        renderApproverDesk();
+      } else if (portal === 'admin') {
+        vAdmin.classList.remove('hidden');
+        bAdmin.className = activeStyle;
+        renderAdminDashboard();
+      }
+    }
+
+    function renderAllViews() {
+      renderRequesterAccountDropdown();
+      renderRequesterPortal();
+      renderApproverDesk();
+      renderAdminDashboard();
+    }
+
+    // =========================================================================
+    // END 1: USER / REQUESTER PORTAL LOGIC
+    // =========================================================================
+    function renderRequesterAccountDropdown() {
+      const select = document.getElementById('requesterAccountSelect');
+      if (!select) return;
+
+      const pending = allDossiers.filter(d => d.category === 'PENDING');
+      const forReview = allDossiers.filter(d => d.category === 'FOR_REVIEW');
+      const forRelease = allDossiers.filter(d => d.category === 'FOR_RELEASE');
+
+      select.innerHTML = `
+        <optgroup label="⏳ Pending Clearance (5)">
+          ${pending.map(d => `<option value="${d.dossier_id}" ${d.dossier_id === activeRequesterDossierId ? 'selected' : ''}>${d.employee_name} (${d.department})</option>`).join('')}
+        </optgroup>
+        <optgroup label="⚠️ Under Review / Discrepancy (5)">
+          ${forReview.map(d => `<option value="${d.dossier_id}" ${d.dossier_id === activeRequesterDossierId ? 'selected' : ''}>${d.employee_name} (${d.department})</option>`).join('')}
+        </optgroup>
+        <optgroup label="🚀 Ready for Release (5)">
+          ${forRelease.map(d => `<option value="${d.dossier_id}" ${d.dossier_id === activeRequesterDossierId ? 'selected' : ''}>${d.employee_name} (${d.department})</option>`).join('')}
+        </optgroup>
+      `;
+    }
+
+    function onSelectRequesterTesterAccount(id) {
+      activeRequesterDossierId = id;
+      renderRequesterPortal();
+      showDynamicToast("Switched Account", `Viewing clearance timeline for ${getActiveRequesterDossier().employee_name}`, "info");
+    }
+
+    function getActiveRequesterDossier() {
+      return allDossiers.find(d => d.dossier_id === activeRequesterDossierId) || allDossiers[0];
+    }
+
+    function renderRequesterPortal() {
+      const d = getActiveRequesterDossier();
+      if (!d) return;
+
+      // Initials & Profile
+      const initials = d.employee_name.split(' ').map(n => n[0]).slice(0, 2).join('');
+      document.getElementById('reqAvatar').textContent = initials;
+      document.getElementById('reqEmpName').textContent = d.employee_name;
+      document.getElementById('reqEmpIdBadge').textContent = d.employee_id;
+      document.getElementById('reqDossierId').textContent = d.dossier_id;
+      document.getElementById('reqDeptTitle').innerHTML = `<i class="fa-solid fa-briefcase mr-1.5 text-neutral-400"></i>${d.department} · ${d.job_level}`;
+      document.getElementById('reqBranch').innerHTML = `<i class="fa-solid fa-building mr-1.5 text-neutral-400"></i>${d.branch}`;
+      document.getElementById('reqEocDate').innerHTML = `<i class="fa-solid fa-calendar-check mr-1.5 text-neutral-400"></i>EOC: ${d.eoc_date}`;
+
+      // Status Badges
+      let statusBadge = '';
+      if (d.category === 'FOR_RELEASE' || d.overall_status === 'CLEARED' || d.overall_status === 'APPROVED') {
+        statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-apple-green uppercase">READY FOR RELEASE</span>';
+        document.getElementById('reqCategoryBadge').textContent = 'All Clearances Signed Off';
+      } else if (d.category === 'FOR_REVIEW' || d.overall_status === 'FLAGGED') {
+        statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-500/10 text-apple-red uppercase">UNDER REVIEW</span>';
+        document.getElementById('reqCategoryBadge').textContent = 'Action / Discrepancy Under Review';
+      } else {
+        statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-apple-amber uppercase">PENDING</span>';
+        document.getElementById('reqCategoryBadge').textContent = 'Pending Standard Turnover';
+      }
+      document.getElementById('reqStatusBadge').outerHTML = `<span id="reqStatusBadge">${statusBadge}</span>`;
+
+      // "Whose Turn" Card
+      document.getElementById('reqCurrentPhaseTitle').textContent = `Current Phase: ${d.stage_name || 'Stage 1: Asset Hand-Off'}`;
+      document.getElementById('reqWhoseTurnHolderBadge').textContent = `Turn: ${d.current_turn_name || 'IT Clearance'}`;
+      document.getElementById('reqWhoseTurnActionText').textContent = d.current_turn_action || 'Department review in progress.';
+
+      // Linear Stepper (4 Stages)
+      const stages = [
+        { num: 1, title: 'Asset Hand-Off', desc: 'Hardware & Lockers' },
+        { num: 2, title: 'Finance & Payroll', desc: 'Audit & Deductions' },
+        { num: 3, title: 'Quit Claim & Waiver', desc: 'Legal Release' },
+        { num: 4, title: 'HR Final Release', desc: 'Disbursement & COE' }
+      ];
+
+      const currentStep = d.stage_step || 1;
+      document.getElementById('reqWorkflowStepSummary').textContent = currentStep >= 4 && d.category === 'FOR_RELEASE' ? 'All 4 Stages Completed' : `Stage ${currentStep} of 4 in progress`;
+
+      document.getElementById('reqWorkflowStepper').innerHTML = stages.map(s => {
+        const isDone = s.num < currentStep || (currentStep === 4 && d.category === 'FOR_RELEASE');
+        const isCurrent = s.num === currentStep && !(currentStep === 4 && d.category === 'FOR_RELEASE');
+        
+        let cardStyle = '';
+        let iconHtml = '';
+        if (isDone) {
+          cardStyle = 'bg-emerald-500/[0.08] dark:bg-emerald-950/20 border-emerald-500/30 text-apple-green';
+          iconHtml = '<i class="fa-solid fa-circle-check text-apple-green"></i>';
+        } else if (isCurrent) {
+          cardStyle = 'bg-blue-500/[0.08] dark:bg-blue-950/30 border-apple-blue shadow-sm ring-1 ring-apple-blue/20';
+          iconHtml = '<span class="w-2 h-2 rounded-full bg-apple-blue apple-pulse-blue"></span>';
+        } else {
+          cardStyle = 'bg-neutral-100/60 dark:bg-neutral-800/40 border-transparent text-neutral-400 opacity-70';
+          iconHtml = '<i class="fa-solid fa-lock text-neutral-300 dark:text-neutral-600 text-[10px]"></i>';
+        }
+
+        return `
+          <div class="p-3.5 rounded-2xl border ${cardStyle} transition">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-bold uppercase tracking-wider">Stage 0${s.num}</span>
+              ${iconHtml}
+            </div>
+            <div class="font-bold text-xs ${isCurrent ? 'text-apple-blue' : ''}">${s.title}</div>
+            <div class="text-[10px] text-neutral-400 mt-0.5 truncate">${s.desc}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Milestone Activity Timeline
+      const timelineBox = document.getElementById('reqTimelineContainer');
+      if (d.timeline && d.timeline.length) {
+        timelineBox.innerHTML = d.timeline.map((t, idx) => {
+          const isDone = t.status === 'COMPLETED';
+          const isInProg = t.status === 'IN_PROGRESS';
+          let dotClass = isDone ? 'bg-apple-green text-white' : (isInProg ? 'bg-apple-blue text-white apple-pulse-blue' : 'bg-neutral-300 dark:bg-neutral-700 text-neutral-500');
+
+          return `
+            <div class="relative flex items-start space-x-3.5 group">
+              <div class="w-6 h-6 rounded-full ${dotClass} flex items-center justify-center text-[10px] shrink-0 -ml-9 shadow-sm">
+                <i class="fa-solid ${t.icon || 'fa-circle'}"></i>
+              </div>
+              <div class="flex-1 min-w-0 bg-neutral-50/90 dark:bg-neutral-800/60 p-3.5 rounded-2xl border border-black/[0.04]">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-bold text-neutral-900 dark:text-white">${t.milestone}</span>
+                  <span class="text-[10px] font-mono text-neutral-400">${t.date}</span>
+                </div>
+                <p class="text-[11px] text-neutral-600 dark:text-neutral-300 mt-1">${t.details}</p>
+                <div class="text-[10px] text-neutral-400 mt-1.5 flex items-center space-x-1">
+                  <i class="fa-solid fa-user-circle text-[9px]"></i>
+                  <span>${t.actor}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        timelineBox.innerHTML = '<p class="text-xs text-neutral-400 italic">No milestone events logged yet.</p>';
+      }
+
+      // Discussion Subtitle & Authorized Badges
+      document.getElementById('reqDiscussionSubtitle').innerHTML = `Confidential thread · Restricted strictly to <strong>${d.employee_name}</strong> & Clearance Approvers`;
+      document.getElementById('reqPostingAsName').textContent = `${d.employee_name} (Requester)`;
+
+      document.getElementById('reqAuthorizedBadges').innerHTML = `
+        <span class="px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold border border-sky-500/20">👤 ${d.employee_name}</span>
+        <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">💻 IT</span>
+        <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">🏢 Admin</span>
+        <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">💼 Finance</span>
+        <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">👥 HR</span>
+      `;
+
+      // Render Comments
+      renderRequesterComments(d);
+    }
+
+    function renderRequesterComments(d) {
+      const container = document.getElementById('reqCommentsContainer');
+      if (!d.comments || !d.comments.length) {
+        container.innerHTML = '<p class="text-xs text-neutral-400 italic py-4 text-center">No notes posted yet. Start the conversation with your approvers below.</p>';
+        return;
+      }
+
+      container.innerHTML = d.comments.map(c => {
+        const isRequester = c.role === 'REQUESTER' || c.role === 'EMPLOYEE' || c.author.includes(d.employee_name);
+        const cardBg = isRequester ? 'bg-sky-500/[0.06] border-sky-500/20' : 'bg-neutral-100/80 dark:bg-neutral-800/80 border-black/[0.04]';
+        const badgeClass = isRequester ? 'bg-sky-500/20 text-sky-700 dark:text-sky-300' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200';
+
+        return `
+          <div class="p-3.5 rounded-2xl border ${cardBg} text-xs space-y-1">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="font-bold text-neutral-900 dark:text-white">${c.author}</span>
+                <span class="text-[9px] font-bold px-1.5 py-0.2 rounded-full ${badgeClass} uppercase">${isRequester ? 'Requester' : c.role.replace('_APPROVER', '')}</span>
+              </div>
+              <span class="text-[10px] text-neutral-400 font-mono">${new Date(c.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+            <p class="text-neutral-700 dark:text-neutral-300">${c.text}</p>
+          </div>
+        `;
+      }).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function postRequesterComment() {
+      const input = document.getElementById('reqCommentInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const d = getActiveRequesterDossier();
+      try {
+        const res = await fetch('/api/approvals/transaction-comment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            dossier_id: d.dossier_id,
+            author: d.employee_name,
+            role: 'REQUESTER',
+            message: text
+          })
+        });
+
+        if (!res.ok) throw new Error('Failed to post comment');
+        const data = await res.json();
+        d.comments = data.comments;
+        input.value = '';
+        renderRequesterComments(d);
+        showDynamicToast("Note Posted", "Your message is visible to clearance approvers.", "success");
+      } catch (err) {
+        showDynamicToast("Error", err.message, "error");
+      }
+    }
+
+
+    // =========================================================================
