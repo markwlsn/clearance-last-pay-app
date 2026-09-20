@@ -758,7 +758,6 @@
             <div class="text-[10px] text-neutral-400 mt-1 truncate">Discrepancy flags noted</div>
           </div>
 
-          <!-- 5 Ready for Release -->
           <div onclick="setAdminBucketFilter('FOR_RELEASE')" class="p-4 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-green/50 cursor-pointer transition shadow-sm group">
             <div class="flex items-center justify-between text-neutral-400 mb-1">
               <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-green transition">5 Ready for Release</span>
@@ -771,7 +770,6 @@
             <div class="text-[10px] text-neutral-400 mt-1 truncate">Ready for pay & COE</div>
           </div>
 
-          <!-- Clearance SLA -->
           <div class="p-4 rounded-2xl bg-emerald-500/[0.06] dark:bg-emerald-950/20 border border-emerald-500/20 shadow-sm">
             <div class="flex items-center justify-between text-neutral-400 mb-1">
               <span class="text-[10px] uppercase font-bold tracking-wider text-apple-green">Clearance SLA</span>
@@ -786,14 +784,13 @@
         </div>
       </div>
 
-      <!-- Master Categorized Queues: Pending (5) · For Review (5) · Ready for Release (5) -->
+      <!-- Master Categorized Queues: 5 Pending · 5 Review · 5 Release -->
       <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-5">
         
-        <!-- Controls: Search & Category Filter Pills -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
           <div class="flex items-center space-x-2">
             <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white" id="adminCategoryTitle">
-              Clearance Master Queue
+              Clearance Master Status Queue
             </h3>
             <span id="adminQueueCountBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-bold border border-black/[0.04]">
               15 accounts
@@ -801,13 +798,11 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <!-- Search Box -->
             <div class="relative w-full sm:w-64">
               <input type="text" id="adminSearchInput" placeholder="Filter by name, ID, branch..." oninput="renderAdminDeck()" class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-neutral-900 rounded-xl pl-8 pr-3 py-1.5 outline-none transition" />
               <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-neutral-400 text-xs"></i>
             </div>
 
-            <!-- Segmented Category Filter -->
             <div class="flex items-center p-1 bg-neutral-100 dark:bg-neutral-800/60 rounded-xl text-[11px] font-medium space-x-1">
               <button id="adminBtnAll" onclick="setAdminBucketFilter('ALL')" class="px-3 py-1 rounded-lg font-bold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition">
                 All (15)
@@ -819,13 +814,13 @@
                 ⚠️ 5 For Review
               </button>
               <button id="adminBtnRelease" onclick="setAdminBucketFilter('FOR_RELEASE')" class="px-3 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition">
-                🚀 5 For Release
+                🚀 5 Ready for Release
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Master Queue Grid of 15 Tester Accounts -->
+        <!-- Cards Grid -->
         <div id="adminCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Populated via JS -->
         </div>
@@ -836,7 +831,7 @@
   </main>
 
   <!-- ================================================================= -->
-  <!-- MODAL 1: FILE NEW CLEARANCE REQUEST (LARK APPROVAL FORM)           -->
+  <!-- MODAL: FILE NEW CLEARANCE REQUEST (LARK APPROVAL FORM)             -->
   <!-- ================================================================= -->
   <div id="modalNewClearance" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark max-w-2xl w-full rounded-3xl p-6 sm:p-8 border border-black/[0.08] dark:border-white/[0.1] shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
@@ -931,7 +926,7 @@
   </div>
 
   <!-- ================================================================= -->
-  <!-- MODAL 2: APPLE SPLIT ESCROW DISBURSEMENT                          -->
+  <!-- MODAL: SPLIT ESCROW DISBURSEMENT                                  -->
   <!-- ================================================================= -->
   <div id="splitEscrowModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark max-w-lg w-full rounded-3xl p-6 border border-black/[0.08] dark:border-white/[0.1] shadow-2xl space-y-5">
@@ -997,91 +992,159 @@
     </div>
   </div>
 
-  <!-- Main JavaScript App Logic -->
+  <!-- JavaScript App Logic -->
   <script>
     // State Store
     let allDossiers = [];
-    let currentPortal = 'approver'; // 'requester' | 'approver' | 'admin'
-    let activeRequesterDossierId = 'DOS-2026-001';
+    let currentPortal = 'user'; // 'gateway' | 'user' | 'approver' | 'admin'
+    let activeUserDossierId = 'DOS-2026-001';
     let activeApproverDossierId = 'DOS-2026-001';
-    let currentApproverRole = 'IT_APPROVER'; // 'IT_APPROVER' | 'ADMIN_APPROVER' | 'FINANCE_APPROVER' | 'HR_APPROVER'
-    let currentApproverQueueFilter = 'MY_TURN'; // 'MY_TURN' | 'ALL' | 'FLAGGED'
-    let currentAdminBucketFilter = 'ALL'; // 'ALL' | 'PENDING' | 'FOR_REVIEW' | 'FOR_RELEASE'
-    let currentInspectionTab = 'DOCS'; // 'DOCS' | 'TIMELINE'
+    let currentApproverRole = 'IT_APPROVER';
+    let currentApproverQueueFilter = 'MY_TURN';
+    let currentAdminBucketFilter = 'ALL';
+    let currentInspectionTab = 'DOCS';
 
-    // Department Signer Mapping
     const APPROVER_PROFILES = {
-      'IT_APPROVER': { name: 'Alex Tan', roleName: 'IT Clearance Lead', nodeKey: 'IT', icon: 'fa-laptop-code' },
-      'ADMIN_APPROVER': { name: 'Elena Cruz', roleName: 'Facilities & Admin Lead', nodeKey: 'ADMIN', icon: 'fa-building-user' },
-      'FINANCE_APPROVER': { name: 'Roberto Ong', roleName: 'Finance & Payroll Lead', nodeKey: 'FINANCE', icon: 'fa-money-check-dollar' },
-      'HR_APPROVER': { name: 'Grace Diaz', roleName: 'HR Operations Lead', nodeKey: 'HR', icon: 'fa-user-tie' }
+      'IT_APPROVER': { name: 'Alex Tan', roleName: 'IT Clearance Lead', nodeKey: 'IT' },
+      'ADMIN_APPROVER': { name: 'Elena Cruz', roleName: 'Facilities & Admin Lead', nodeKey: 'ADMIN' },
+      'FINANCE_APPROVER': { name: 'Roberto Ong', roleName: 'Finance & Payroll Lead', nodeKey: 'FINANCE' },
+      'HR_APPROVER': { name: 'Grace Diaz', roleName: 'HR Operations Lead', nodeKey: 'HR' }
     };
 
-    // Initialize App
     document.addEventListener('DOMContentLoaded', async () => {
       await fetchDossiers();
-      renderAllViews();
+
+      // Read portal from URL pathname or default to gateway/user
+      const path = window.location.pathname.toLowerCase();
+      if (path === '/user' || path === '/requester') {
+        currentPortal = 'user';
+      } else if (path === '/approver') {
+        currentPortal = 'approver';
+      } else if (path === '/admin') {
+        currentPortal = 'admin';
+      } else {
+        // Root / -> Gateway
+        currentPortal = 'gateway';
+      }
+
+      applyPortalView();
+    });
+
+    // Close dropdown on outside click
+    window.addEventListener('click', (e) => {
+      const btn = document.getElementById('portalDropdownBtn');
+      const menu = document.getElementById('portalDropdownMenu');
+      if (menu && !menu.contains(e.target) && !btn.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    function togglePortalDropdown() {
+      const menu = document.getElementById('portalDropdownMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    function navigateToPortal(portal, event) {
+      if (event) event.preventDefault();
+      currentPortal = portal;
+      
+      // Update browser URL cleanly without reload
+      const newPath = portal === 'gateway' ? '/' : `/${portal}`;
+      window.history.pushState({}, '', newPath);
+      
+      const menu = document.getElementById('portalDropdownMenu');
+      if (menu) menu.classList.add('hidden');
+
+      applyPortalView();
+    }
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', () => {
+      const path = window.location.pathname.toLowerCase();
+      if (path === '/user' || path === '/requester') {
+        currentPortal = 'user';
+      } else if (path === '/approver') {
+        currentPortal = 'approver';
+      } else if (path === '/admin') {
+        currentPortal = 'admin';
+      } else {
+        currentPortal = 'gateway';
+      }
+      applyPortalView();
     });
 
     async function fetchDossiers() {
       try {
-        const res = await fetch('/api/clearance/dossiers');
+        const res = await fetch('/api/clearance/dossiers', { cache: 'no-store' });
         allDossiers = await res.json();
       } catch (err) {
         console.error('Failed to load dossiers:', err);
       }
     }
 
-    // Portal Navigation Switcher
-    function switchPortal(portal) {
-      currentPortal = portal;
-      
-      const vReq = document.getElementById('viewRequesterPortal');
-      const vAppr = document.getElementById('viewApproverDesk');
-      const vAdmin = document.getElementById('viewAdminDashboard');
+    function applyPortalView() {
+      const vGate = document.getElementById('viewGateway');
+      const vUser = document.getElementById('viewUserEnd');
+      const vAppr = document.getElementById('viewApproverEnd');
+      const vAdmin = document.getElementById('viewAdminEnd');
 
-      const bReq = document.getElementById('tabBtnRequester');
-      const bAppr = document.getElementById('tabBtnApprover');
-      const bAdmin = document.getElementById('tabBtnAdmin');
-
-      const inactiveStyle = "px-3.5 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1.5";
-      const activeStyle = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition flex items-center space-x-1.5";
-
-      vReq.classList.add('hidden');
+      vGate.classList.add('hidden');
+      vUser.classList.add('hidden');
       vAppr.classList.add('hidden');
       vAdmin.classList.add('hidden');
 
-      bReq.className = inactiveStyle;
-      bAppr.className = inactiveStyle;
-      bAdmin.className = inactiveStyle;
+      const indicator = document.getElementById('activePortalIndicator');
+      const label = document.getElementById('currentPortalLabel');
 
-      if (portal === 'requester') {
-        vReq.classList.remove('hidden');
-        bReq.className = activeStyle;
-        renderRequesterPortal();
-      } else if (portal === 'approver') {
+      if (currentPortal === 'gateway') {
+        vGate.classList.remove('hidden');
+        if (indicator) indicator.innerHTML = '';
+        if (label) label.textContent = 'Choose End';
+      } else if (currentPortal === 'user') {
+        vUser.classList.remove('hidden');
+        if (indicator) {
+          indicator.innerHTML = `
+            <div class="px-3.5 py-1.5 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold text-xs border border-sky-500/20 flex items-center space-x-2">
+              <i class="fa-solid fa-user"></i>
+              <span>User End (Employee Clearance)</span>
+            </div>
+          `;
+        }
+        if (label) label.textContent = '👤 User End';
+        renderUserEnd();
+      } else if (currentPortal === 'approver') {
         vAppr.classList.remove('hidden');
-        bAppr.className = activeStyle;
-        renderApproverDesk();
-      } else if (portal === 'admin') {
+        if (indicator) {
+          indicator.innerHTML = `
+            <div class="px-3.5 py-1.5 rounded-2xl bg-emerald-500/10 text-apple-green font-bold text-xs border border-emerald-500/20 flex items-center space-x-2">
+              <i class="fa-solid fa-user-check"></i>
+              <span>Approver End (Review Desk)</span>
+            </div>
+          `;
+        }
+        if (label) label.textContent = '✍️ Approver End';
+        renderApproverEnd();
+      } else if (currentPortal === 'admin') {
         vAdmin.classList.remove('hidden');
-        bAdmin.className = activeStyle;
-        renderAdminDashboard();
+        if (indicator) {
+          indicator.innerHTML = `
+            <div class="px-3.5 py-1.5 rounded-2xl bg-purple-500/10 text-apple-purple font-bold text-xs border border-purple-500/20 flex items-center space-x-2">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>Admin End (Executive Oversight)</span>
+            </div>
+          `;
+        }
+        if (label) label.textContent = '🛡️ Admin End';
+        renderAdminEnd();
       }
     }
 
-    function renderAllViews() {
-      renderRequesterAccountDropdown();
-      renderRequesterPortal();
-      renderApproverDesk();
-      renderAdminDashboard();
-    }
 
     // =========================================================================
-    // END 1: USER / REQUESTER PORTAL LOGIC
+    // 1️⃣ USER END (EMPLOYEE PORTAL) LOGIC
     // =========================================================================
-    function renderRequesterAccountDropdown() {
-      const select = document.getElementById('requesterAccountSelect');
+    function renderUserAccountDropdown() {
+      const select = document.getElementById('userAccountSelect');
       if (!select) return;
 
       const pending = allDossiers.filter(d => d.category === 'PENDING');
@@ -1090,59 +1153,58 @@
 
       select.innerHTML = `
         <optgroup label="⏳ Pending Clearance (5)">
-          ${pending.map(d => `<option value="${d.dossier_id}" ${d.dossier_id === activeRequesterDossierId ? 'selected' : ''}>${d.employee_name} (${d.department})</option>`).join('')}
+          ${pending.map(d => `<option value="${d.dossier_id}" ${d.dossier_id === activeUserDossierId ? 'selected' : ''}>${d.employee_name} (${d.department})</option>`).join('')}
         </optgroup>
         <optgroup label="⚠️ Under Review / Discrepancy (5)">
-          ${forReview.map(d => `<option value="${d.dossier_id}" ${d.dossier_id === activeRequesterDossierId ? 'selected' : ''}>${d.employee_name} (${d.department})</option>`).join('')}
+          ${forReview.map(d => `<option value="${d.dossier_id}" ${d.dossier_id === activeUserDossierId ? 'selected' : ''}>${d.employee_name} (${d.department})</option>`).join('')}
         </optgroup>
         <optgroup label="🚀 Ready for Release (5)">
-          ${forRelease.map(d => `<option value="${d.dossier_id}" ${d.dossier_id === activeRequesterDossierId ? 'selected' : ''}>${d.employee_name} (${d.department})</option>`).join('')}
+          ${forRelease.map(d => `<option value="${d.dossier_id}" ${d.dossier_id === activeUserDossierId ? 'selected' : ''}>${d.employee_name} (${d.department})</option>`).join('')}
         </optgroup>
       `;
     }
 
-    function onSelectRequesterTesterAccount(id) {
-      activeRequesterDossierId = id;
-      renderRequesterPortal();
-      showDynamicToast("Switched Account", `Viewing clearance timeline for ${getActiveRequesterDossier().employee_name}`, "info");
+    function onSelectUserAccount(id) {
+      activeUserDossierId = id;
+      renderUserEnd();
+      showDynamicToast("Employee Switched", `Viewing clearance timeline for ${getActiveUserDossier().employee_name}`, "info");
     }
 
-    function getActiveRequesterDossier() {
-      return allDossiers.find(d => d.dossier_id === activeRequesterDossierId) || allDossiers[0];
+    function getActiveUserDossier() {
+      return allDossiers.find(d => d.dossier_id === activeUserDossierId) || allDossiers[0];
     }
 
-    function renderRequesterPortal() {
-      const d = getActiveRequesterDossier();
+    function renderUserEnd() {
+      renderUserAccountDropdown();
+      const d = getActiveUserDossier();
       if (!d) return;
 
-      // Initials & Profile
       const initials = d.employee_name.split(' ').map(n => n[0]).slice(0, 2).join('');
-      document.getElementById('reqAvatar').textContent = initials;
-      document.getElementById('reqEmpName').textContent = d.employee_name;
-      document.getElementById('reqEmpIdBadge').textContent = d.employee_id;
-      document.getElementById('reqDossierId').textContent = d.dossier_id;
-      document.getElementById('reqDeptTitle').innerHTML = `<i class="fa-solid fa-briefcase mr-1.5 text-neutral-400"></i>${d.department} · ${d.job_level}`;
-      document.getElementById('reqBranch').innerHTML = `<i class="fa-solid fa-building mr-1.5 text-neutral-400"></i>${d.branch}`;
-      document.getElementById('reqEocDate').innerHTML = `<i class="fa-solid fa-calendar-check mr-1.5 text-neutral-400"></i>EOC: ${d.eoc_date}`;
+      document.getElementById('userAvatar').textContent = initials;
+      document.getElementById('userEmpName').textContent = d.employee_name;
+      document.getElementById('userEmpIdBadge').textContent = d.employee_id;
+      document.getElementById('userDossierId').textContent = d.dossier_id;
+      document.getElementById('userDeptTitle').innerHTML = `<i class="fa-solid fa-briefcase mr-1.5 text-neutral-400"></i>${d.department} · ${d.job_level}`;
+      document.getElementById('userBranch').innerHTML = `<i class="fa-solid fa-building mr-1.5 text-neutral-400"></i>${d.branch}`;
+      document.getElementById('userEocDate').innerHTML = `<i class="fa-solid fa-calendar-check mr-1.5 text-neutral-400"></i>EOC: ${d.eoc_date}`;
 
-      // Status Badges
       let statusBadge = '';
       if (d.category === 'FOR_RELEASE' || d.overall_status === 'CLEARED' || d.overall_status === 'APPROVED') {
         statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-apple-green uppercase">READY FOR RELEASE</span>';
-        document.getElementById('reqCategoryBadge').textContent = 'All Clearances Signed Off';
+        document.getElementById('userCategoryBadge').textContent = 'All Clearances Signed Off';
       } else if (d.category === 'FOR_REVIEW' || d.overall_status === 'FLAGGED') {
         statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-500/10 text-apple-red uppercase">UNDER REVIEW</span>';
-        document.getElementById('reqCategoryBadge').textContent = 'Action / Discrepancy Under Review';
+        document.getElementById('userCategoryBadge').textContent = 'Action / Discrepancy Under Review';
       } else {
         statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-apple-amber uppercase">PENDING</span>';
-        document.getElementById('reqCategoryBadge').textContent = 'Pending Standard Turnover';
+        document.getElementById('userCategoryBadge').textContent = 'Pending Standard Turnover';
       }
-      document.getElementById('reqStatusBadge').outerHTML = `<span id="reqStatusBadge">${statusBadge}</span>`;
+      document.getElementById('userStatusBadge').outerHTML = `<span id="userStatusBadge">${statusBadge}</span>`;
 
       // "Whose Turn" Card
-      document.getElementById('reqCurrentPhaseTitle').textContent = `Current Phase: ${d.stage_name || 'Stage 1: Asset Hand-Off'}`;
-      document.getElementById('reqWhoseTurnHolderBadge').textContent = `Turn: ${d.current_turn_name || 'IT Clearance'}`;
-      document.getElementById('reqWhoseTurnActionText').textContent = d.current_turn_action || 'Department review in progress.';
+      document.getElementById('userCurrentPhaseTitle').textContent = `Current Phase: ${d.stage_name || 'Stage 1: Asset Hand-Off'}`;
+      document.getElementById('userWhoseTurnHolderBadge').textContent = `Turn: ${d.current_turn_name || 'IT Clearance'}`;
+      document.getElementById('userWhoseTurnActionText').textContent = d.current_turn_action || 'Department review in progress.';
 
       // Linear Stepper (4 Stages)
       const stages = [

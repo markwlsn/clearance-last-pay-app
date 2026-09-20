@@ -705,6 +705,12 @@ else:
     HTML_DASHBOARD = "<html><body><h1>Clearance Dashboard</h1></body></html>"
 
 
+def get_html_content():
+    if template_path.exists():
+        return template_path.read_text(encoding="utf-8")
+    return HTML_DASHBOARD
+
+
 @app.get("/", response_class=HTMLResponse)
 def index_page():
     """Interactive Apple-minimalist dashboard for clearance and last pay testing."""
