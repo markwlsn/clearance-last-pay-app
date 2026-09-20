@@ -688,6 +688,13 @@ def get_audit_logs(limit: int = 30):
     return app.state.audit_logger.get_recent_logs(limit=limit)
 
 
+template_path = Path(__file__).resolve().parent / "templates" / "dashboard.html"
+if template_path.exists():
+    HTML_DASHBOARD = template_path.read_text(encoding="utf-8")
+else:
+    HTML_DASHBOARD = "<html><body><h1>Clearance Dashboard</h1></body></html>"
+
+
 @app.get("/", response_class=HTMLResponse)
 def index_page():
     """Interactive Apple-minimalist dashboard for document extraction testing."""

@@ -262,7 +262,15 @@ def test_dossiers_have_timeline_and_comments(client):
     resp = client.get("/api/clearance/dossiers")
     assert resp.status_code == 200
     dossiers = resp.json()
-    assert len(dossiers) >= 4
+    assert len(dossiers) == 15
+
+    pending = [d for d in dossiers if d.get("category") == "PENDING"]
+    for_review = [d for d in dossiers if d.get("category") == "FOR_REVIEW"]
+    for_release = [d for d in dossiers if d.get("category") == "FOR_RELEASE"]
+
+    assert len(pending) == 5
+    assert len(for_review) == 5
+    assert len(for_release) == 5
 
     for d in dossiers:
         assert "timeline" in d

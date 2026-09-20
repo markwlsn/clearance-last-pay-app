@@ -88,3 +88,21 @@ new_sign = '''    # Advance linear turn sequence if matching active node
                 target["current_turn_action"] = "Execute final DOLE-compliant disbursement and release COE."
                 target["current_stage"] = "STAGE_4_HR_RELEASE"
                 target["stage_step"] = 4
+        else:
+            target["current_turn_node"] = "HR"
+            target["current_turn_action"] = "All departmental sign-offs completed. Final pay and COE released."
+            target["category"] = "FOR_RELEASE"
+            target["overall_status"] = "CLEARED"
+            target["stage_step"] = 4
+
+    if req.node_key == "HR" and req.action == "CLEARED":
+        target["overall_status"] = "APPROVED"
+        target["category"] = "FOR_RELEASE"
+        target["stage_step"] = 4
+
+    if "timeline" in target:
+        target["timeline"].append({
+            "milestone": f"{req.node_key} Clearance Cleared",
+            "actor": f"{req.approver_name} ({req.role})",
+            "date": datetime.now(timezone.utc).strftime("%Y-%m-%d %I:%M %p"),
+            "status": "COMPLETED",

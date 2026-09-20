@@ -964,3 +964,197 @@ def get_initial_dossiers() -> List[Dict[str, Any]]:
             "current_stage": "STAGE_3_QUITCLAIM",
             "stage_name": "Stage 3: Quit Claim & Waiver",
             "stage_step": 3,
+            "current_turn_node": "EMPLOYEE",
+            "current_turn_name": "Emilio Aguinaldo (Employee)",
+            "current_turn_role": "REQUESTER",
+            "current_turn_action": "Action Needed from Employee: Quit Claim & Waiver document lacks notary dry seal and witness signature page.",
+            "overall_status": "FLAGGED",
+            "submitted_at": "2026-09-18T16:00:00Z",
+            "sample_file": "quit_claim_mismatch.pdf",
+            "sample_type": "QUIT_CLAIM",
+            "ai_flags_count": 1,
+            "flags_summary": ["FLAG_SIGNATURE_ABSENT"],
+            "routing_mode": "SEQUENTIAL",
+            "assigned_signer": "Grace Diaz (HR Operations Lead)",
+            "nodes": {
+                "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "CLEARED", "summary": "Legal document repository access revoked"},
+                "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Taguig office keys & badge returned"},
+                "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "CLEARED", "summary": "Final ledger balanced at ₱84,200.00"},
+                "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "FLAGGED", "summary": "Quitclaim requires notary seal & signatures"}
+            },
+            "escrow_details": None,
+            "timeline": [
+                {
+                    "milestone": "Clearance Request Lodged",
+                    "actor": "Emilio Aguinaldo (Employee)",
+                    "date": "2026-09-18 04:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Legal resignation clearance lodged for Taguig HQ.",
+                    "icon": "fa-file-lines"
+                },
+                {
+                    "milestone": "Legal Vault Access Revocation",
+                    "actor": "Alex Tan (IT Clearance Lead)",
+                    "date": "2026-09-18 05:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Secured corporate contracts drive and e-discovery tools wiped.",
+                    "icon": "fa-laptop"
+                },
+                {
+                    "milestone": "Facilities & Law Library Key Surrender",
+                    "actor": "Elena Cruz (Facilities Lead)",
+                    "date": "2026-09-19 09:30 AM",
+                    "status": "COMPLETED",
+                    "details": "Corporate Law Library keys and 24th floor turnstile tag surrendered.",
+                    "icon": "fa-key"
+                },
+                {
+                    "milestone": "Finance & Executive Payroll Audit",
+                    "actor": "Roberto Ong (Finance Lead)",
+                    "date": "2026-09-19 02:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Final net pay audited at ₱84,200.00. Zero company liabilities.",
+                    "icon": "fa-calculator"
+                },
+                {
+                    "milestone": "Notarized Quit Claim & Waiver",
+                    "actor": "Grace Diaz (HR Operations)",
+                    "date": "2026-09-20 10:00 AM",
+                    "status": "IN_PROGRESS",
+                    "details": "Uploaded document missing Page 2 Notarial Acknowledgment seal.",
+                    "icon": "fa-signature"
+                },
+                {
+                    "milestone": "HR Final Pay Release & COE",
+                    "actor": "Grace Diaz (HR Operations)",
+                    "date": "Pending Release",
+                    "status": "PENDING",
+                    "details": "Final payout release to Metrobank account and automated COE delivery.",
+                    "icon": "fa-money-bill-transfer"
+                }
+            ],
+            "comments": [
+                {
+                    "id": "cmt-1001",
+                    "author": "Grace Diaz",
+                    "role": "HR_APPROVER",
+                    "text": "Atty. Emilio, page 2 of the Quitclaim PDF was scanned without the notary public seal and witness signatures. Please upload complete copy.",
+                    "timestamp": "2026-09-20T10:15:00Z"
+                },
+                {
+                    "id": "cmt-1002",
+                    "author": "Emilio Aguinaldo",
+                    "role": "REQUESTER",
+                    "text": "Apologies, scanner skipped page 2. I have the notarized original right here and am re-uploading.",
+                    "timestamp": "2026-09-20T11:20:00Z"
+                }
+            ],
+            "docs": [
+                {"title": "Quit Claim & Waiver", "file": "quit_claim_mismatch.pdf", "type": "QUIT_CLAIM", "has_flags": True},
+                {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
+                {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+            ]
+        },
+
+        # =====================================================================
+        # 5 READY FOR RELEASE TESTER ACCOUNTS (All 4 Nodes Cleared · Ready to Release)
+        # =====================================================================
+        {
+            "dossier_id": "DOS-2026-011",
+            "employee_name": "Elena Cruz",
+            "employee_id": "EMP-77102",
+            "department": "Retail Operations",
+            "company": "CMG Retail Inc.",
+            "unit_channel": "Retail Stores Network",
+            "job_level": "Junior Associate",
+            "branch": "Davao Regional Hub",
+            "date_hired": "2023-08-01",
+            "eoc_date": "2026-09-25",
+            "employee_status": "Regular",
+            "reason_for_separation": "Resignation",
+            "with_clearance_already": "Yes",
+            "category": "FOR_RELEASE",
+            "current_stage": "STAGE_4_HR_RELEASE",
+            "stage_name": "Stage 4: HR Final Release & COE",
+            "stage_step": 4,
+            "current_turn_node": "HR",
+            "current_turn_name": "Grace Diaz (HR Operations Lead)",
+            "current_turn_role": "HR_APPROVER",
+            "current_turn_action": "All 4 departments cleared! Ready to execute final pay release (₱38,200.00 via BDO) and deliver digital COE.",
+            "overall_status": "CLEARED",
+            "submitted_at": "2026-09-20T09:10:00Z",
+            "sample_file": "clearance_sheet_valid.pdf",
+            "sample_type": "CLEARANCE_SHEET",
+            "ai_flags_count": 0,
+            "flags_summary": [],
+            "routing_mode": "SEQUENTIAL",
+            "assigned_signer": "Grace Diaz (HR Operations Manager)",
+            "nodes": {
+                "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "CLEARED", "summary": "POS credentials revoked"},
+                "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Store keys surrendered"},
+                "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "CLEARED", "summary": "Final computation balanced (₱38,200.00)"},
+                "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "CLEARED", "summary": "COE approved & BDO disbursement authorized"}
+            },
+            "escrow_details": None,
+            "timeline": [
+                {
+                    "milestone": "Clearance Request Lodged",
+                    "actor": "Elena Cruz (Employee)",
+                    "date": "2026-09-20 09:10 AM",
+                    "status": "COMPLETED",
+                    "details": "Resignation clearance lodged via Lark Form for Davao Regional Hub.",
+                    "icon": "fa-file-lines"
+                },
+                {
+                    "milestone": "IT Hardware Turnover",
+                    "actor": "Alex Tan (IT Clearance Lead)",
+                    "date": "2026-09-20 11:00 AM",
+                    "status": "COMPLETED",
+                    "details": "POS inventory tablet returned and cleared.",
+                    "icon": "fa-laptop"
+                },
+                {
+                    "milestone": "Facilities & Store Keys Turnover",
+                    "actor": "Elena Cruz (Facilities Lead)",
+                    "date": "2026-09-20 01:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Davao branch store keys and safe lock combination surrendered.",
+                    "icon": "fa-key"
+                },
+                {
+                    "milestone": "Finance & Payroll Audit",
+                    "actor": "Roberto Ong (Finance Lead)",
+                    "date": "2026-09-20 03:00 PM",
+                    "status": "COMPLETED",
+                    "details": "All deductions zeroed. Final pay ₱38,200.00 balanced.",
+                    "icon": "fa-calculator"
+                },
+                {
+                    "milestone": "Quit Claim & Waiver Sign-Off",
+                    "actor": "Elena Cruz (Employee)",
+                    "date": "2026-09-20 04:30 PM",
+                    "status": "COMPLETED",
+                    "details": "Notarized Quit Claim & Waiver signed and validated.",
+                    "icon": "fa-signature"
+                },
+                {
+                    "milestone": "HR Final Pay Release & COE",
+                    "actor": "Grace Diaz (HR Operations)",
+                    "date": "2026-09-20 05:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Ready for BDO payout execution and automated digital COE transmission.",
+                    "icon": "fa-money-bill-transfer"
+                }
+            ],
+            "comments": [
+                {
+                    "id": "cmt-1101",
+                    "author": "Grace Diaz",
+                    "role": "HR_APPROVER",
+                    "text": "100% completed clearance with 0 AI flags. Ready for batch DOLE 30-day payout execution.",
+                    "timestamp": "2026-09-20T17:05:00Z"
+                },
+                {
+                    "id": "cmt-1102",
+                    "author": "Elena Cruz",
+                    "role": "REQUESTER",
