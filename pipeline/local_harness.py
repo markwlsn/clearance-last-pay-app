@@ -2532,21 +2532,29 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                           c.role === 'IT_APPROVER' ? 'IT Lead' :
                           c.role === 'FINANCE_APPROVER' ? 'Finance Lead' :
                           c.role === 'HR_APPROVER' ? 'HR Operations' :
-                          c.role === 'ADMIN_APPROVER' ? 'Facilities Lead' : 'Employee';
+                          c.role === 'ADMIN_APPROVER' ? 'Facilities Lead' : 'Approver';
         
         let roleBadgeClass = "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300";
+        if (isRequester) roleBadgeClass = "bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/20";
         if (c.role === 'IT_APPROVER') roleBadgeClass = "bg-blue-500/10 text-apple-blue";
         if (c.role === 'FINANCE_APPROVER') roleBadgeClass = "bg-emerald-500/10 text-apple-green";
         if (c.role === 'HR_APPROVER') roleBadgeClass = "bg-purple-500/10 text-apple-purple";
         if (c.role === 'ADMIN_APPROVER') roleBadgeClass = "bg-amber-500/10 text-apple-amber";
 
+        const cardClass = isRequester 
+          ? "p-3 rounded-2xl bg-sky-500/[0.04] dark:bg-sky-950/20 border border-sky-500/25 shadow-sm space-y-1.5 transition"
+          : "p-3 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] shadow-sm space-y-1.5 transition";
+
         const timeStr = c.timestamp ? new Date(c.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', month:'short', day:'numeric'}) : 'Recently';
 
         return `
-          <div class="p-3 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] shadow-sm space-y-1.5 transition">
+          <div class="${cardClass}">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-2">
-                <span class="text-xs font-bold text-neutral-900 dark:text-white">${c.author}</span>
+                <span class="text-xs font-bold text-neutral-900 dark:text-white flex items-center space-x-1">
+                  ${isRequester ? '<i class="fa-solid fa-user text-sky-500 text-[10px] mr-1"></i>' : ''}
+                  <span>${c.author}</span>
+                </span>
                 <span class="text-[9px] font-bold px-2 py-0.2 rounded-full ${roleBadgeClass}">${roleLabel}</span>
               </div>
               <span class="text-[10px] text-neutral-400 font-mono">${timeStr}</span>
@@ -2837,28 +2845,49 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
     function switchApproverRole(role) {
       currentApproverRole = role;
+      const btnReq = document.getElementById('roleBtnRequester');
       const btnIT = document.getElementById('roleBtnIT');
       const btnFin = document.getElementById('roleBtnFinance');
       const btnHR = document.getElementById('roleBtnHR');
       const btnAdmin = document.getElementById('roleBtnAdmin');
       const currentRoleLabel = document.getElementById('currentRoleLabel');
 
-      const activeClass = "px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm";
-      const inactiveClass = "px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2";
+      const activeClass = "px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm";
+      const inactiveClass = "px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2";
 
+      if (btnReq) btnReq.className = role === 'REQUESTER' ? activeClass : inactiveClass;
       if (btnIT) btnIT.className = role === 'IT_APPROVER' ? activeClass : inactiveClass;
       if (btnFin) btnFin.className = role === 'FINANCE_APPROVER' ? activeClass : inactiveClass;
       if (btnHR) btnHR.className = role === 'HR_APPROVER' ? activeClass : inactiveClass;
       if (btnAdmin) btnAdmin.className = role === 'ADMIN_APPROVER' ? activeClass : inactiveClass;
 
-      if (role === 'IT_APPROVER') {
-        currentRoleLabel.textContent = 'Alex Tan (IT Clearance Lead)';
-      } else if (role === 'FINANCE_APPROVER') {
-        currentRoleLabel.textContent = 'Roberto Ong (Finance & Payroll Lead)';
-      } else if (role === 'HR_APPROVER') {
-        currentRoleLabel.textContent = 'Grace Diaz (HR Operations Manager)';
-      } else if (role === 'ADMIN_APPROVER') {
-        currentRoleLabel.textContent = 'Elena Cruz (Facilities & Admin Lead)';
+      const requesterName = activeDossier ? activeDossier.employee_name : 'Juan Dela Cruz';
+      const noticeBanner = document.getElementById('requesterNoticeBanner');
+      const approverActionBtns = document.getElementById('approverActionButtonsGroup');
+
+      if (role === 'REQUESTER') {
+        if (currentRoleLabel) currentRoleLabel.textContent = `${requesterName} (Requesting Employee)`;
+        if (noticeBanner) noticeBanner.classList.remove('hidden');
+        if (approverActionBtns) approverActionBtns.classList.add('opacity-50', 'pointer-events-none');
+      } else {
+        if (noticeBanner) noticeBanner.classList.add('hidden');
+        if (approverActionBtns) approverActionBtns.classList.remove('opacity-50', 'pointer-events-none');
+        if (role === 'IT_APPROVER') {
+          if (currentRoleLabel) currentRoleLabel.textContent = 'Alex Tan (IT Clearance Lead)';
+        } else if (role === 'FINANCE_APPROVER') {
+          if (currentRoleLabel) currentRoleLabel.textContent = 'Roberto Ong (Finance & Payroll Lead)';
+        } else if (role === 'HR_APPROVER') {
+          if (currentRoleLabel) currentRoleLabel.textContent = 'Grace Diaz (HR Operations Manager)';
+        } else if (role === 'ADMIN_APPROVER') {
+          if (currentRoleLabel) currentRoleLabel.textContent = 'Elena Cruz (Facilities & Admin Lead)';
+        }
+      }
+
+      // Sync select dropdown in transaction discussion
+      const senderSelect = document.getElementById('commentSenderRoleSelect');
+      if (senderSelect) {
+        senderSelect.value = role;
+        onCommentSenderChanged();
       }
 
       if (activeDossier) {
@@ -2872,6 +2901,49 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
       const hasITFlag = d.flags_summary && (d.flags_summary.includes("FLAG_ACCOUNTABILITY_NOTED") || d.flags_summary.includes("FLAG_MISSING_FIELD"));
       const hasFinanceFlag = d.flags_summary && (d.flags_summary.includes("FLAG_AMOUNT_MISMATCH") || d.flags_summary.includes("FLAG_FORMAT_MISMATCH"));
+
+      if (role === 'REQUESTER') {
+        container.innerHTML = `
+          <div class="flex items-center justify-between pb-2 border-b border-black/[0.05] dark:border-white/[0.06]">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-user-circle text-sky-500"></i>
+              <span class="font-bold text-xs uppercase tracking-wider text-neutral-800 dark:text-neutral-200">Requester Clearance Status Desk</span>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-sky-500/10 text-sky-600 dark:text-sky-400">
+              Employee Portal View
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 text-xs">
+            <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] space-y-2">
+              <div class="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 pb-1 border-b border-black/[0.04] dark:border-white/[0.06] flex justify-between">
+                <span>My Clearance Checklist</span>
+                <span class="text-apple-blue font-semibold">Stage ${d.stage_step || 1} of 4</span>
+              </div>
+              <div class="space-y-1.5 text-[11px]">
+                <div class="flex items-center justify-between"><span>IT Hardware Hand-Off:</span><span class="font-bold text-neutral-800 dark:text-neutral-200">${d.nodes && d.nodes.IT ? d.nodes.IT.status : 'In Progress'}</span></div>
+                <div class="flex items-center justify-between"><span>Physical Locker & Facilities:</span><span class="font-bold text-apple-green">${d.nodes && d.nodes.ADMIN ? d.nodes.ADMIN.status : 'Cleared'}</span></div>
+                <div class="flex items-center justify-between"><span>Finance & Payroll Audit:</span><span class="font-bold text-neutral-800 dark:text-neutral-200">${d.nodes && d.nodes.FINANCE ? d.nodes.FINANCE.status : 'In Progress'}</span></div>
+                <div class="flex items-center justify-between"><span>Quit Claim Notarization:</span><span class="font-bold text-neutral-500">Pending Review</span></div>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] space-y-2">
+              <div class="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 pb-1 border-b border-black/[0.04] dark:border-white/[0.06]">
+                <span>Communication Guidance</span>
+              </div>
+              <p class="text-[11px] text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                Use the <strong>Centralized Transaction Discussion</strong> below to reply directly to your IT, Finance, HR, and Facilities approvers. All notes are confidential and logged for compliance.
+              </p>
+              <div class="pt-1 text-[10px] text-apple-blue font-semibold flex items-center space-x-1">
+                <i class="fa-solid fa-lock text-[9px]"></i>
+                <span>Private channel with your 4 assigned approvers only</span>
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
 
       if (role === 'IT_APPROVER') {
         container.innerHTML = `
@@ -3098,13 +3170,64 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         }
       }
 
+      // Update Requester Scope Labels
+      const threadReqEl = document.getElementById('threadRequesterName');
+      if (threadReqEl) threadReqEl.textContent = `${d.employee_name} (Requester)`;
+
+      const roleReqEl = document.getElementById('roleLabelRequesterName');
+      if (roleReqEl) roleReqEl.textContent = `${d.employee_name} (Requester)`;
+
+      const noticeReqEl = document.getElementById('requesterNoticeName');
+      if (noticeReqEl) noticeReqEl.textContent = d.employee_name;
+
+      // Update Authorized Participants Badges
+      const authBadges = document.getElementById('authorizedParticipantsBadges');
+      if (authBadges) {
+        authBadges.innerHTML = `
+          <span class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-600 dark:text-sky-400 font-bold flex items-center space-x-1 shadow-2xs">
+            <i class="fa-solid fa-user text-[8px]"></i>
+            <span>${d.employee_name} (Requester)</span>
+          </span>
+          <span class="px-2 py-0.5 rounded-md bg-blue-500/10 text-apple-blue font-medium flex items-center space-x-1">
+            <i class="fa-solid fa-laptop-code text-[8px]"></i>
+            <span>Alex Tan (IT)</span>
+          </span>
+          <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-apple-green font-medium flex items-center space-x-1">
+            <i class="fa-solid fa-money-check-dollar text-[8px]"></i>
+            <span>Roberto Ong (Finance)</span>
+          </span>
+          <span class="px-2 py-0.5 rounded-md bg-purple-500/10 text-apple-purple font-medium flex items-center space-x-1">
+            <i class="fa-solid fa-user-tie text-[8px]"></i>
+            <span>Grace Diaz (HR)</span>
+          </span>
+          <span class="px-2 py-0.5 rounded-md bg-amber-500/10 text-apple-amber font-medium flex items-center space-x-1">
+            <i class="fa-solid fa-building-user text-[8px]"></i>
+            <span>Elena Cruz (Admin)</span>
+          </span>
+        `;
+      }
+
+      // Update Comment Sender Role Select Dropdown
+      const senderSelect = document.getElementById('commentSenderRoleSelect');
+      if (senderSelect) {
+        senderSelect.innerHTML = `
+          <option value="REQUESTER">${d.employee_name} (Requester)</option>
+          <option value="IT_APPROVER">Alex Tan (IT Clearance Lead)</option>
+          <option value="FINANCE_APPROVER">Roberto Ong (Finance & Payroll Lead)</option>
+          <option value="HR_APPROVER">Grace Diaz (HR Operations Manager)</option>
+          <option value="ADMIN_APPROVER">Elena Cruz (Facilities & Admin Lead)</option>
+        `;
+        senderSelect.value = currentApproverRole;
+        onCommentSenderChanged();
+      }
+
       // Progression Steps
       updateProgressPipeline(d);
 
       // Render Hand-off Milestone Activity Timeline
       renderTimeline(d);
 
-      // Render Centralized Transaction Discussion
+      // Render Centralized Transaction Discussion (Scoped: Requester & Approvers only)
       renderTransactionComments(d);
 
       // Render Role-Specific Work Desk
