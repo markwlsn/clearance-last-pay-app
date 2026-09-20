@@ -1682,60 +1682,44 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                   <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage3Sub">Employee & Notary Verification</div>
                 </div>
 
-                <!-- HR Final Release Node (Convergence Target) -->
-                <div id="pNodeBoxHR" class="p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-2 transition">
+                <!-- Stage 4: HR Final Release & COE -->
+                <div id="linStage4Box" class="p-3.5 rounded-2xl border transition space-y-2">
                   <div class="flex items-center justify-between">
-                    <span class="font-bold text-neutral-900 dark:text-white flex items-center space-x-1.5">
-                      <i class="fa-solid fa-stamp text-apple-green"></i>
+                    <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
+                      <span id="linStage4Num" class="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-500 font-mono text-[10px] flex items-center justify-center font-bold">4</span>
                       <span>HR Final Release</span>
                     </span>
-                    <span id="pNodeBadgeHR" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-200/80 dark:bg-neutral-800 text-neutral-500 font-mono">🔒 LOCKED</span>
+                    <span id="linStage4Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">LOCKED</span>
                   </div>
-                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="pNodeSignerHR">Signer: Grace Diaz</div>
-                  <div class="text-[10px] font-mono text-neutral-400 truncate" id="pNodeSummaryHR">Requires 3 depts</div>
-                  <button onclick="signParallelNode('HR')" id="btnSignNodeHR" disabled class="w-full py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400 text-[10px] font-bold cursor-not-allowed transition flex items-center justify-center space-x-1">
-                    <i class="fa-solid fa-lock text-[9px]"></i>
-                    <span>Release Final Pay</span>
-                  </button>
+                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage4Detail">Bank Disbursement & COE</div>
+                  <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage4Sub">Grace Diaz (HR Operations)</div>
                 </div>
 
               </div>
+            </div>
 
-              <!-- Sequential Pipeline Grid (Toggleable Alternative) -->
-              <div id="sequentialPipelineContainer" class="hidden grid-cols-4 gap-2.5 text-center text-xs">
-                
-                <div id="step1Box" class="p-3 rounded-xl border border-lark-blue bg-blue-50/60 dark:bg-blue-950/30 text-lark-blue font-semibold transition">
-                  <div class="flex items-center justify-center space-x-1.5 mb-1">
-                    <i id="step1Icon" class="fa-solid fa-laptop-file text-sm"></i>
-                    <span class="text-[11px] font-bold">1. Clearances</span>
+            <!-- 2b. Detailed Minimalist Hand-Off & Milestone Activity Timeline -->
+            <div class="p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3.5">
+              <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-7 h-7 rounded-xl bg-blue-500/15 text-apple-blue flex items-center justify-center text-xs shadow-sm">
+                    <i class="fa-solid fa-list-check"></i>
                   </div>
-                  <div id="step1Status" class="text-[10px] text-apple-red font-bold">IT Hold</div>
-                </div>
-
-                <div id="step2Box" class="p-3 rounded-xl border border-black/[0.05] dark:border-white/[0.08] bg-white dark:bg-neutral-800 text-neutral-400 transition">
-                  <div class="flex items-center justify-center space-x-1.5 mb-1">
-                    <i class="fa-solid fa-calculator text-sm"></i>
-                    <span class="text-[11px] font-bold">2. Last Pay</span>
+                  <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
+                      Hand-Off & Milestone Activity Timeline
+                    </h4>
+                    <p class="text-[10px] text-neutral-500 dark:text-neutral-400">Concrete physical turnover events and clearance audit records</p>
                   </div>
-                  <div id="step2Status" class="text-[10px]">Pending</div>
                 </div>
+                <span id="timelineCountBadge" class="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-apple-blue">
+                  6 Milestones
+                </span>
+              </div>
 
-                <div id="step3Box" class="p-3 rounded-xl border border-black/[0.05] dark:border-white/[0.08] bg-white dark:bg-neutral-800 text-neutral-400 transition">
-                  <div class="flex items-center justify-center space-x-1.5 mb-1">
-                    <i class="fa-solid fa-file-contract text-sm"></i>
-                    <span class="text-[11px] font-bold">3. Quit Claim</span>
-                  </div>
-                  <div id="step3Status" class="text-[10px]">Pending</div>
-                </div>
-
-                <div id="step4Box" class="p-3 rounded-xl border border-black/[0.05] dark:border-white/[0.08] bg-white dark:bg-neutral-800 text-neutral-400 transition">
-                  <div class="flex items-center justify-center space-x-1.5 mb-1">
-                    <i class="fa-solid fa-money-check-dollar text-sm"></i>
-                    <span class="text-[11px] font-bold">4. Release</span>
-                  </div>
-                  <div id="step4Status" class="text-[10px]">Pending</div>
-                </div>
-
+              <!-- Vertical Timeline Items -->
+              <div id="dossierMilestoneTimeline" class="space-y-3 relative">
+                <!-- Rendered dynamically via renderTimeline(d) -->
               </div>
             </div>
 
@@ -1814,6 +1798,41 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
             </div>
 
+            <!-- 5b. Centralized Transaction Discussion Thread (Transparent Audit Chat) -->
+            <div class="p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3.5">
+              <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-7 h-7 rounded-xl bg-purple-500/15 text-apple-purple flex items-center justify-center text-xs shadow-sm">
+                    <i class="fa-solid fa-comments"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
+                      Centralized Transaction Discussion
+                    </h4>
+                    <p class="text-[10px] text-neutral-500 dark:text-neutral-400">Transparent in-dossier thread · Shared across Employee, IT, Facilities, Finance & HR</p>
+                  </div>
+                </div>
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-apple-green flex items-center space-x-1">
+                  <i class="fa-solid fa-shield-check text-[9px]"></i>
+                  <span>Zero Silos · Transparent Audit</span>
+                </span>
+              </div>
+
+              <!-- Discussion Messages Stream -->
+              <div id="transactionCommentsList" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                <!-- Rendered dynamically via renderTransactionComments(d) -->
+              </div>
+
+              <!-- Add Comment Input Box -->
+              <div class="pt-2 border-t border-black/[0.05] dark:border-white/[0.06] flex items-center space-x-2">
+                <input type="text" id="transactionCommentInput" placeholder="Add a transparent update, turnover note, or audit override for this transaction..." class="flex-1 text-xs bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 border border-black/[0.08] dark:border-white/[0.1] rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-apple-blue transition" onkeydown="if(event.key==='Enter') postTransactionComment()" />
+                <button onclick="postTransactionComment()" id="btnPostTransactionComment" class="px-4 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold rounded-xl shadow-sm hover:opacity-90 active:scale-95 transition flex items-center space-x-1.5 shrink-0">
+                  <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                  <span>Post Note</span>
+                </button>
+              </div>
+            </div>
+
             <!-- 6. Docked Apple Action Bar -->
             <div class="p-5 rounded-2xl bg-neutral-100/70 dark:bg-neutral-800/80 apple-glass border border-black/[0.06] dark:border-white/[0.08] space-y-4 shadow-sm">
               
@@ -1854,20 +1873,15 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                       <span id="apprUrgencyTag" class="text-apple-amber font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/10">18h Remaining</span>
                       <span class="text-[9px] text-neutral-400 font-normal">(48h node max)</span>
                     </div>
-                    <div class="text-[10px] text-neutral-400">Proactively nudge signers or open huddles to keep clearance velocity high.</div>
+                    <div class="text-[10px] text-neutral-400">Proactively nudge signers or post centralized notes to keep clearance velocity high.</div>
                   </div>
                 </div>
 
-                <!-- Anti-Idle Action Buttons -->
+                <!-- Anti-Idle Action Buttons (Lark Huddle Purged) -->
                 <div class="flex flex-wrap items-center gap-1.5">
                   <button onclick="nudgePendingSigner()" class="px-2.5 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-[11px] font-semibold transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Dispatches instant Lark Bot reminder to the current signer holding up this ticket">
                     <i class="fa-solid fa-bell text-apple-amber text-[10px]"></i>
                     <span>Nudge Signer</span>
-                  </button>
-
-                  <button onclick="openLarkHuddle()" class="px-2.5 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-lark-blue text-[11px] font-semibold border border-blue-500/20 transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Instant 3-way Lark group chat with Employee, Dept Head, and HR for 5-minute alignment">
-                    <i class="fa-solid fa-users text-[10px]"></i>
-                    <span>Lark Huddle</span>
                   </button>
 
                   <button onclick="escalateTicket()" class="px-2.5 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-apple-red text-[11px] font-semibold border border-red-500/20 transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Escalates idle ticket to Division VP / HR Director">
@@ -1999,7 +2013,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           <div class="flex items-center justify-between p-3 rounded-xl bg-neutral-100/80 dark:bg-neutral-800/80 border border-black/[0.04]">
             <div>
               <div class="font-bold text-neutral-800 dark:text-neutral-200">Disputed Hold Amount (Escrowed)</div>
-              <div class="text-[10px] text-apple-red">Held in payroll escrow pending Lark Huddle</div>
+              <div class="text-[10px] text-apple-red">Held in payroll escrow pending transaction resolution</div>
             </div>
             <div class="font-mono text-base font-bold text-apple-red" id="splitModalEscrow">₱3,500.00</div>
           </div>
@@ -2143,9 +2157,9 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       const activeClass = "flex-1 py-1 rounded-lg font-semibold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition";
       const inactiveClass = "flex-1 py-1 rounded-lg hover:text-neutral-900 dark:hover:text-white transition";
 
-      fAll.className = filter === 'ALL' ? activeClass : inactiveClass;
-      fFlag.className = filter === 'FLAGGED' ? activeClass : inactiveClass;
-      fClear.className = filter === 'CLEARED' ? activeClass : inactiveClass;
+      if (fAll) fAll.className = filter === 'ALL' ? activeClass : inactiveClass;
+      if (fFlag) fFlag.className = filter === 'FLAGGED' ? activeClass : inactiveClass;
+      if (fClear) fClear.className = filter === 'CLEARED' ? activeClass : inactiveClass;
 
       renderQueue();
     }
@@ -2161,14 +2175,32 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         const res = await fetch('/api/clearance/dossiers');
         allDossiersCache = await res.json();
 
-        // Update stats
-        const pending = allDossiersCache.filter(d => d.overall_status !== 'APPROVED').length;
+        // Calculate Executive Dashboard KPI metrics
+        const total = allDossiersCache.length;
+        const pending = allDossiersCache.filter(d => d.overall_status !== 'APPROVED' && d.overall_status !== 'CLEARED').length;
         const flagged = allDossiersCache.filter(d => d.ai_flags_count > 0).length;
-        const cleared = allDossiersCache.filter(d => d.overall_status === 'CLEARED' || d.overall_status === 'APPROVED').length;
+        const ready = allDossiersCache.filter(d => d.overall_status === 'CLEARED' || d.overall_status === 'APPROVED' || d.ai_flags_count === 0).length;
 
-        document.getElementById('statPending').textContent = pending;
-        document.getElementById('statFlagged').textContent = flagged;
-        document.getElementById('statCleared').textContent = cleared;
+        // Update Top Executive KPI metric tiles
+        const elKpiTotal = document.getElementById('statKpiTotal');
+        const elKpiPending = document.getElementById('statKpiPending');
+        const elKpiFlagged = document.getElementById('statKpiFlagged');
+        const elKpiReady = document.getElementById('statKpiReady');
+        const elKpiSla = document.getElementById('statKpiSla');
+
+        if (elKpiTotal) elKpiTotal.textContent = total;
+        if (elKpiPending) elKpiPending.textContent = pending;
+        if (elKpiFlagged) elKpiFlagged.textContent = flagged;
+        if (elKpiReady) elKpiReady.textContent = ready;
+        if (elKpiSla) elKpiSla.textContent = "4.2d";
+
+        // Update inline status badges if present
+        const elPending = document.getElementById('statPending');
+        const elFlagged = document.getElementById('statFlagged');
+        const elCleared = document.getElementById('statCleared');
+        if (elPending) elPending.textContent = pending;
+        if (elFlagged) elFlagged.textContent = flagged;
+        if (elCleared) elCleared.textContent = ready;
 
         renderQueue();
 
@@ -2191,7 +2223,8 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         if (!matchSearch) return false;
 
         if (currentFilter === 'FLAGGED') return d.ai_flags_count > 0;
-        if (currentFilter === 'CLEARED') return d.ai_flags_count === 0 || d.overall_status === 'APPROVED';
+        if (currentFilter === 'CLEARED') return d.overall_status === 'CLEARED' || d.overall_status === 'APPROVED' || d.ai_flags_count === 0;
+        if (currentFilter === 'PENDING') return d.overall_status !== 'APPROVED' && d.overall_status !== 'CLEARED';
         return true;
       });
 
