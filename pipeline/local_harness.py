@@ -445,9 +445,9 @@ def post_transaction_comment(req: TransactionCommentRequest):
 def get_approval_metrics():
     """Returns live KPI metric numbers for the Executive Clearance Dashboard."""
     total = len(app.state.dossiers)
-    pending = sum(1 for d in app.state.dossiers if d.get("overall_status") not in ("APPROVED", "CLEARED"))
-    flagged = sum(1 for d in app.state.dossiers if d.get("ai_flags_count", 0) > 0)
-    ready = sum(1 for d in app.state.dossiers if d.get("overall_status") in ("APPROVED", "CLEARED") or d.get("ai_flags_count", 0) == 0)
+    pending = sum(1 for d in app.state.dossiers if d.get("category") == "PENDING" or d.get("overall_status") == "PENDING")
+    flagged = sum(1 for d in app.state.dossiers if d.get("category") == "FOR_REVIEW" or d.get("overall_status") == "FLAGGED")
+    ready = sum(1 for d in app.state.dossiers if d.get("category") == "FOR_RELEASE" or d.get("overall_status") in ("APPROVED", "CLEARED"))
     return {
         "total_requests": total,
         "pending": pending,
