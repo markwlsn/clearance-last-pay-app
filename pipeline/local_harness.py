@@ -541,6 +541,38 @@ def sign_department_node(req: NodeSignRequest):
         if nodes.get("HR", {}).get("status") == "READY":
             nodes["HR"]["status"] = "LOCKED"
 
+    # Advance linear turn sequence if matching active node
+    seq = ["IT", "ADMIN", "FINANCE", "HR"]
+    if target.get("current_turn_node") == req.node_key and req.action == "CLEARED":
+        idx = seq.index(req.node_key)
+        if idx + 1 < len(seq):
+            nxt = seq[idx + 1]
+            target["current_turn_node"] = nxt
+            if nxt == "ADMIN":
+                target["current_turn_role"] = "ADMIN_APPROVER"
+                target["current_turn_name"] = "Elena Cruz (Facilities Lead)"
+                target["current_turn_action"] = "Surrender physical office keys, locker padlocks, and RFID transponder."
+                target["current_stage"] = "STAGE_1_ASSET"
+                target["stage_step"] = 1
+            elif nxt == "FINANCE":
+                target["current_turn_role"] = "FINANCE_APPROVER"
+                target["current_turn_name"] = "Roberto Ong (Finance Lead)"
+                target["current_turn_action"] = "Audit pro-rated payroll ledger, tax adjustments, and deductions."
+                target["current_stage"] = "STAGE_2_FINANCE"
+                target["stage_step"] = 2
+            elif nxt == "HR":
+                target["current_turn_role"] = "HR_APPROVER"
+                target["current_turn_name"] = "Grace Diaz (HR Operations Lead)"
+                target["current_turn_action"] = "Execute final DOLE-compliant disbursement and release COE."
+                target["current_stage"] = "STAGE_4_HR_RELEASE"
+                target["stage_step"] = 4
+        else:
+            target["current_turn_node"] = "HR"
+            target["current_turn_action"] = "All departmental sign-offs completed. Final pay and COE released."
+            target["category"] = "FOR_RELEASE"
+            target["overall_status"] = "CLEARED"
+            target["stage_step"] = 4
+
     if req.node_key == "HR" and req.action == "CLEARED":
         target["overall_status"] = "APPROVED"
         target["stage_step"] = 4

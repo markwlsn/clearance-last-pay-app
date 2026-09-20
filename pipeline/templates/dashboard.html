@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clearance & Last Pay — Lark Companion App</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: [
+              '-apple-system',
+              'BlinkMacSystemFont',
+              '"SF Pro Display"',
+              '"SF Pro Text"',
+              '"Helvetica Neue"',
+              'Arial',
+              'sans-serif'
+            ],
+            mono: ['"SF Mono"', 'Menlo', 'Monaco', 'monospace'],
+          },
+          colors: {
+            lark: {
+              blue: '#3370FF',
+              blueHover: '#295ECC',
+              border: '#DEE0E3',
+              bgGray: '#F5F6F7',
+              textDark: '#1F2329',
+              textMuted: '#646A73',
+              redStar: '#F54A45',
+            },
+            apple: {
+              blue: '#0071E3',
+              blueHover: '#0077ED',
+              green: '#34C759',
+              amber: '#FF9500',
+              red: '#FF3B30',
+              purple: '#AF52DE',
+              canvasLight: '#F5F5F7',
+              surfaceLight: '#FFFFFF',
+              canvasDark: '#000000',
+              surfaceDark: '#1C1C1E',
+              elevatedDark: '#2C2C2E',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <style>
+    html { -webkit-font-smoothing: antialiased; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: rgba(140, 140, 145, 0.25); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(140, 140, 145, 0.45); }
+    
+    .lark-input {
+      width: 100%;
+      font-size: 13px;
+      color: #1F2329;
+      background-color: #FFFFFF;
+      border: 1px solid #DEE0E3;
+      border-radius: 10px;
+      padding: 9px 12px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .dark .lark-input {
+      color: #F5F5F7;
+      background-color: #1C1C1E;
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .lark-input:focus {
+      border-color: #0071E3;
+      box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.18);
+    }
+    .lark-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1F2329;
+      margin-bottom: 6px;
+    }
+    .dark .lark-label { color: #E5E5EA; }
+    .lark-required { color: #F54A45; margin-left: 2px; }
+
+    .apple-glass {
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+    }
+
+    @keyframes pulseGreen {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 199, 89, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+    }
+    .apple-pulse-green {
+      animation: pulseGreen 2s infinite;
+    }
+
+    @keyframes pulseBlue {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 113, 227, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 113, 227, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 113, 227, 0); }
+    }
+    .apple-pulse-blue {
+      animation: pulseBlue 2s infinite;
+    }
+  </style>
+</head>
+<body class="bg-apple-canvasLight dark:bg-apple-canvasDark text-neutral-900 dark:text-neutral-100 min-h-screen transition-colors duration-300">
+  
+  <!-- Apple Dynamic Island Floating Toast Notification -->
+  <div id="dynamicIslandToast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="px-5 py-3 rounded-full bg-neutral-900/90 dark:bg-white/95 text-white dark:text-neutral-900 shadow-2xl apple-glass border border-white/20 dark:border-black/10 flex items-center space-x-3.5 text-xs font-semibold">
+      <div id="toastIcon" class="w-6 h-6 rounded-full bg-apple-green text-white flex items-center justify-center text-xs shrink-0 shadow-sm">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <div>
+        <div id="toastTitle" class="font-bold text-xs tracking-tight">Action Completed</div>
+        <div id="toastMessage" class="text-[11px] text-neutral-300 dark:text-neutral-600 font-normal">Recorded to immutable audit trail.</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Apple Frosted Glass Top Navigation Bar (3 Dedicated Ends) -->
+  <header class="sticky top-0 z-50 bg-white/85 dark:bg-neutral-900/85 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-3 shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-lark-blue text-white flex items-center justify-center shadow-sm">
+          <i class="fa-solid fa-file-signature text-sm"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-sm font-semibold tracking-tight">Clearance & Last Pay</h1>
+            <span class="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-500/10 text-lark-blue border border-blue-500/20">
+              Lark Companion
+            </span>
+          </div>
+          <p class="text-[11px] text-neutral-500 dark:text-neutral-400">CMG Group of Companies · Human-in-the-Loop</p>
+        </div>
+      </div>
+
+      <!-- Center 3-End Segmented Navigation -->
+      <nav class="flex items-center p-1 bg-neutral-200/70 dark:bg-neutral-800/80 rounded-2xl space-x-1 shadow-inner">
+        <!-- End 1: User / Requester Portal -->
+        <button id="tabBtnRequester" onclick="switchPortal('requester')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1.5">
+          <i class="fa-regular fa-user text-sky-500"></i>
+          <span class="hidden md:inline">User End (Requester)</span>
+          <span class="md:hidden">Requester</span>
+        </button>
+        <!-- End 2: Approver Desk -->
+        <button id="tabBtnApprover" onclick="switchPortal('approver')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-user-check text-apple-green"></i>
+          <span class="hidden md:inline">Approver Dashboard</span>
+          <span class="md:hidden">Approver</span>
+        </button>
+        <!-- End 3: Admin Dashboard -->
+        <button id="tabBtnAdmin" onclick="switchPortal('admin')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-shield-halved text-apple-purple"></i>
+          <span class="hidden md:inline">Admin Dashboard</span>
+          <span class="md:hidden">Admin</span>
+        </button>
+      </nav>
+
+      <!-- Right Controls: Guardrail & Theme Switcher -->
+      <div class="flex items-center space-x-2.5 shrink-0">
+        <div class="hidden lg:flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+          <i class="fa-solid fa-shield-check text-[11px]"></i>
+          <span>DOLE Compliant</span>
+        </div>
+
+        <button id="themeToggle" onclick="toggleTheme()" class="p-2 w-9 h-9 rounded-full bg-neutral-200/70 dark:bg-neutral-800 hover:bg-neutral-300/70 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 transition flex items-center justify-center focus:outline-none" title="Toggle Light / Dark Mode">
+          <i id="themeIconSun" class="fa-solid fa-sun text-sm hidden"></i>
+          <i id="themeIconMoon" class="fa-solid fa-moon text-sm"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+    <!-- ================================================================= -->
+    <!-- END 1: USER / REQUESTER PORTAL (REQUESTING & MONITORING TIMELINE) -->
+    <!-- ================================================================= -->
+    <section id="viewRequesterPortal" class="hidden space-y-6">
+      
+      <!-- Requester Tester Account Switcher & File Action Bar -->
+      <div class="bg-white/80 dark:bg-neutral-900/80 apple-glass p-4 sm:p-5 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-sky-500/15 text-sky-500 flex items-center justify-center text-base shadow-sm shrink-0">
+            <i class="fa-solid fa-user-circle"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">Requesting Employee Perspective</span>
+              <span class="text-[10px] px-2 py-0.2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 font-mono">15 Tester Accounts</span>
+            </div>
+            <h2 class="text-sm font-bold text-neutral-900 dark:text-white">Clearance Request & Hand-Off Timeline Monitor</h2>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <div class="flex items-center space-x-2">
+            <label for="requesterAccountSelect" class="text-xs font-semibold text-neutral-500 shrink-0">Switch Account:</label>
+            <select id="requesterAccountSelect" onchange="onSelectRequesterTesterAccount(this.value)" class="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white border border-black/[0.06] dark:border-white/[0.08] rounded-xl px-3 py-2 outline-none font-medium transition cursor-pointer">
+              <!-- Populated via JS with 15 Tester Accounts grouped by Pending, For Review, Ready for Release -->
+            </select>
+          </div>
+
+          <button onclick="openNewClearanceModal()" class="px-4 py-2 rounded-xl bg-apple-blue hover:bg-apple-blueHover text-white text-xs font-bold shadow-sm transition active:scale-95 flex items-center space-x-1.5">
+            <i class="fa-solid fa-plus text-xs"></i>
+            <span>File New Request</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Requester Dossier Container -->
+      <div id="requesterDossierContainer" class="space-y-6">
+        
+        <!-- Requester Hero Profile Card -->
+        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div class="flex items-start space-x-4">
+            <div id="reqAvatar" class="w-16 h-16 rounded-3xl bg-neutral-200/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 text-xl font-bold flex items-center justify-center shadow-inner shrink-0">
+              JD
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 id="reqEmpName" class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">Juan Dela Cruz</h3>
+                <span id="reqEmpIdBadge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">
+                  EMP-94812
+                </span>
+                <span id="reqStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-apple-amber uppercase">
+                  PENDING
+                </span>
+              </div>
+              <div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+                <span id="reqDeptTitle"><i class="fa-solid fa-briefcase mr-1.5 text-neutral-400"></i>Information Technology · Senior Specialist</span>
+                <span id="reqBranch"><i class="fa-solid fa-building mr-1.5 text-neutral-400"></i>Taguig HQ - 24th Floor</span>
+                <span id="reqEocDate"><i class="fa-solid fa-calendar-check mr-1.5 text-neutral-400"></i>EOC: 2026-08-31</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 pt-3 md:pt-0 border-black/[0.05]">
+            <span class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">Clearance Dossier</span>
+            <span id="reqDossierId" class="text-sm font-mono font-bold text-apple-blue">DOS-2026-001</span>
+            <span id="reqCategoryBadge" class="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 mt-0.5">Pending Asset Turnover</span>
+          </div>
+        </div>
+
+        <!-- "Whose Turn" Prominent Notification Banner -->
+        <div id="reqWhoseTurnCard" class="p-5 rounded-3xl bg-blue-50/70 dark:bg-blue-950/25 border border-apple-blue/30 shadow-sm flex items-start space-x-4">
+          <div class="w-10 h-10 rounded-2xl bg-apple-blue/15 text-apple-blue flex items-center justify-center text-lg shrink-0 mt-0.5">
+            <i class="fa-solid fa-clock-rotate-left apple-pulse-blue"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold text-apple-blue uppercase tracking-wider" id="reqCurrentPhaseTitle">Current Phase: Stage 1 - Asset Hand-Off</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-apple-blue text-white" id="reqWhoseTurnHolderBadge">Turn: IT Clearance (Alex Tan)</span>
+            </div>
+            <p id="reqWhoseTurnActionText" class="text-xs text-neutral-700 dark:text-neutral-200 font-medium mt-1">
+              Alex Tan (IT Clearance Lead) is currently inspecting your Lenovo ThinkPad T14s serial number and sanitizing corporate data.
+            </p>
+          </div>
+        </div>
+
+        <!-- Linear Clearance Workflow Stepper (4 Stages) -->
+        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-400">Clearance Linear Workflow Progress</h4>
+            <span id="reqWorkflowStepSummary" class="text-xs font-bold text-neutral-700 dark:text-neutral-300">Stage 1 of 4 in progress</span>
+          </div>
+          <div id="reqWorkflowStepper" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Hand-Off & Milestone Activity Timeline -->
+        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-5">
+          <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-apple-green flex items-center justify-center text-sm shadow-sm">
+                <i class="fa-solid fa-timeline"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Hand-Off & Milestone Timeline</h4>
+                <p class="text-[11px] text-neutral-400">Chronological verification of company hardware, keys, and payroll audits</p>
+              </div>
+            </div>
+            <span class="text-[10px] font-mono text-neutral-400">Auto-Logged</span>
+          </div>
+
+          <div id="reqTimelineContainer" class="relative pl-6 space-y-6 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200 dark:before:bg-neutral-800">
+            <!-- Timeline items rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Centralized Confidential Transaction Discussion (Requester & Approvers Only) -->
+        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06] gap-2">
+            <div>
+              <div class="flex items-center space-x-2">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Centralized Transaction Discussion</h4>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">
+                  🔒 Requester & Approvers Only
+                </span>
+              </div>
+              <p class="text-[11px] text-neutral-400 mt-0.5" id="reqDiscussionSubtitle">
+                Confidential thread · Restricted strictly to Juan Dela Cruz & Clearance Approvers
+              </p>
+            </div>
+            <!-- Dynamic participant badges -->
+            <div id="reqAuthorizedBadges" class="flex flex-wrap items-center gap-1.5 text-[10px]">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+
+          <!-- Message Thread Box -->
+          <div id="reqCommentsContainer" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+            <!-- Comments rendered via JS -->
+          </div>
+
+          <!-- Requester Comment Input -->
+          <div class="pt-2 border-t border-black/[0.05] dark:border-white/[0.06] space-y-2">
+            <textarea id="reqCommentInput" rows="2" placeholder="Post an update or reply to your clearance approvers..." class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-neutral-900 rounded-2xl p-3 outline-none transition"></textarea>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-neutral-400">Posting as: <strong id="reqPostingAsName">Juan Dela Cruz (Requester)</strong></span>
+              <button onclick="postRequesterComment()" class="px-4 py-2 rounded-xl bg-apple-blue hover:bg-apple-blueHover text-white text-xs font-bold shadow-sm transition active:scale-95 flex items-center space-x-1.5">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+                <span>Post Note to Approvers</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ================================================================= -->
+    <!-- END 2: APPROVER DASHBOARD (WHOSE TURN TO APPROVE WHOM)            -->
+    <!-- ================================================================= -->
+    <section id="viewApproverDesk" class="space-y-6">
+      
+      <!-- Approver Persona Switcher Bar -->
+      <div class="bg-white/80 dark:bg-neutral-900/80 apple-glass px-5 py-4 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-apple-green flex items-center justify-center text-base shadow-sm shrink-0">
+            <i class="fa-solid fa-user-check"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Approver Clearance Desk</span>
+              <span class="text-[10px] px-2 py-0.2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 font-mono">Sign-Off Authority</span>
+            </div>
+            <h2 class="text-sm font-bold text-neutral-900 dark:text-white">Active Approver Role & Review Workstation</h2>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center p-1 bg-neutral-200/70 dark:bg-neutral-800/80 rounded-2xl gap-1">
+          <button onclick="switchApproverPersona('IT_APPROVER')" id="apprPersonaIT" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm">
+            <i class="fa-solid fa-laptop-code text-apple-blue"></i>
+            <span>Alex Tan (IT)</span>
+          </button>
+          <button onclick="switchApproverPersona('ADMIN_APPROVER')" id="apprPersonaAdmin" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-building-user text-apple-amber"></i>
+            <span>Elena Cruz (Admin)</span>
+          </button>
+          <button onclick="switchApproverPersona('FINANCE_APPROVER')" id="apprPersonaFinance" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-money-check-dollar text-apple-green"></i>
+            <span>Roberto Ong (Finance)</span>
+          </button>
+          <button onclick="switchApproverPersona('HR_APPROVER')" id="apprPersonaHR" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-user-tie text-apple-purple"></i>
+            <span>Grace Diaz (HR)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Clearance Requests Board & "Whose Turn" Filter -->
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-4">
+        
+        <!-- Queue Header & Filter Tabs -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-apple-blue flex items-center justify-center text-sm shadow-sm">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Clearance Requests Queue</h3>
+                <span id="apprQueueCounterBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-bold border border-black/[0.04]">
+                  15 dossiers
+                </span>
+              </div>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-400">Click any card to inspect equipment hand-off, AI pre-checks, and sign off</p>
+            </div>
+          </div>
+
+          <!-- 3 Filter Pills: Action Required by You vs All vs Flagged -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Search Input -->
+            <div class="relative w-full sm:w-56">
+              <input type="text" id="apprQueueSearch" placeholder="Search employee, ID, branch..." oninput="renderApproverQueue()" class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-neutral-900 rounded-xl pl-8 pr-3 py-1.5 outline-none transition" />
+              <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-neutral-400 text-xs"></i>
+            </div>
+
+            <!-- Segmented Filter -->
+            <div class="flex items-center p-1 bg-neutral-100 dark:bg-neutral-800/60 rounded-xl text-[11px] font-medium space-x-1">
+              <button id="filterMyTurnBtn" onclick="setApproverQueueFilter('MY_TURN')" class="px-3 py-1 rounded-lg font-bold bg-white dark:bg-apple-elevatedDark text-apple-blue shadow-sm transition flex items-center space-x-1">
+                <span>⚡ Action Required by You</span>
+                <span id="myTurnCountBadge" class="ml-1 text-[9px] px-1.5 py-0.2 rounded-full bg-blue-500/15 text-apple-blue font-bold">1</span>
+              </button>
+              <button id="filterAllBtn" onclick="setApproverQueueFilter('ALL')" class="px-3 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition">
+                All (15)
+              </button>
+              <button id="filterFlaggedBtn" onclick="setApproverQueueFilter('FLAGGED')" class="px-3 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition">
+                ⚠️ Discrepancies (5)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4-Column Responsive Cards Grid -->
+        <div id="apprQueueGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Active Approver Inspection Workstation -->
+      <div id="apprActiveWorkstation" class="space-y-6">
+        
+        <!-- Workstation Hero Summary Bar -->
+        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start space-x-4">
+              <div id="workstationAvatar" class="w-14 h-14 rounded-2xl bg-neutral-200/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-bold text-lg flex items-center justify-center shadow-inner shrink-0">
+                JD
+              </div>
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 id="workstationEmpName" class="text-lg font-bold tracking-tight text-neutral-900 dark:text-white">Juan Dela Cruz</h3>
+                  <span id="workstationDossierBadge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-apple-blue border border-black/[0.04]">
+                    DOS-2026-001
+                  </span>
+                  <span id="workstationOverallBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-apple-amber">
+                    PENDING
+                  </span>
+                </div>
+                <div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+                  <span id="workstationDept"><i class="fa-solid fa-briefcase mr-1.5 text-neutral-400"></i>Information Technology</span>
+                  <span id="workstationBranch"><i class="fa-solid fa-location-dot mr-1.5 text-neutral-400"></i>Taguig HQ - 24th Floor</span>
+                  <span id="workstationEoc"><i class="fa-solid fa-calendar mr-1.5 text-neutral-400"></i>EOC: 2026-08-31</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Whose Turn Live Status Pill -->
+            <div class="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/80 border border-black/[0.04] text-right">
+              <div class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">Current Clearance Turn</div>
+              <div id="workstationCurrentTurnPill" class="text-xs font-bold text-apple-blue flex items-center justify-end space-x-1.5 mt-0.5">
+                <span class="w-2 h-2 rounded-full bg-apple-blue apple-pulse-blue"></span>
+                <span id="workstationTurnHolderName">Alex Tan (IT Clearance Lead)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Linear Turn Progression Sequence: [IT] -> [Admin] -> [Finance] -> [HR] -->
+          <div class="pt-3 border-t border-black/[0.05] dark:border-white/[0.06]">
+            <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-2">
+              <span>Linear Department Approval Sequence</span>
+              <span id="workstationTurnActionGuidance" class="text-apple-blue lowercase font-medium">Turn: IT Clearance verify device</span>
+            </div>
+            <div id="workstationLinearProgression" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Inspection Tabs: Documents & AI Flags vs Hand-Off Timeline -->
+        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-5">
+          <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+            <div class="flex items-center p-1 bg-neutral-100 dark:bg-neutral-800/60 rounded-xl space-x-1 text-xs font-semibold">
+              <button id="tabApprDocs" onclick="switchApproverInspectionTab('DOCS')" class="px-3.5 py-1.5 rounded-lg bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition">
+                <i class="fa-solid fa-file-shield mr-1.5 text-apple-blue"></i> Documents & Pre-Checks
+              </button>
+              <button id="tabApprTimeline" onclick="switchApproverInspectionTab('TIMELINE')" class="px-3.5 py-1.5 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition">
+                <i class="fa-solid fa-timeline mr-1.5 text-apple-green"></i> Activity & Hand-Off Timeline
+              </button>
+            </div>
+            <span class="text-[11px] text-neutral-400">Interactive Pre-Check Audit</span>
+          </div>
+
+          <!-- Documents Panel -->
+          <div id="apprPanelDocs" class="space-y-4">
+            <div id="apprDocsList" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <!-- Rendered via JS -->
+            </div>
+            <div id="apprDocFlagsDetail" class="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-black/[0.05] space-y-2">
+              <!-- AI Flags detail -->
+            </div>
+          </div>
+
+          <!-- Timeline Panel -->
+          <div id="apprPanelTimeline" class="hidden space-y-4">
+            <div id="apprTimelineList" class="relative pl-6 space-y-5 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200 dark:before:bg-neutral-800">
+              <!-- Timeline items rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Approver Decision Dock (Approve & Pass Turn / Flag / Split Escrow) -->
+        <div class="bg-white/90 dark:bg-neutral-900/90 apple-glass p-5 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center space-x-3">
+            <div id="dockTurnIcon" class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-apple-green flex items-center justify-center text-lg shadow-sm shrink-0">
+              <i class="fa-solid fa-signature"></i>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-neutral-900 dark:text-white" id="dockTurnPrompt">
+                Ready to sign off this step?
+              </div>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-400" id="dockTurnSubtext">
+                Signing as CLEARED will record an immutable audit stamp and automatically advance the turn to the next department.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 shrink-0" id="approverActionButtons">
+            <button onclick="handleApproverDecision('FLAG')" class="px-4 py-2.5 rounded-xl border border-apple-red/30 bg-red-500/10 hover:bg-red-500/20 text-apple-red text-xs font-bold transition flex items-center space-x-1.5">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>Flag Discrepancy</span>
+            </button>
+
+            <button id="btnSplitEscrowRelease" onclick="openSplitEscrowModal()" class="hidden px-4 py-2.5 rounded-xl border border-apple-amber/30 bg-amber-500/10 hover:bg-amber-500/20 text-apple-amber text-xs font-bold transition flex items-center space-x-1.5">
+              <i class="fa-solid fa-scale-balanced"></i>
+              <span>Split Escrow Release</span>
+            </button>
+
+            <button id="btnApprovePassTurn" onclick="handleApproverDecision('APPROVE')" class="px-5 py-2.5 rounded-xl bg-apple-green hover:bg-emerald-600 text-white text-xs font-bold shadow-md transition active:scale-95 flex items-center space-x-2">
+              <i class="fa-solid fa-check"></i>
+              <span>Approve & Pass Turn</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Centralized Transaction Discussion Thread in Approver Desk -->
+        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06] gap-2">
+            <div>
+              <div class="flex items-center space-x-2">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Centralized Transaction Discussion</h4>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">
+                  🔒 Requester & Approvers Only
+                </span>
+              </div>
+              <p class="text-[11px] text-neutral-400 mt-0.5" id="apprDiscussionSubtitle">
+                Confidential thread · Restricted strictly to Juan Dela Cruz & Clearance Approvers
+              </p>
+            </div>
+            <div id="apprAuthorizedBadges" class="flex flex-wrap items-center gap-1.5 text-[10px]">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+
+          <div id="apprCommentsContainer" class="space-y-3 max-h-72 overflow-y-auto pr-1">
+            <!-- Comments rendered via JS -->
+          </div>
+
+          <div class="pt-2 border-t border-black/[0.05] dark:border-white/[0.06] space-y-2">
+            <textarea id="apprCommentInput" rows="2" placeholder="Post note, clarify equipment condition, or verify deductions..." class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-neutral-900 rounded-2xl p-3 outline-none transition"></textarea>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-neutral-400">Posting as: <strong id="apprPostingAsLabel">Alex Tan (IT Clearance Lead)</strong></span>
+              <button onclick="postApproverComment()" class="px-4 py-2 rounded-xl bg-apple-blue hover:bg-apple-blueHover text-white text-xs font-bold shadow-sm transition active:scale-95 flex items-center space-x-1.5">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+                <span>Post Note</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ================================================================= -->
+    <!-- END 3: ADMIN DASHBOARD (EXECUTIVE STATUS OVERVIEW)                 -->
+    <!-- ================================================================= -->
+    <section id="viewAdminDashboard" class="hidden space-y-6">
+      
+      <!-- Executive KPI Header & 5 Metrics -->
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 sm:p-7 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-2xl bg-purple-500/10 text-apple-purple flex items-center justify-center text-base shadow-sm">
+              <i class="fa-solid fa-gauge-high"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-neutral-900 dark:text-white tracking-tight">Admin Executive Clearance Dashboard</h2>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-400">Company-wide clearance pipeline tracking across 15 seeded tester accounts</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 text-xs">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-apple-green border border-emerald-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-apple-green apple-pulse-green mr-1.5"></span>
+              Live Pipeline Active
+            </span>
+          </div>
+        </div>
+
+        <!-- 5 Interactive Metric KPI Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
+          <!-- Total Requests -->
+          <div onclick="setAdminBucketFilter('ALL')" class="p-4 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-blue/50 cursor-pointer transition shadow-sm group">
+            <div class="flex items-center justify-between text-neutral-400 mb-1">
+              <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-blue transition">Total Requests</span>
+              <i class="fa-solid fa-folder-open text-apple-blue text-xs"></i>
+            </div>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="adminKpiTotal" class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-mono">15</span>
+              <span class="text-[10px] text-neutral-400">accounts</span>
+            </div>
+            <div class="text-[10px] text-neutral-400 mt-1 truncate">All tester dossiers</div>
+          </div>
+
+          <!-- 5 Pending -->
+          <div onclick="setAdminBucketFilter('PENDING')" class="p-4 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-amber/50 cursor-pointer transition shadow-sm group">
+            <div class="flex items-center justify-between text-neutral-400 mb-1">
+              <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-amber transition">5 Pending</span>
+              <i class="fa-solid fa-clock text-apple-amber text-xs"></i>
+            </div>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="adminKpiPending" class="text-2xl font-bold tracking-tight text-apple-amber font-mono">5</span>
+              <span class="text-[10px] text-neutral-400">in-progress</span>
+            </div>
+            <div class="text-[10px] text-neutral-400 mt-1 truncate">Standard turnover underway</div>
+          </div>
+
+          <!-- 5 For Review -->
+          <div onclick="setAdminBucketFilter('FOR_REVIEW')" class="p-4 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-red/50 cursor-pointer transition shadow-sm group">
+            <div class="flex items-center justify-between text-neutral-400 mb-1">
+              <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-red transition">5 For Review</span>
+              <i class="fa-solid fa-triangle-exclamation text-apple-red text-xs"></i>
+            </div>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="adminKpiFlagged" class="text-2xl font-bold tracking-tight text-apple-red font-mono">5</span>
+              <span class="text-[10px] text-apple-red font-semibold">action needed</span>
+            </div>
+            <div class="text-[10px] text-neutral-400 mt-1 truncate">Discrepancy flags noted</div>
+          </div>
+
+          <!-- 5 Ready for Release -->
+          <div onclick="setAdminBucketFilter('FOR_RELEASE')" class="p-4 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-green/50 cursor-pointer transition shadow-sm group">
+            <div class="flex items-center justify-between text-neutral-400 mb-1">
+              <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-green transition">5 Ready for Release</span>
+              <i class="fa-solid fa-circle-check text-apple-green text-xs"></i>
+            </div>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="adminKpiReady" class="text-2xl font-bold tracking-tight text-apple-green font-mono">5</span>
+              <span class="text-[10px] text-apple-green font-semibold">cleared</span>
+            </div>
+            <div class="text-[10px] text-neutral-400 mt-1 truncate">Ready for pay & COE</div>
+          </div>
+
+          <!-- Clearance SLA -->
+          <div class="p-4 rounded-2xl bg-emerald-500/[0.06] dark:bg-emerald-950/20 border border-emerald-500/20 shadow-sm">
+            <div class="flex items-center justify-between text-neutral-400 mb-1">
+              <span class="text-[10px] uppercase font-bold tracking-wider text-apple-green">Clearance SLA</span>
+              <i class="fa-solid fa-bolt text-apple-green text-xs"></i>
+            </div>
+            <div class="flex items-baseline space-x-1.5">
+              <span class="text-2xl font-bold tracking-tight text-apple-green font-mono">4.2d</span>
+              <span class="text-[10px] px-1 py-0.2 rounded bg-emerald-500/20 text-apple-green font-bold">-68%</span>
+            </div>
+            <div class="text-[10px] text-neutral-400 mt-1 truncate">DOLE 30-Day Velocity</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Master Categorized Queues: Pending (5) · For Review (5) · Ready for Release (5) -->
+      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-5">
+        
+        <!-- Controls: Search & Category Filter Pills -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+          <div class="flex items-center space-x-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white" id="adminCategoryTitle">
+              Clearance Master Queue
+            </h3>
+            <span id="adminQueueCountBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-bold border border-black/[0.04]">
+              15 accounts
+            </span>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Search Box -->
+            <div class="relative w-full sm:w-64">
+              <input type="text" id="adminSearchInput" placeholder="Filter by name, ID, branch..." oninput="renderAdminDeck()" class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-neutral-900 rounded-xl pl-8 pr-3 py-1.5 outline-none transition" />
+              <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-neutral-400 text-xs"></i>
+            </div>
+
+            <!-- Segmented Category Filter -->
+            <div class="flex items-center p-1 bg-neutral-100 dark:bg-neutral-800/60 rounded-xl text-[11px] font-medium space-x-1">
+              <button id="adminBtnAll" onclick="setAdminBucketFilter('ALL')" class="px-3 py-1 rounded-lg font-bold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition">
+                All (15)
+              </button>
+              <button id="adminBtnPending" onclick="setAdminBucketFilter('PENDING')" class="px-3 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition">

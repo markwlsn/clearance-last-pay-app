@@ -250,7 +250,10 @@ def test_approval_metrics_endpoint(client):
     assert "pending" in data
     assert "action_needed" in data
     assert "ready_for_release" in data
-    assert data["total_requests"] >= 4
+    assert data["total_requests"] == 15
+    assert data["pending"] == 5
+    assert data["action_needed"] == 5
+    assert data["ready_for_release"] == 5
     assert data["avg_sla_days"] == 4.2
 
 
