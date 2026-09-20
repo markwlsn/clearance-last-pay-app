@@ -1158,3 +1158,196 @@ def get_initial_dossiers() -> List[Dict[str, Any]]:
                     "id": "cmt-1102",
                     "author": "Elena Cruz",
                     "role": "REQUESTER",
+                    "text": "Thank you so much to HR, IT, and Admin teams for the fast turnaround!",
+                    "timestamp": "2026-09-20T17:15:00Z"
+                }
+            ],
+            "docs": [
+                {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
+                {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
+                {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+            ]
+        },
+        {
+            "dossier_id": "DOS-2026-012",
+            "employee_name": "Jose Rizal",
+            "employee_id": "EMP-99101",
+            "department": "Design & Brand Experience",
+            "company": "CMG Group of Companies",
+            "unit_channel": "Corporate HQ",
+            "job_level": "Specialist / Professional",
+            "branch": "Taguig HQ - 24th Floor",
+            "date_hired": "2021-02-15",
+            "eoc_date": "2026-09-21",
+            "employee_status": "Regular",
+            "reason_for_separation": "Resignation",
+            "with_clearance_already": "Yes",
+            "category": "FOR_RELEASE",
+            "current_stage": "STAGE_4_HR_RELEASE",
+            "stage_name": "Stage 4: HR Final Release & COE",
+            "stage_step": 4,
+            "current_turn_node": "HR",
+            "current_turn_name": "Grace Diaz (HR Operations Lead)",
+            "current_turn_role": "HR_APPROVER",
+            "current_turn_action": "All 4 departments cleared! Ready to execute final pay release (₱72,400.00 via BPI) and deliver digital COE.",
+            "overall_status": "CLEARED",
+            "submitted_at": "2026-09-19T08:30:00Z",
+            "sample_file": "clearance_sheet_valid.pdf",
+            "sample_type": "CLEARANCE_SHEET",
+            "ai_flags_count": 0,
+            "flags_summary": [],
+            "routing_mode": "SEQUENTIAL",
+            "assigned_signer": "Grace Diaz (HR Operations Manager)",
+            "nodes": {
+                "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "CLEARED", "summary": "iMac 27\" & Wacom tablet returned"},
+                "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Design studio RFID surrendered"},
+                "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "CLEARED", "summary": "Final computation audited (₱72,400.00)"},
+                "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "CLEARED", "summary": "COE approved & BPI disbursement authorized"}
+            },
+            "escrow_details": None,
+            "timeline": [
+                {
+                    "milestone": "Clearance Request Lodged",
+                    "actor": "Jose Rizal (Employee)",
+                    "date": "2026-09-19 08:30 AM",
+                    "status": "COMPLETED",
+                    "details": "Clearance lodged for Design Studio.",
+                    "icon": "fa-file-lines"
+                },
+                {
+                    "milestone": "Creative Hardware Turnover",
+                    "actor": "Alex Tan (IT Clearance Lead)",
+                    "date": "2026-09-19 11:30 AM",
+                    "status": "COMPLETED",
+                    "details": "Apple iMac 27\", Magic Trackpad, and Wacom Cintiq inspected and cleared.",
+                    "icon": "fa-laptop"
+                },
+                {
+                    "milestone": "Studio Access & Locker",
+                    "actor": "Elena Cruz (Facilities Lead)",
+                    "date": "2026-09-19 02:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Studio key and locker #04 padlock surrendered.",
+                    "icon": "fa-key"
+                },
+                {
+                    "milestone": "Finance Ledger Verification",
+                    "actor": "Roberto Ong (Finance Lead)",
+                    "date": "2026-09-20 10:00 AM",
+                    "status": "COMPLETED",
+                    "details": "Final pay ledger balanced at ₱72,400.00.",
+                    "icon": "fa-calculator"
+                },
+                {
+                    "milestone": "HR Final Pay Release & COE",
+                    "actor": "Grace Diaz (HR Operations)",
+                    "date": "2026-09-20 03:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Direct credit scheduled to BPI account. COE generated.",
+                    "icon": "fa-money-bill-transfer"
+                }
+            ],
+            "comments": [
+                {
+                    "id": "cmt-1201",
+                    "author": "Roberto Ong",
+                    "role": "FINANCE_APPROVER",
+                    "text": "BPI bank details verified. Final pay net amount: ₱72,400.00.",
+                    "timestamp": "2026-09-20T10:15:00Z"
+                }
+            ],
+            "docs": [
+                {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
+                {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
+                {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+            ]
+        },
+        {
+            "dossier_id": "DOS-2026-013",
+            "employee_name": "Melchora Aquino",
+            "employee_id": "EMP-41829",
+            "department": "Customer Service",
+            "company": "CMG Group of Companies",
+            "unit_channel": "Corporate HQ",
+            "job_level": "Specialist / Professional",
+            "branch": "Makati Central Hub",
+            "date_hired": "2022-06-15",
+            "eoc_date": "2026-09-23",
+            "employee_status": "Regular",
+            "reason_for_separation": "Resignation",
+            "with_clearance_already": "Yes",
+            "category": "FOR_RELEASE",
+            "current_stage": "STAGE_4_HR_RELEASE",
+            "stage_name": "Stage 4: HR Final Release & COE",
+            "stage_step": 4,
+            "current_turn_node": "HR",
+            "current_turn_name": "Grace Diaz (HR Operations Lead)",
+            "current_turn_role": "HR_APPROVER",
+            "current_turn_action": "All 4 departments cleared! Ready to credit final pay (₱45,600.00 via GCash 0917-555-1234) and deliver digital COE.",
+            "overall_status": "CLEARED",
+            "submitted_at": "2026-09-19T13:00:00Z",
+            "sample_file": "clearance_sheet_valid.pdf",
+            "sample_type": "CLEARANCE_SHEET",
+            "ai_flags_count": 0,
+            "flags_summary": [],
+            "routing_mode": "SEQUENTIAL",
+            "assigned_signer": "Grace Diaz (HR Operations Manager)",
+            "nodes": {
+                "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "CLEARED", "summary": "Zendesk & Plantronics headset returned"},
+                "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Makati locker surrendered"},
+                "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "CLEARED", "summary": "Final pay audited (₱45,600.00)"},
+                "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "CLEARED", "summary": "COE approved & GCash payout authorized"}
+            },
+            "escrow_details": None,
+            "timeline": [
+                {
+                    "milestone": "Clearance Request Lodged",
+                    "actor": "Melchora Aquino (Employee)",
+                    "date": "2026-09-19 01:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Resignation clearance submitted for Makati CS Department.",
+                    "icon": "fa-file-lines"
+                },
+                {
+                    "milestone": "Call Center Headset Turnover",
+                    "actor": "Alex Tan (IT Clearance Lead)",
+                    "date": "2026-09-19 03:30 PM",
+                    "status": "COMPLETED",
+                    "details": "Noise-cancelling USB headset and softphone extension revoked.",
+                    "icon": "fa-laptop"
+                },
+                {
+                    "milestone": "Facilities & Locker Clearance",
+                    "actor": "Elena Cruz (Facilities Lead)",
+                    "date": "2026-09-20 09:00 AM",
+                    "status": "COMPLETED",
+                    "details": "Makati hub locker #31 returned clean.",
+                    "icon": "fa-key"
+                },
+                {
+                    "milestone": "Finance & Payroll Computation",
+                    "actor": "Roberto Ong (Finance Lead)",
+                    "date": "2026-09-20 11:00 AM",
+                    "status": "COMPLETED",
+                    "details": "Verified final payout of ₱45,600.00.",
+                    "icon": "fa-calculator"
+                },
+                {
+                    "milestone": "HR Final Pay Release & COE",
+                    "actor": "Grace Diaz (HR Operations)",
+                    "date": "2026-09-20 02:00 PM",
+                    "status": "COMPLETED",
+                    "details": "GCash verified disbursement ready. COE issued.",
+                    "icon": "fa-money-bill-transfer"
+                }
+            ],
+            "comments": [
+                {
+                    "id": "cmt-1301",
+                    "author": "Melchora Aquino",
+                    "role": "REQUESTER",
+                    "text": "GCash number confirmed as 0917-555-1234. Thank you team!",
+                    "timestamp": "2026-09-20T11:15:00Z"
+                }
+            ],
+            "docs": [

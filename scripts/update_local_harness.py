@@ -106,3 +106,21 @@ new_sign = '''    # Advance linear turn sequence if matching active node
             "actor": f"{req.approver_name} ({req.role})",
             "date": datetime.now(timezone.utc).strftime("%Y-%m-%d %I:%M %p"),
             "status": "COMPLETED",
+            "details": f"Node {req.node_key} signed as {req.action}. Notes: {req.notes or 'Turnover verified.'}",
+            "icon": "fa-check"
+        })'''
+
+assert old_sign in content, "old_sign not found in content"
+content = content.replace(old_sign, new_sign)
+
+# 4. Replace embedded HTML_DASHBOARD block with reading templates/dashboard.html
+marker_html_start = '@app.get("/", response_class=HTMLResponse)'
+marker_html_end = "def main():"
+
+idx_h1 = content.find(marker_html_start)
+idx_h2 = content.find(marker_html_end)
+assert idx_h1 != -1 and idx_h2 != -1, f"HTML markers not found: {idx_h1}, {idx_h2}"
+
+new_html_block = '''template_path = Path(__file__).resolve().parent / "templates" / "dashboard.html"
+if template_path.exists():
+    HTML_DASHBOARD = template_path.read_text(encoding="utf-8")

@@ -1429,3 +1429,241 @@
       } else {
         btnSplit.classList.add('hidden');
       }
+
+      // Discussion Header & Comments
+      document.getElementById('apprDiscussionSubtitle').innerHTML = `Confidential thread · Restricted strictly to <strong>${d.employee_name}</strong> & Clearance Approvers`;
+      document.getElementById('apprPostingAsLabel').textContent = `${APPROVER_PROFILES[currentApproverRole].name} (${APPROVER_PROFILES[currentApproverRole].roleName})`;
+
+      document.getElementById('apprAuthorizedBadges').innerHTML = `
+        <span class="px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold border border-sky-500/20">👤 ${d.employee_name}</span>
+        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'IT_APPROVER' ? 'bg-blue-500/20 text-apple-blue font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">💻 IT</span>
+        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'ADMIN_APPROVER' ? 'bg-amber-500/20 text-apple-amber font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">🏢 Admin</span>
+        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'FINANCE_APPROVER' ? 'bg-emerald-500/20 text-apple-green font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">💼 Finance</span>
+        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'HR_APPROVER' ? 'bg-purple-500/20 text-apple-purple font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">👥 HR</span>
+      `;
+
+      renderApproverComments(d);
+    }
+
+    function switchApproverInspectionTab(tab) {
+      currentInspectionTab = tab;
+      const bDocs = document.getElementById('tabApprDocs');
+      const bTime = document.getElementById('tabApprTimeline');
+      const pDocs = document.getElementById('apprPanelDocs');
+      const pTime = document.getElementById('apprPanelTimeline');
+
+      const activeClass = "px-3.5 py-1.5 rounded-lg bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition";
+      const inactiveClass = "px-3.5 py-1.5 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition";
+
+      if (tab === 'DOCS') {
+        bDocs.className = activeClass;
+        bTime.className = inactiveClass;
+        pDocs.classList.remove('hidden');
+        pTime.classList.add('hidden');
+      } else {
+        bDocs.className = inactiveClass;
+        bTime.className = activeClass;
+        pDocs.classList.add('hidden');
+        pTime.classList.remove('hidden');
+      }
+    }
+
+    function renderApproverDocs(d) {
+      const list = document.getElementById('apprDocsList');
+      if (!d.docs) return;
+
+      list.innerHTML = d.docs.map(doc => {
+        return `
+          <div class="p-3.5 rounded-2xl border ${doc.has_flags ? 'border-apple-red/30 bg-red-500/[0.04]' : 'border-black/[0.05] bg-neutral-50/80 dark:bg-neutral-800/60'} text-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">${doc.type}</span>
+              ${doc.has_flags ? '<span class="text-[10px] text-apple-red font-bold">⚠️ Flagged</span>' : '<span class="text-[10px] text-apple-green font-bold">✓ Valid</span>'}
+            </div>
+            <div class="font-bold text-neutral-900 dark:text-white truncate">${doc.title}</div>
+            <div class="text-[10px] text-neutral-400 font-mono truncate">${doc.file}</div>
+          </div>
+        `;
+      }).join('');
+
+      const detail = document.getElementById('apprDocFlagsDetail');
+      if (d.ai_flags_count > 0) {
+        detail.innerHTML = `
+          <div class="flex items-center space-x-2 text-apple-red font-bold text-xs">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>${d.ai_flags_count} AI Discrepancy Flag(s) Detected</span>
+          </div>
+          <div class="text-xs text-neutral-700 dark:text-neutral-300 space-y-1">
+            <div class="font-medium">${d.current_turn_action}</div>
+            <div class="text-[10px] text-neutral-400">Flag codes: ${d.flags_summary.join(', ') || 'FLAG_ACCOUNTABILITY_NOTED'}</div>
+          </div>
+        `;
+      } else {
+        detail.innerHTML = `
+          <div class="flex items-center space-x-2 text-apple-green font-bold text-xs">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>0 Pre-Check Discrepancies · Clean Clearance Submission</span>
+          </div>
+          <p class="text-[11px] text-neutral-500 dark:text-neutral-400">
+            All required signature fields, asset tags, and payroll balances pass automated compliance validation.
+          </p>
+        `;
+      }
+    }
+
+    function renderApproverTimeline(d) {
+      const box = document.getElementById('apprTimelineList');
+      if (!d.timeline) return;
+
+      box.innerHTML = d.timeline.map(t => {
+        const isDone = t.status === 'COMPLETED';
+        const dotClass = isDone ? 'bg-apple-green text-white' : 'bg-apple-blue text-white apple-pulse-blue';
+        return `
+          <div class="relative flex items-start space-x-3.5 group">
+            <div class="w-6 h-6 rounded-full ${dotClass} flex items-center justify-center text-[10px] shrink-0 -ml-9 shadow-sm">
+              <i class="fa-solid ${t.icon || 'fa-circle'}"></i>
+            </div>
+            <div class="flex-1 min-w-0 bg-neutral-50/90 dark:bg-neutral-800/60 p-3 rounded-2xl border border-black/[0.04]">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-bold text-neutral-900 dark:text-white">${t.milestone}</span>
+                <span class="text-[10px] font-mono text-neutral-400">${t.date}</span>
+              </div>
+              <p class="text-[11px] text-neutral-600 dark:text-neutral-300 mt-0.5">${t.details}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderApproverComments(d) {
+      const container = document.getElementById('apprCommentsContainer');
+      if (!d.comments || !d.comments.length) {
+        container.innerHTML = '<p class="text-xs text-neutral-400 italic py-4 text-center">No discussion notes yet.</p>';
+        return;
+      }
+
+      container.innerHTML = d.comments.map(c => {
+        const isRequester = c.role === 'REQUESTER' || c.role === 'EMPLOYEE';
+        const cardBg = isRequester ? 'bg-sky-500/[0.06] border-sky-500/20' : 'bg-neutral-100/80 dark:bg-neutral-800/80 border-black/[0.04]';
+        const badgeClass = isRequester ? 'bg-sky-500/20 text-sky-700 dark:text-sky-300' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200';
+
+        return `
+          <div class="p-3.5 rounded-2xl border ${cardBg} text-xs space-y-1">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="font-bold text-neutral-900 dark:text-white">${c.author}</span>
+                <span class="text-[9px] font-bold px-1.5 py-0.2 rounded-full ${badgeClass} uppercase">${isRequester ? 'Requester' : c.role.replace('_APPROVER', '')}</span>
+              </div>
+              <span class="text-[10px] text-neutral-400 font-mono">${new Date(c.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+            <p class="text-neutral-700 dark:text-neutral-300">${c.text}</p>
+          </div>
+        `;
+      }).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function postApproverComment() {
+      const input = document.getElementById('apprCommentInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const d = getActiveApproverDossier();
+      const approver = APPROVER_PROFILES[currentApproverRole];
+      try {
+        const res = await fetch('/api/approvals/transaction-comment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            dossier_id: d.dossier_id,
+            author: `${approver.name} (${approver.roleName})`,
+            role: currentApproverRole,
+            message: text
+          })
+        });
+
+        if (!res.ok) throw new Error('Failed to post note');
+        const data = await res.json();
+        d.comments = data.comments;
+        input.value = '';
+        renderApproverComments(d);
+        showDynamicToast("Note Added", "Your comment has been logged to the transaction discussion.", "success");
+      } catch (err) {
+        showDynamicToast("Error", err.message, "error");
+      }
+    }
+
+    async function handleApproverDecision(action) {
+      const d = getActiveApproverDossier();
+      const approver = APPROVER_PROFILES[currentApproverRole];
+
+      try {
+        const res = await fetch('/api/approvals/node-sign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            dossier_id: d.dossier_id,
+            node_key: approver.nodeKey,
+            approver_name: approver.name,
+            role: currentApproverRole,
+            action: action === 'APPROVE' ? 'CLEARED' : 'FLAGGED',
+            notes: action === 'APPROVE' ? 'Verified physical hand-off & zero liabilities.' : 'Discrepancy noted for adjustment.'
+          })
+        });
+
+        if (!res.ok) throw new Error('Failed to record sign-off decision');
+        const data = await res.json();
+        
+        // Update local object
+        Object.assign(d, data.dossier);
+        renderApproverDesk();
+        renderAdminDashboard();
+
+        showDynamicToast(
+          action === 'APPROVE' ? "Step Cleared & Turn Passed" : "Discrepancy Flagged",
+          `${approver.roleName} signed ${action === 'APPROVE' ? 'CLEARED' : 'FLAGGED'} on ${d.employee_name}.`,
+          action === 'APPROVE' ? "success" : "error"
+        );
+      } catch (err) {
+        showDynamicToast("Error", err.message, "error");
+      }
+    }
+
+
+    // =========================================================================
+    // END 3: ADMIN DASHBOARD LOGIC (5 PENDING, 5 REVIEW, 5 RELEASE)
+    // =========================================================================
+    function setAdminBucketFilter(bucket) {
+      currentAdminBucketFilter = bucket;
+      
+      const bAll = document.getElementById('adminBtnAll');
+      const bPen = document.getElementById('adminBtnPending');
+      const bRev = document.getElementById('adminBtnReview');
+      const bRel = document.getElementById('adminBtnRelease');
+
+      const activeClass = "px-3 py-1 rounded-lg font-bold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition";
+      const inactiveClass = "px-3 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition";
+
+      bAll.className = bucket === 'ALL' ? activeClass : inactiveClass;
+      bPen.className = bucket === 'PENDING' ? activeClass : inactiveClass;
+      bRev.className = bucket === 'FOR_REVIEW' ? activeClass : inactiveClass;
+      bRel.className = bucket === 'FOR_RELEASE' ? activeClass : inactiveClass;
+
+      renderAdminDeck();
+    }
+
+    function renderAdminDashboard() {
+      // Update KPIs
+      const total = allDossiers.length;
+      const pending = allDossiers.filter(d => d.category === 'PENDING').length;
+      const forReview = allDossiers.filter(d => d.category === 'FOR_REVIEW').length;
+      const forRelease = allDossiers.filter(d => d.category === 'FOR_RELEASE').length;
+
+      document.getElementById('adminKpiTotal').textContent = total;
+      document.getElementById('adminKpiPending').textContent = pending;
+      document.getElementById('adminKpiFlagged').textContent = forReview;
+      document.getElementById('adminKpiReady').textContent = forRelease;
+
+      renderAdminDeck();
+    }
+
+    function renderAdminDeck() {
