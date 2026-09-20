@@ -1627,80 +1627,59 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               </div>
             </div>
 
-            <!-- 2. Dual-Mode Clearance Routing & Progression (Parallel Matrix vs Sequential) -->
-            <div class="p-4 sm:p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3.5">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            <!-- 2. Strict Linear Clearance Workflow Stepper -->
+            <div class="p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3.5">
+              <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-400">
                 <div class="flex items-center space-x-2">
-                  <i class="fa-solid fa-route text-apple-blue"></i>
-                  <span>Clearance Routing Matrix</span>
-                  <span id="parallelBadgePill" class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-apple-green font-mono lowercase">concurrent</span>
+                  <i class="fa-solid fa-timeline text-apple-blue"></i>
+                  <span>Linear Clearance Pipeline</span>
+                  <span class="text-[9px] px-2 py-0.5 rounded-full bg-blue-500/10 text-apple-blue font-mono lowercase">stage <span id="linearCurrentStepNum">1</span> of 4</span>
                 </div>
-
-                <!-- Mode Switcher Pill -->
-                <div class="flex items-center p-0.5 rounded-xl bg-neutral-200/80 dark:bg-neutral-700/60 font-semibold lowercase tracking-normal">
-                  <button id="modeParallelBtn" onclick="setRoutingMode('PARALLEL')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition flex items-center space-x-1" title="IT, Admin, and Finance evaluate simultaneously, converging into HR final sign-off">
-                    <i class="fa-solid fa-bolt text-apple-green text-[9px]"></i>
-                    <span>Parallel Matrix (4.2d)</span>
-                  </button>
-                  <button id="modeSequentialBtn" onclick="setRoutingMode('SEQUENTIAL')" class="px-2.5 py-1 rounded-lg text-[10px] font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1" title="Traditional step-by-step queue where each stage blocks the next">
-                    <i class="fa-solid fa-arrow-right-long text-neutral-400 text-[9px]"></i>
-                    <span>Sequential (14d)</span>
-                  </button>
+                <div class="text-[10px] text-neutral-400 lowercase font-normal">
+                  <i class="fa-solid fa-arrow-right-long mr-1 text-apple-blue"></i> sequential milestone gate
                 </div>
               </div>
 
-              <!-- Parallel Convergence Grid (Default) -->
-              <div id="parallelMatrixContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
+              <!-- Linear 4-Stage Stepper Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs" id="linearStepperContainer">
                 
-                <!-- IT Node -->
-                <div id="pNodeBoxIT" class="p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-2 transition">
+                <!-- Stage 1: Asset Hand-Off & Turnover -->
+                <div id="linStage1Box" class="p-3.5 rounded-2xl border transition space-y-2">
                   <div class="flex items-center justify-between">
-                    <span class="font-bold text-neutral-900 dark:text-white flex items-center space-x-1.5">
-                      <i class="fa-solid fa-laptop-code text-apple-blue"></i>
-                      <span>IT Clearance</span>
+                    <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
+                      <span id="linStage1Num" class="w-5 h-5 rounded-full bg-blue-500/15 text-apple-blue font-mono text-[10px] flex items-center justify-center font-bold">1</span>
+                      <span>Asset Hand-Off</span>
                     </span>
-                    <span id="pNodeBadgeIT" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red">FLAGGED</span>
+                    <span id="linStage1Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">IN REVIEW</span>
                   </div>
-                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="pNodeSignerIT">Signer: Alex Tan</div>
-                  <div class="text-[10px] font-mono text-neutral-400 truncate" id="pNodeSummaryIT">ThinkPad hold</div>
-                  <button onclick="signParallelNode('IT')" id="btnSignNodeIT" class="w-full py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-neutral-800 dark:text-neutral-200 text-[10px] font-bold transition flex items-center justify-center space-x-1">
-                    <i class="fa-solid fa-check text-[9px]"></i>
-                    <span>Sign IT Node</span>
-                  </button>
+                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage1Detail">IT Laptop & Locker Surrender</div>
+                  <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage1Sub">Alex Tan · Elena Cruz</div>
                 </div>
 
-                <!-- Admin & Facilities Node -->
-                <div id="pNodeBoxAdmin" class="p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-2 transition">
+                <!-- Stage 2: Finance & Payroll Audit -->
+                <div id="linStage2Box" class="p-3.5 rounded-2xl border transition space-y-2">
                   <div class="flex items-center justify-between">
-                    <span class="font-bold text-neutral-900 dark:text-white flex items-center space-x-1.5">
-                      <i class="fa-solid fa-building-user text-apple-amber"></i>
-                      <span>Facilities & Locker</span>
+                    <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
+                      <span id="linStage2Num" class="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-500 font-mono text-[10px] flex items-center justify-center font-bold">2</span>
+                      <span>Finance & Payroll</span>
                     </span>
-                    <span id="pNodeBadgeAdmin" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-apple-green">CLEARED</span>
+                    <span id="linStage2Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">PENDING</span>
                   </div>
-                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="pNodeSignerAdmin">Signer: Elena Cruz</div>
-                  <div class="text-[10px] font-mono text-neutral-400 truncate" id="pNodeSummaryAdmin">Locker & parking OK</div>
-                  <button onclick="signParallelNode('ADMIN')" id="btnSignNodeAdmin" class="w-full py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-neutral-800 dark:text-neutral-200 text-[10px] font-bold transition flex items-center justify-center space-x-1">
-                    <i class="fa-solid fa-check text-[9px]"></i>
-                    <span>Sign Admin Node</span>
-                  </button>
+                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage2Detail">Final Pay Ledger & Deductions</div>
+                  <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage2Sub">Roberto Ong (Finance)</div>
                 </div>
 
-                <!-- Finance & Payroll Node -->
-                <div id="pNodeBoxFinance" class="p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-2 transition">
+                <!-- Stage 3: Quit Claim & Waiver -->
+                <div id="linStage3Box" class="p-3.5 rounded-2xl border transition space-y-2">
                   <div class="flex items-center justify-between">
-                    <span class="font-bold text-neutral-900 dark:text-white flex items-center space-x-1.5">
-                      <i class="fa-solid fa-calculator text-apple-purple"></i>
-                      <span>Finance Ledger</span>
+                    <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
+                      <span id="linStage3Num" class="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-500 font-mono text-[10px] flex items-center justify-center font-bold">3</span>
+                      <span>Quit Claim & Bank</span>
                     </span>
-                    <span id="pNodeBadgeFinance" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-apple-amber">PENDING</span>
+                    <span id="linStage3Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">PENDING</span>
                   </div>
-                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="pNodeSignerFinance">Signer: Roberto Ong</div>
-                  <div class="text-[10px] font-mono text-neutral-400 truncate" id="pNodeSummaryFinance">Pay audit</div>
-                  <button onclick="signParallelNode('FINANCE')" id="btnSignNodeFinance" class="w-full py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-neutral-800 dark:text-neutral-200 text-[10px] font-bold transition flex items-center justify-center space-x-1">
-                    <i class="fa-solid fa-check text-[9px]"></i>
-                    <span>Sign Finance Node</span>
-                  </button>
+                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage3Detail">Legal Release & Bank Proof</div>
+                  <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage3Sub">Employee & Notary Verification</div>
                 </div>
 
                 <!-- HR Final Release Node (Convergence Target) -->

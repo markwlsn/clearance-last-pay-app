@@ -197,4 +197,54 @@ def test_split_escrow_disbursement(client):
     assert "SPLIT_ESCROW_DISBURSEMENT" in actions
 
 
-# progressive refinement step
+def test_transaction_comments(client):
+    """Verifies Centralized Transaction Discussion thread posting and audit logging."""
+    resp = client.post("/api/approvals/transaction-comment", json={
+        "dossier_id": "DOS-2026-001",
+        "author": "Alex Tan (IT Clearance Lead)",
+        "role": "IT_APPROVER",
+        "message": "Lenovo ThinkPad T14s serial verified (20WM-0045PH). Charger missing, applied ₱1,200 deduction."
+    })
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "SUCCESS"
+    assert data["comment"]["author"] == "Alex Tan (IT Clearance Lead)"
+    assert "20WM-0045PH" in data["comment"]["text"]
+    assert len(data["comments"]) >= 1
+
+    # Verify audit log was recorded
+    logs_resp = client.get("/api/audit-logs?limit=5")
+    assert logs_resp.status_code == 200
+    actions = [l.get("action") for l in logs_resp.json()]
+    assert "TRANSACTION_COMMENT_POSTED" in actions
+
+
+def test_approval_metrics_endpoint(client):
+    """Verifies Executive Clearance Dashboard KPI metrics endpoint."""
+    resp = client.get("/api/approvals/metrics")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "total_requests" in data
+    assert "pending" in data
+    assert "action_needed" in data
+    assert "ready_for_release" in data
+    assert data["total_requests"] >= 4
+    assert data["avg_sla_days"] == 4.2
+
+
+def test_dossiers_have_timeline_and_comments(client):
+    """Verifies all dossiers have populated timeline milestones and discussion comments."""
+    resp = client.get("/api/clearance/dossiers")
+    assert resp.status_code == 200
+    dossiers = resp.json()
+    assert len(dossiers) >= 4
+
+    for d in dossiers:
+        assert "timeline" in d
+        assert len(d["timeline"]) >= 1
+        m = d["timeline"][0]
+        assert "milestone" in m
+        assert "status" in m
+        assert "details" in m
+        assert "comments" in d
+
