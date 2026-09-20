@@ -280,4 +280,40 @@ def test_dossiers_have_timeline_and_comments(client):
         assert "status" in m
         assert "details" in m
         assert "comments" in d
+        assert "current_turn_node" in d
+        assert "current_turn_name" in d
+
+
+def test_turn_advancement_in_sequence(client):
+    """Verifies that signing off a node advances the turn to the next department in sequence."""
+    # In DOS-2026-003, current_turn_node starts at ADMIN (Elena Cruz)
+    sign_resp = client.post("/api/approvals/node-sign", json={
+        "dossier_id": "DOS-2026-003",
+        "node_key": "ADMIN",
+        "approver_name": "Elena Cruz (Facilities Lead)",
+        "role": "ADMIN_APPROVER",
+        "action": "CLEARED",
+        "notes": "Locker key returned"
+    })
+    assert sign_resp.status_code == 200
+    data = sign_resp.json()
+    dossier = data["dossier"]
+    # Turn should advance from ADMIN -> FINANCE
+    assert dossier["current_turn_node"] == "FINANCE"
+    assert dossier["current_turn_role"] == "FINANCE_APPROVER"
+    assert "Roberto Ong" in dossier["current_turn_name"]
+
+
+def test_three_portals_rendered(client):
+    """Verifies that the index page serves the 3 dedicated ends and removes simulation clutter."""
+    resp = client.get("/")
+    assert resp.status_code == 200
+    html = resp.text
+    # 3 Dedicated Portals
+    assert "viewRequesterPortal" in html
+    assert "viewApproverDesk" in html
+    assert "viewAdminDashboard" in html
+    # Simulation clutter removed
+    assert "viewHarness" not in html
+
 

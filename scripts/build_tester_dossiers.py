@@ -1361,3 +1361,198 @@ def get_15_dossiers():
             "unit_channel": "Regional Logistics Hub",
             "job_level": "Team Lead",
             "branch": "Bulacan Distribution Depot",
+            "date_hired": "2020-09-01",
+            "eoc_date": "2026-09-22",
+            "employee_status": "Regular",
+            "reason_for_separation": "Resignation",
+            "with_clearance_already": "Yes",
+            "category": "FOR_RELEASE",
+            "current_stage": "STAGE_4_HR_RELEASE",
+            "stage_name": "Stage 4: HR Final Release & COE",
+            "stage_step": 4,
+            "current_turn_node": "HR",
+            "current_turn_name": "Grace Diaz (HR Operations Lead)",
+            "current_turn_role": "HR_APPROVER",
+            "current_turn_action": "All 4 departments cleared! Ready to execute final pay release (₱41,300.00 via UnionBank) and deliver digital COE.",
+            "overall_status": "CLEARED",
+            "submitted_at": "2026-09-18T15:00:00Z",
+            "sample_file": "clearance_sheet_valid.pdf",
+            "sample_type": "CLEARANCE_SHEET",
+            "ai_flags_count": 0,
+            "flags_summary": [],
+            "routing_mode": "SEQUENTIAL",
+            "assigned_signer": "Grace Diaz (HR Operations Manager)",
+            "nodes": {
+                "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "CLEARED", "summary": "Depot inventory tablet returned"},
+                "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Bulacan depot keys surrendered"},
+                "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "CLEARED", "summary": "Final payroll audited (₱41,300.00)"},
+                "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "CLEARED", "summary": "COE approved & UnionBank payout authorized"}
+            },
+            "escrow_details": None,
+            "timeline": [
+                {
+                    "milestone": "Clearance Request Lodged",
+                    "actor": "Andres Bonifacio (Employee)",
+                    "date": "2026-09-18 03:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Resignation clearance submitted for Bulacan Depot.",
+                    "icon": "fa-file-lines"
+                },
+                {
+                    "milestone": "Warehouse Device Turnover",
+                    "actor": "Alex Tan (IT Clearance Lead)",
+                    "date": "2026-09-18 04:30 PM",
+                    "status": "COMPLETED",
+                    "details": "Ruggedized Android warehouse tablet S/N RT-2991 returned.",
+                    "icon": "fa-laptop"
+                },
+                {
+                    "milestone": "Depot Master Keys Turnover",
+                    "actor": "Elena Cruz (Facilities Lead)",
+                    "date": "2026-09-19 10:00 AM",
+                    "status": "COMPLETED",
+                    "details": "Loading bay master key and padlock surrendered to depot security.",
+                    "icon": "fa-key"
+                },
+                {
+                    "milestone": "Finance & Payroll Audit",
+                    "actor": "Roberto Ong (Finance Lead)",
+                    "date": "2026-09-19 02:30 PM",
+                    "status": "COMPLETED",
+                    "details": "Final net pay audited at ₱41,300.00.",
+                    "icon": "fa-calculator"
+                },
+                {
+                    "milestone": "HR Final Pay Release & COE",
+                    "actor": "Grace Diaz (HR Operations)",
+                    "date": "2026-09-20 11:00 AM",
+                    "status": "COMPLETED",
+                    "details": "UnionBank payout authorized. Automated COE generated.",
+                    "icon": "fa-money-bill-transfer"
+                }
+            ],
+            "comments": [
+                {
+                    "id": "cmt-1401",
+                    "author": "Elena Cruz",
+                    "role": "ADMIN_APPROVER",
+                    "text": "Bulacan depot keys verified and secured.",
+                    "timestamp": "2026-09-19T10:15:00Z"
+                }
+            ],
+            "docs": [
+                {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
+                {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
+                {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+            ]
+        },
+        {
+            "dossier_id": "DOS-2026-015",
+            "employee_name": "Apolinario Mabini",
+            "employee_id": "EMP-50123",
+            "department": "Compliance & Risk",
+            "company": "CMG Group of Companies",
+            "unit_channel": "Corporate HQ",
+            "job_level": "Specialist / Professional",
+            "branch": "Taguig HQ - 24th Floor",
+            "date_hired": "2021-11-01",
+            "eoc_date": "2026-09-24",
+            "employee_status": "Regular",
+            "reason_for_separation": "Resignation",
+            "with_clearance_already": "Yes",
+            "category": "FOR_RELEASE",
+            "current_stage": "STAGE_4_HR_RELEASE",
+            "stage_name": "Stage 4: HR Final Release & COE",
+            "stage_step": 4,
+            "current_turn_node": "HR",
+            "current_turn_name": "Grace Diaz (HR Operations Lead)",
+            "current_turn_role": "HR_APPROVER",
+            "current_turn_action": "All 4 departments cleared! Ready to execute final pay release (₱68,900.00 via Security Bank) and deliver digital COE.",
+            "overall_status": "CLEARED",
+            "submitted_at": "2026-09-19T11:45:00Z",
+            "sample_file": "clearance_sheet_valid.pdf",
+            "sample_type": "CLEARANCE_SHEET",
+            "ai_flags_count": 0,
+            "flags_summary": [],
+            "routing_mode": "SEQUENTIAL",
+            "assigned_signer": "Grace Diaz (HR Operations Manager)",
+            "nodes": {
+                "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "CLEARED", "summary": "Security tokens & ThinkPad returned"},
+                "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "HQ access badge deactivated"},
+                "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "CLEARED", "summary": "Final compensation audited (₱68,900.00)"},
+                "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "CLEARED", "summary": "COE approved & Security Bank payout authorized"}
+            },
+            "escrow_details": None,
+            "timeline": [
+                {
+                    "milestone": "Clearance Request Lodged",
+                    "actor": "Apolinario Mabini (Employee)",
+                    "date": "2026-09-19 11:45 AM",
+                    "status": "COMPLETED",
+                    "details": "Resignation clearance submitted for Compliance & Risk.",
+                    "icon": "fa-file-lines"
+                },
+                {
+                    "milestone": "Compliance & Hardware Turnover",
+                    "actor": "Alex Tan (IT Clearance Lead)",
+                    "date": "2026-09-19 02:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Hardware 2FA YubiKeys surrendered. Lenovo ThinkPad X1 Carbon wiped.",
+                    "icon": "fa-laptop"
+                },
+                {
+                    "milestone": "Executive Office Access Turnover",
+                    "actor": "Elena Cruz (Facilities Lead)",
+                    "date": "2026-09-20 09:30 AM",
+                    "status": "COMPLETED",
+                    "details": "24th floor turnstile RFID badge surrendered.",
+                    "icon": "fa-key"
+                },
+                {
+                    "milestone": "Finance & Compensation Audit",
+                    "actor": "Roberto Ong (Finance Lead)",
+                    "date": "2026-09-20 01:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Final net pay audited at ₱68,900.00.",
+                    "icon": "fa-calculator"
+                },
+                {
+                    "milestone": "HR Final Pay Release & COE",
+                    "actor": "Grace Diaz (HR Operations)",
+                    "date": "2026-09-20 04:00 PM",
+                    "status": "COMPLETED",
+                    "details": "Security Bank payout authorized. Automated COE generated.",
+                    "icon": "fa-money-bill-transfer"
+                }
+            ],
+            "comments": [
+                {
+                    "id": "cmt-1501",
+                    "author": "Grace Diaz",
+                    "role": "HR_APPROVER",
+                    "text": "Zero liabilities. Ready for final payroll release batch.",
+                    "timestamp": "2026-09-20T16:15:00Z"
+                }
+            ],
+            "docs": [
+                {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
+                {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
+                {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+            ]
+        }
+    ]
+
+if __name__ == "__main__":
+    dossiers = get_15_dossiers()
+    print(f"Total: {len(dossiers)}")
+    pending = [d for d in dossiers if d["category"] == "PENDING"]
+    for_review = [d for d in dossiers if d["category"] == "FOR_REVIEW"]
+    for_release = [d for d in dossiers if d["category"] == "FOR_RELEASE"]
+    print(f"Pending: {len(pending)}")
+    print(f"For Review: {len(for_review)}")
+    print(f"For Release: {len(for_release)}")
+    assert len(dossiers) == 15
+    assert len(pending) == 5
+    assert len(for_review) == 5
+    assert len(for_release) == 5
+    print("ALL 15 TESTER ACCOUNTS VALIDATED PERFECTLY!")

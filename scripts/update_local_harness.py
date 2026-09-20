@@ -124,3 +124,21 @@ assert idx_h1 != -1 and idx_h2 != -1, f"HTML markers not found: {idx_h1}, {idx_h
 new_html_block = '''template_path = Path(__file__).resolve().parent / "templates" / "dashboard.html"
 if template_path.exists():
     HTML_DASHBOARD = template_path.read_text(encoding="utf-8")
+else:
+    HTML_DASHBOARD = "<html><body><h1>Clearance Dashboard</h1></body></html>"
+
+
+@app.get("/", response_class=HTMLResponse)
+def index_page():
+    """Interactive Apple-minimalist dashboard for clearance and last pay testing."""
+    if template_path.exists():
+        return HTMLResponse(template_path.read_text(encoding="utf-8"))
+    return HTMLResponse(HTML_DASHBOARD)
+
+
+'''
+
+content = content[:idx_h1] + new_html_block + content[idx_h2:]
+
+path.write_text(content, encoding="utf-8")
+print("pipeline/local_harness.py successfully updated!")
