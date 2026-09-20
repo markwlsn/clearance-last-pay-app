@@ -713,3 +713,242 @@
                 All (15)
               </button>
               <button id="adminBtnPending" onclick="setAdminBucketFilter('PENDING')" class="px-3 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition">
+                ⏳ 5 Pending
+              </button>
+              <button id="adminBtnReview" onclick="setAdminBucketFilter('FOR_REVIEW')" class="px-3 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition">
+                ⚠️ 5 For Review
+              </button>
+              <button id="adminBtnRelease" onclick="setAdminBucketFilter('FOR_RELEASE')" class="px-3 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition">
+                🚀 5 For Release
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Master Queue Grid of 15 Tester Accounts -->
+        <div id="adminCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================================================================= -->
+  <!-- MODAL 1: FILE NEW CLEARANCE REQUEST (LARK APPROVAL FORM)           -->
+  <!-- ================================================================= -->
+  <div id="modalNewClearance" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark max-w-2xl w-full rounded-3xl p-6 sm:p-8 border border-black/[0.08] dark:border-white/[0.1] shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-lark-blue/15 text-lark-blue flex items-center justify-center text-lg shadow-sm">
+            <i class="fa-solid fa-file-pen"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-neutral-900 dark:text-white">Lark Clearance Application</h3>
+            <p class="text-[11px] text-neutral-400">CMG Group of Companies · Resignation & End of Contract Clearance</p>
+          </div>
+        </div>
+        <button onclick="closeNewClearanceModal()" class="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 hover:text-neutral-700 dark:hover:text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <form id="larkSubmitForm" onsubmit="handleLarkSubmit(event)" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="lark-label">Employee Name<span class="lark-required">*</span></label>
+            <input type="text" id="formEmpName" required placeholder="Full legal name" class="lark-input" />
+          </div>
+          <div>
+            <label class="lark-label">Department<span class="lark-required">*</span></label>
+            <select id="formDept" required class="lark-input">
+              <option value="Information Technology">Information Technology</option>
+              <option value="Finance & Accounting">Finance & Accounting</option>
+              <option value="Human Resources">Human Resources</option>
+              <option value="Logistics & Supply Chain">Logistics & Supply Chain</option>
+              <option value="Retail Operations">Retail Operations</option>
+              <option value="Marketing & Brand">Marketing & Brand</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="lark-label">Branch Location<span class="lark-required">*</span></label>
+            <select id="formBranch" required class="lark-input">
+              <option value="Taguig HQ - 24th Floor">Taguig HQ - 24th Floor</option>
+              <option value="Makati Central Hub">Makati Central Hub</option>
+              <option value="Cebu Distribution Center">Cebu Distribution Center</option>
+              <option value="Davao Regional Hub">Davao Regional Hub</option>
+              <option value="Bulacan Distribution Depot">Bulacan Distribution Depot</option>
+            </select>
+          </div>
+          <div>
+            <label class="lark-label">Job Level<span class="lark-required">*</span></label>
+            <select id="formJobLevel" required class="lark-input">
+              <option value="Rank & File">Rank & File</option>
+              <option value="Junior Associate">Junior Associate</option>
+              <option value="Specialist / Professional">Specialist / Professional</option>
+              <option value="Senior Specialist">Senior Specialist</option>
+              <option value="Team Lead">Team Lead</option>
+              <option value="Manager">Manager</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="lark-label">Date Hired<span class="lark-required">*</span></label>
+            <input type="date" id="formDateHired" required value="2022-01-15" class="lark-input" />
+          </div>
+          <div>
+            <label class="lark-label">EOC / Separation Date<span class="lark-required">*</span></label>
+            <input type="date" id="formEocDate" required value="2026-09-30" class="lark-input" />
+          </div>
+          <div>
+            <label class="lark-label">Separation Reason<span class="lark-required">*</span></label>
+            <select id="formReason" required class="lark-input">
+              <option value="Resignation">Resignation</option>
+              <option value="End of Contract">End of Contract</option>
+              <option value="Retirement">Retirement</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end space-x-2.5">
+          <button type="button" onclick="closeNewClearanceModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+            Cancel
+          </button>
+          <button type="submit" id="larkSubmitBtn" class="px-5 py-2.5 rounded-xl bg-lark-blue hover:bg-lark-blueHover text-white text-xs font-bold shadow-md transition active:scale-95 flex items-center space-x-1.5">
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+            <span>Submit Clearance Request</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- MODAL 2: APPLE SPLIT ESCROW DISBURSEMENT                          -->
+  <!-- ================================================================= -->
+  <div id="splitEscrowModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark max-w-lg w-full rounded-3xl p-6 border border-black/[0.08] dark:border-white/[0.1] shadow-2xl space-y-5">
+      <div class="flex items-center justify-between pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500/15 text-apple-amber flex items-center justify-center text-base shadow-sm">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-neutral-900 dark:text-white">Split Clearance & Escrow Disbursement</h3>
+            <p class="text-[11px] text-neutral-400">DOLE Labor Advisory #06 Compliance Safeguard</p>
+          </div>
+        </div>
+        <button onclick="closeSplitEscrowModal()" class="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 hover:text-neutral-700 dark:hover:text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-neutral-700 dark:text-neutral-300 space-y-1">
+        <div class="font-bold text-apple-green flex items-center space-x-1.5">
+          <i class="fa-solid fa-shield-check"></i>
+          <span>Zero-Dispute Final Pay Protocol</span>
+        </div>
+        <p class="text-[11px] text-neutral-600 dark:text-neutral-400">
+          Releases undisputed livelihood earnings to the employee immediately. Isolates the disputed variance into a 7-day Lark arbitration escrow window.
+        </p>
+      </div>
+
+      <div class="space-y-2.5 text-xs">
+        <div class="flex items-center justify-between p-3 rounded-xl bg-neutral-100/80 dark:bg-neutral-800/80 border border-black/[0.04]">
+          <div>
+            <div class="font-bold text-neutral-800 dark:text-neutral-200">Undisputed Net Pay (Disburse Now)</div>
+            <div class="text-[10px] text-neutral-400">Direct credit to employee verified account</div>
+          </div>
+          <div class="font-mono text-base font-bold text-apple-green" id="splitModalUndisputed">₱48,500.00</div>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-xl bg-neutral-100/80 dark:bg-neutral-800/80 border border-black/[0.04]">
+          <div>
+            <div class="font-bold text-neutral-800 dark:text-neutral-200">Disputed Hold Amount (Escrowed)</div>
+            <div class="text-[10px] text-apple-red">Held in payroll escrow pending transaction resolution</div>
+          </div>
+          <div class="font-mono text-base font-bold text-apple-red" id="splitModalEscrow">₱3,500.00</div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-black/[0.04] space-y-1">
+          <span class="text-[10px] font-bold text-neutral-400 uppercase">Reason for Escrow Hold</span>
+          <div class="text-[11px] text-neutral-700 dark:text-neutral-300 font-medium" id="splitModalReason">
+            Disputed Quit Claim stated amount (₱52,000.00) vs Computed Final Pay (₱48,500.00)
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 flex items-center justify-end space-x-2.5">
+        <button onclick="closeSplitEscrowModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+          Cancel
+        </button>
+        <button onclick="confirmSplitEscrowDisbursement()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-md transition active:scale-95 flex items-center space-x-1.5">
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+          <span>Execute Split Disbursement</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript App Logic -->
+  <script>
+    // State Store
+    let allDossiers = [];
+    let currentPortal = 'approver'; // 'requester' | 'approver' | 'admin'
+    let activeRequesterDossierId = 'DOS-2026-001';
+    let activeApproverDossierId = 'DOS-2026-001';
+    let currentApproverRole = 'IT_APPROVER'; // 'IT_APPROVER' | 'ADMIN_APPROVER' | 'FINANCE_APPROVER' | 'HR_APPROVER'
+    let currentApproverQueueFilter = 'MY_TURN'; // 'MY_TURN' | 'ALL' | 'FLAGGED'
+    let currentAdminBucketFilter = 'ALL'; // 'ALL' | 'PENDING' | 'FOR_REVIEW' | 'FOR_RELEASE'
+    let currentInspectionTab = 'DOCS'; // 'DOCS' | 'TIMELINE'
+
+    // Department Signer Mapping
+    const APPROVER_PROFILES = {
+      'IT_APPROVER': { name: 'Alex Tan', roleName: 'IT Clearance Lead', nodeKey: 'IT', icon: 'fa-laptop-code' },
+      'ADMIN_APPROVER': { name: 'Elena Cruz', roleName: 'Facilities & Admin Lead', nodeKey: 'ADMIN', icon: 'fa-building-user' },
+      'FINANCE_APPROVER': { name: 'Roberto Ong', roleName: 'Finance & Payroll Lead', nodeKey: 'FINANCE', icon: 'fa-money-check-dollar' },
+      'HR_APPROVER': { name: 'Grace Diaz', roleName: 'HR Operations Lead', nodeKey: 'HR', icon: 'fa-user-tie' }
+    };
+
+    // Initialize App
+    document.addEventListener('DOMContentLoaded', async () => {
+      await fetchDossiers();
+      renderAllViews();
+    });
+
+    async function fetchDossiers() {
+      try {
+        const res = await fetch('/api/clearance/dossiers');
+        allDossiers = await res.json();
+      } catch (err) {
+        console.error('Failed to load dossiers:', err);
+      }
+    }
+
+    // Portal Navigation Switcher
+    function switchPortal(portal) {
+      currentPortal = portal;
+      
+      const vReq = document.getElementById('viewRequesterPortal');
+      const vAppr = document.getElementById('viewApproverDesk');
+      const vAdmin = document.getElementById('viewAdminDashboard');
+
+      const bReq = document.getElementById('tabBtnRequester');
+      const bAppr = document.getElementById('tabBtnApprover');
+      const bAdmin = document.getElementById('tabBtnAdmin');
+
+      const inactiveStyle = "px-3.5 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1.5";
+      const activeStyle = "px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition flex items-center space-x-1.5";
+
+      vReq.classList.add('hidden');
+      vAppr.classList.add('hidden');
+      vAdmin.classList.add('hidden');
+
+      bReq.className = inactiveStyle;

@@ -575,6 +575,7 @@ def sign_department_node(req: NodeSignRequest):
 
     if req.node_key == "HR" and req.action == "CLEARED":
         target["overall_status"] = "APPROVED"
+        target["category"] = "FOR_RELEASE"
         target["stage_step"] = 4
 
     entry = app.state.audit_logger.log_human_action(

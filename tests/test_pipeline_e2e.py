@@ -258,7 +258,7 @@ def test_approval_metrics_endpoint(client):
 
 
 def test_dossiers_have_timeline_and_comments(client):
-    """Verifies all dossiers have populated timeline milestones and discussion comments."""
+    """Verifies all 15 tester accounts are partitioned into 5 pending, 5 for review, and 5 for release."""
     resp = client.get("/api/clearance/dossiers")
     assert resp.status_code == 200
     dossiers = resp.json()

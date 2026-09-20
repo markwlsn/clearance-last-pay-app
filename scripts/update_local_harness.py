@@ -52,3 +52,21 @@ def get_approval_metrics():
         "pending": pending,
         "action_needed": flagged,
         "ready_for_release": ready,
+        "avg_sla_days": 4.2,
+    }'''
+
+assert old_metrics in content, "old_metrics not found in content"
+content = content.replace(old_metrics, new_metrics)
+
+# 3. Update sign_department_node to advance linear turn sequence
+old_sign = '''    if req.node_key == "HR" and req.action == "CLEARED":
+        target["overall_status"] = "APPROVED"
+        target["stage_step"] = 4'''
+
+new_sign = '''    # Advance linear turn sequence if matching active node
+    seq = ["IT", "ADMIN", "FINANCE", "HR"]
+    if target.get("current_turn_node") == req.node_key and req.action == "CLEARED":
+        idx = seq.index(req.node_key)
+        if idx + 1 < len(seq):
+            nxt = seq[idx + 1]
+            target["current_turn_node"] = nxt

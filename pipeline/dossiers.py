@@ -578,3 +578,196 @@ def get_initial_dossiers() -> List[Dict[str, Any]]:
                     "actor": "Elena Cruz (Facilities Lead)",
                     "date": "2026-09-18 09:30 AM",
                     "status": "COMPLETED",
+                    "details": "Office Locker #12 and Makati Central Hub physical store keys surrendered.",
+                    "icon": "fa-key"
+                },
+                {
+                    "milestone": "Finance & Payroll Computation Audit",
+                    "actor": "Roberto Ong (Finance Lead)",
+                    "date": "2026-09-18 02:15 PM",
+                    "status": "IN_PROGRESS",
+                    "details": "Quitclaim stated amount (₱52,000.00) vs Computed Final Pay (₱48,500.00) has ₱3,500 variance under review.",
+                    "icon": "fa-calculator"
+                },
+                {
+                    "milestone": "Quit Claim & Waiver Sign-Off",
+                    "actor": "Maria Clara Santos (Employee)",
+                    "date": "Pending Revision",
+                    "status": "PENDING",
+                    "details": "Awaiting alignment on ₱3,500 variance or split escrow disbursement.",
+                    "icon": "fa-signature"
+                },
+                {
+                    "milestone": "HR Final Pay Release & COE",
+                    "actor": "Grace Diaz (HR Operations)",
+                    "date": "Pending Release",
+                    "status": "PENDING",
+                    "details": "Awaiting Finance audit resolution before final payout execution.",
+                    "icon": "fa-money-bill-transfer"
+                }
+            ],
+            "comments": [
+                {
+                    "id": "cmt-201",
+                    "author": "Roberto Ong",
+                    "role": "FINANCE_APPROVER",
+                    "text": "Variance of ₱3,500 found between Quitclaim draft (₱52,000) and computed payroll (₱48,500). Eligible for split escrow release.",
+                    "timestamp": "2026-09-18T14:30:00Z"
+                },
+                {
+                    "id": "cmt-202",
+                    "author": "Grace Diaz",
+                    "role": "HR_APPROVER",
+                    "text": "Split escrow option ready to disburse ₱48,500.00 immediately to Maria Clara to prevent DOLE 30-day compliance delay.",
+                    "timestamp": "2026-09-18T16:00:00Z"
+                },
+                {
+                    "id": "cmt-203",
+                    "author": "Maria Clara Santos",
+                    "role": "REQUESTER",
+                    "text": "Agreeing to the split escrow release of ₱48,500.00 while Finance and HR resolve the ₱3,500 adapter dispute.",
+                    "timestamp": "2026-09-18T16:30:00Z"
+                }
+            ],
+            "docs": [
+                {"title": "Quit Claim & Waiver", "file": "quit_claim_mismatch.pdf", "type": "QUIT_CLAIM", "has_flags": True},
+                {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
+                {"title": "Bank / E-Wallet Proof", "file": "bank_gcash_valid.png", "type": "BANK_ENROLLMENT", "has_flags": False}
+            ]
+        },
+        {
+            "dossier_id": "DOS-2026-007",
+            "employee_name": "Pedro Penduko",
+            "employee_id": "EMP-88419",
+            "department": "Logistics & Supply Chain",
+            "company": "CMG Distribution Corp.",
+            "unit_channel": "Logistics Hub",
+            "job_level": "Rank & File",
+            "branch": "Cebu Distribution Center",
+            "date_hired": "2023-01-10",
+            "eoc_date": "2026-09-30",
+            "employee_status": "Regular",
+            "reason_for_separation": "Resignation",
+            "with_clearance_already": "No",
+            "category": "FOR_REVIEW",
+            "current_stage": "STAGE_3_QUITCLAIM",
+            "stage_name": "Stage 3: Quit Claim & Waiver",
+            "stage_step": 3,
+            "current_turn_node": "EMPLOYEE",
+            "current_turn_name": "Pedro Penduko (Employee)",
+            "current_turn_role": "REQUESTER",
+            "current_turn_action": "Action Needed from Employee: Re-upload full 11-digit GCash/Bank screenshot (current proof truncated to 6 digits).",
+            "overall_status": "FLAGGED",
+            "submitted_at": "2026-09-19T14:45:00Z",
+            "sample_file": "bank_bad_format.png",
+            "sample_type": "BANK_ENROLLMENT",
+            "ai_flags_count": 1,
+            "flags_summary": ["FLAG_FORMAT_MISMATCH"],
+            "routing_mode": "SEQUENTIAL",
+            "assigned_signer": "Roberto Ong (Finance & Payroll Lead)",
+            "nodes": {
+                "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "CLEARED", "summary": "No IT assets issued"},
+                "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Safety gear & uniform returned"},
+                "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "FLAGGED", "summary": "Truncated bank account number (091712)"},
+                "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "LOCKED", "summary": "Awaiting bank proof update"}
+            },
+            "escrow_details": None,
+            "timeline": [
+                {
+                    "milestone": "Clearance Request Lodged",
+                    "actor": "Pedro Penduko (Employee)",
+                    "date": "2026-09-19 02:45 PM",
+                    "status": "COMPLETED",
+                    "details": "Resignation clearance lodged via Lark Form for Cebu Distribution Center.",
+                    "icon": "fa-file-lines"
+                },
+                {
+                    "milestone": "IT Access Turnover",
+                    "actor": "Alex Tan (IT Clearance Lead)",
+                    "date": "2026-09-19 04:00 PM",
+                    "status": "COMPLETED",
+                    "details": "No IT laptop issued; WMS mobile account access deactivated.",
+                    "icon": "fa-laptop"
+                },
+                {
+                    "milestone": "Facilities & Uniform Turnover",
+                    "actor": "Elena Cruz (Facilities Lead)",
+                    "date": "2026-09-20 10:00 AM",
+                    "status": "COMPLETED",
+                    "details": "Safety vest, steel-toe boots, and Cebu Hub turnstile RFID returned.",
+                    "icon": "fa-key"
+                },
+                {
+                    "milestone": "Finance & Payroll Computation",
+                    "actor": "Roberto Ong (Finance Lead)",
+                    "date": "2026-09-20 01:15 PM",
+                    "status": "IN_PROGRESS",
+                    "details": "Payroll computed (₱24,800.00). Bank enrollment account number (091712) truncated; proof upload requested.",
+                    "icon": "fa-calculator"
+                },
+                {
+                    "milestone": "Quit Claim & Bank Verification",
+                    "actor": "Pedro Penduko (Employee)",
+                    "date": "Pending Bank Proof",
+                    "status": "PENDING",
+                    "details": "Awaiting valid full 11-digit GCash/Bank screenshot from employee.",
+                    "icon": "fa-signature"
+                },
+                {
+                    "milestone": "HR Final Pay Release & COE",
+                    "actor": "Grace Diaz (HR Operations)",
+                    "date": "Pending Release",
+                    "status": "PENDING",
+                    "details": "Pending verified disbursement target.",
+                    "icon": "fa-money-bill-transfer"
+                }
+            ],
+            "comments": [
+                {
+                    "id": "cmt-701",
+                    "author": "Roberto Ong",
+                    "role": "FINANCE_APPROVER",
+                    "text": "GCash screenshot is cut off showing only 6 digits (091712). Please upload an uncropped screenshot.",
+                    "timestamp": "2026-09-20T13:20:00Z"
+                },
+                {
+                    "id": "cmt-702",
+                    "author": "Pedro Penduko",
+                    "role": "REQUESTER",
+                    "text": "Noted Sir Roberto, uploading the full GCash account profile right away.",
+                    "timestamp": "2026-09-20T14:00:00Z"
+                }
+            ],
+            "docs": [
+                {"title": "Bank / E-Wallet Proof", "file": "bank_bad_format.png", "type": "BANK_ENROLLMENT", "has_flags": True},
+                {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
+                {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False}
+            ]
+        },
+        {
+            "dossier_id": "DOS-2026-008",
+            "employee_name": "Antonio Luna",
+            "employee_id": "EMP-38491",
+            "department": "Operations Management",
+            "company": "CMG Group of Companies",
+            "unit_channel": "Corporate HQ",
+            "job_level": "Manager",
+            "branch": "Taguig HQ - 24th Floor",
+            "date_hired": "2019-10-15",
+            "eoc_date": "2026-09-18",
+            "employee_status": "Regular",
+            "reason_for_separation": "Resignation",
+            "with_clearance_already": "In Progress",
+            "category": "FOR_REVIEW",
+            "current_stage": "STAGE_1_ASSET",
+            "stage_name": "Stage 1: Asset Hand-Off & Turnover",
+            "stage_step": 1,
+            "current_turn_node": "IT",
+            "current_turn_name": "Alex Tan (IT Clearance Lead)",
+            "current_turn_role": "IT_APPROVER",
+            "current_turn_action": "Action Needed from IT: MacBook Pro 16\" surrendered but 85W MagSafe 3 charger and USB-C cable missing (₱3,200 payroll adjustment pending approval).",
+            "overall_status": "FLAGGED",
+            "submitted_at": "2026-09-18T08:00:00Z",
+            "sample_file": "clearance_missing_it.pdf",
+            "sample_type": "CLEARANCE_SHEET",
+            "ai_flags_count": 1,
