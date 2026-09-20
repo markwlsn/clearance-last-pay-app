@@ -242,7 +242,7 @@ def test_transaction_comments(client):
 
 
 def test_approval_metrics_endpoint(client):
-    """Verifies Executive Clearance Dashboard KPI metrics endpoint."""
+    """Verifies Executive Clearance Dashboard KPI metrics endpoint with 15 tester accounts."""
     resp = client.get("/api/approvals/metrics")
     assert resp.status_code == 200
     data = resp.json()
