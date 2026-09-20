@@ -196,3 +196,5 @@ def test_split_escrow_disbursement(client):
     actions = [l.get("action") for l in logs_resp.json()]
     assert "SPLIT_ESCROW_DISBURSEMENT" in actions
 
+
+# progressive refinement step

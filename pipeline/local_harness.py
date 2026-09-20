@@ -64,11 +64,11 @@ class NudgeRequest(BaseModel):
     reason: str
 
 
-class HuddleRequest(BaseModel):
+class TransactionCommentRequest(BaseModel):
     dossier_id: str
-    employee_name: str
-    sender_role: str
-    topic: str
+    author: str
+    role: str
+    message: str
 
 
 class EscalateRequest(BaseModel):
@@ -159,6 +159,79 @@ app.state.dossiers = [
             "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "LOCKED", "summary": "Awaiting IT hardware clearance"}
         },
         "escrow_details": None,
+        "timeline": [
+            {
+                "milestone": "Clearance Request Lodged",
+                "actor": "Juan Dela Cruz (Employee)",
+                "date": "2026-08-31 09:15 AM",
+                "status": "COMPLETED",
+                "details": "Clearance form & resignation documents submitted via Lark Form for Taguig Corporate HQ.",
+                "icon": "fa-file-lines"
+            },
+            {
+                "milestone": "Company Laptop & IT Hardware Hand-Off",
+                "actor": "Alex Tan (IT Clearance Lead)",
+                "date": "2026-09-02 11:30 AM",
+                "status": "IN_PROGRESS",
+                "details": "Lenovo ThinkPad T14s handed off at Taguig HQ reception. Serial verified (20WM-0045PH). Missing 65W AC charger noted for ₱1,200 payroll adjustment.",
+                "icon": "fa-laptop"
+            },
+            {
+                "milestone": "Facilities & Physical Locker Turnover",
+                "actor": "Elena Cruz (Facilities Lead)",
+                "date": "2026-09-03 02:00 PM",
+                "status": "COMPLETED",
+                "details": "Office Locker #24 padlock surrendered. 24th Floor turnstile RFID transponder deactivated.",
+                "icon": "fa-key"
+            },
+            {
+                "milestone": "Finance & Payroll Computation",
+                "actor": "Roberto Ong (Finance Lead)",
+                "date": "2026-09-04 10:15 AM",
+                "status": "COMPLETED",
+                "details": "Pro-rated salary (₱32,000.00) & 13th month (₱16,500.00) audited. Missing charger deduction (-₱1,200.00) applied. Net pay: ₱48,500.00.",
+                "icon": "fa-calculator"
+            },
+            {
+                "milestone": "Quit Claim & Waiver Sign-Off",
+                "actor": "Juan Dela Cruz (Employee)",
+                "date": "Pending Sign-Off",
+                "status": "PENDING",
+                "details": "Awaiting notarized release signature and bank verification.",
+                "icon": "fa-signature"
+            },
+            {
+                "milestone": "HR Final Pay Release & COE",
+                "actor": "Grace Diaz (HR Operations)",
+                "date": "Pending Release",
+                "status": "PENDING",
+                "details": "Final disbursement release to bank/e-wallet and automated COE delivery.",
+                "icon": "fa-money-bill-transfer"
+            }
+        ],
+        "comments": [
+            {
+                "id": "cmt-101",
+                "author": "Alex Tan",
+                "role": "IT_APPROVER",
+                "text": "Lenovo ThinkPad T14s received at Taguig HQ reception. S/N: 20WM-0045PH. Device wiped successfully. Missing 65W charger will be deducted from final pay per policy.",
+                "timestamp": "2026-09-02T11:45:00Z"
+            },
+            {
+                "id": "cmt-102",
+                "author": "Roberto Ong",
+                "role": "FINANCE_APPROVER",
+                "text": "Deduction of ₱1,200.00 factored into final pay itemization. Net final payout confirmed at ₱48,500.00.",
+                "timestamp": "2026-09-04T10:30:00Z"
+            },
+            {
+                "id": "cmt-103",
+                "author": "Juan Dela Cruz",
+                "role": "EMPLOYEE",
+                "text": "Acknowledged and agreed on the ₱1,200 charger deduction from final pay. Bank account proof uploaded.",
+                "timestamp": "2026-09-04T14:10:00Z"
+            }
+        ],
         "docs": [
             {"title": "Clearance Sign-Off Sheet", "file": "clearance_missing_it.pdf", "type": "CLEARANCE_SHEET", "has_flags": True},
             {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
@@ -202,6 +275,72 @@ app.state.dossiers = [
             "status": "PENDING",
             "active": False
         },
+        "timeline": [
+            {
+                "milestone": "Clearance Request Lodged",
+                "actor": "Maria Clara Santos (Employee)",
+                "date": "2026-09-17 11:20 AM",
+                "status": "COMPLETED",
+                "details": "End of Contract clearance lodged via Lark Form for Makati Central Hub.",
+                "icon": "fa-file-lines"
+            },
+            {
+                "milestone": "IT Hardware & Cloud Turnover",
+                "actor": "Alex Tan (IT Clearance Lead)",
+                "date": "2026-09-17 03:00 PM",
+                "status": "COMPLETED",
+                "details": "ThinkPad X1 surrendered and inspected. Cloud ERP and IAM access revoked.",
+                "icon": "fa-laptop"
+            },
+            {
+                "milestone": "Facilities & Store Keys Turnover",
+                "actor": "Elena Cruz (Facilities Lead)",
+                "date": "2026-09-18 09:30 AM",
+                "status": "COMPLETED",
+                "details": "Office Locker #12 and Makati Central Hub physical store keys surrendered.",
+                "icon": "fa-key"
+            },
+            {
+                "milestone": "Finance & Payroll Computation Audit",
+                "actor": "Roberto Ong (Finance Lead)",
+                "date": "2026-09-18 02:15 PM",
+                "status": "IN_PROGRESS",
+                "details": "Quitclaim stated amount (₱52,000.00) vs Computed Final Pay (₱48,500.00) has ₱3,500 variance under review.",
+                "icon": "fa-calculator"
+            },
+            {
+                "milestone": "Quit Claim & Waiver Sign-Off",
+                "actor": "Maria Clara Santos (Employee)",
+                "date": "Pending Revision",
+                "status": "PENDING",
+                "details": "Awaiting alignment on ₱3,500 variance or split escrow disbursement.",
+                "icon": "fa-signature"
+            },
+            {
+                "milestone": "HR Final Pay Release & COE",
+                "actor": "Grace Diaz (HR Operations)",
+                "date": "Pending Release",
+                "status": "PENDING",
+                "details": "Awaiting Finance audit resolution before final payout execution.",
+                "icon": "fa-money-bill-transfer"
+            }
+        ],
+        "comments": [
+            {
+                "id": "cmt-201",
+                "author": "Roberto Ong",
+                "role": "FINANCE_APPROVER",
+                "text": "Variance of ₱3,500 found between Quitclaim draft (₱52,000) and computed payroll (₱48,500). Eligible for split escrow release.",
+                "timestamp": "2026-09-18T14:30:00Z"
+            },
+            {
+                "id": "cmt-202",
+                "author": "Grace Diaz",
+                "role": "HR_APPROVER",
+                "text": "Split escrow option ready to disburse ₱48,500.00 immediately to Maria Clara to prevent DOLE 30-day compliance delay.",
+                "timestamp": "2026-09-18T16:00:00Z"
+            }
+        ],
         "docs": [
             {"title": "Quit Claim & Waiver", "file": "quit_claim_mismatch.pdf", "type": "QUIT_CLAIM", "has_flags": True},
             {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
@@ -239,6 +378,65 @@ app.state.dossiers = [
             "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "LOCKED", "summary": "Awaiting bank proof update"}
         },
         "escrow_details": None,
+        "timeline": [
+            {
+                "milestone": "Clearance Request Lodged",
+                "actor": "Pedro Penduko (Employee)",
+                "date": "2026-09-19 02:45 PM",
+                "status": "COMPLETED",
+                "details": "Resignation clearance lodged via Lark Form for Cebu Distribution Center.",
+                "icon": "fa-file-lines"
+            },
+            {
+                "milestone": "IT Access Turnover",
+                "actor": "Alex Tan (IT Clearance Lead)",
+                "date": "2026-09-19 04:00 PM",
+                "status": "COMPLETED",
+                "details": "No IT laptop issued; WMS mobile account access deactivated.",
+                "icon": "fa-laptop"
+            },
+            {
+                "milestone": "Facilities & Uniform Turnover",
+                "actor": "Elena Cruz (Facilities Lead)",
+                "date": "2026-09-20 10:00 AM",
+                "status": "COMPLETED",
+                "details": "Safety vest, steel-toe boots, and Cebu Hub turnstile RFID returned.",
+                "icon": "fa-key"
+            },
+            {
+                "milestone": "Finance & Payroll Computation",
+                "actor": "Roberto Ong (Finance Lead)",
+                "date": "2026-09-20 01:15 PM",
+                "status": "IN_PROGRESS",
+                "details": "Payroll computed (₱24,800.00). Bank enrollment account number (091712) truncated; proof upload requested.",
+                "icon": "fa-calculator"
+            },
+            {
+                "milestone": "Quit Claim & Bank Verification",
+                "actor": "Pedro Penduko (Employee)",
+                "date": "Pending Bank Proof",
+                "status": "PENDING",
+                "details": "Awaiting valid full 11-digit GCash/Bank screenshot from employee.",
+                "icon": "fa-signature"
+            },
+            {
+                "milestone": "HR Final Pay Release & COE",
+                "actor": "Grace Diaz (HR Operations)",
+                "date": "Pending Release",
+                "status": "PENDING",
+                "details": "Pending verified disbursement target.",
+                "icon": "fa-money-bill-transfer"
+            }
+        ],
+        "comments": [
+            {
+                "id": "cmt-301",
+                "author": "Roberto Ong",
+                "role": "FINANCE_APPROVER",
+                "text": "GCash number is truncated to 6 digits (091712). Sent Lark reminder requesting valid screenshot.",
+                "timestamp": "2026-09-20T13:20:00Z"
+            }
+        ],
         "docs": [
             {"title": "Bank / E-Wallet Proof", "file": "bank_bad_format.png", "type": "BANK_ENROLLMENT", "has_flags": True},
             {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
@@ -276,6 +474,65 @@ app.state.dossiers = [
             "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "CLEARED", "summary": "COE issued, final pay release ready"}
         },
         "escrow_details": None,
+        "timeline": [
+            {
+                "milestone": "Clearance Request Lodged",
+                "actor": "Elena Cruz (Employee)",
+                "date": "2026-09-20 09:10 AM",
+                "status": "COMPLETED",
+                "details": "Resignation clearance lodged via Lark Form for Davao Regional Hub.",
+                "icon": "fa-file-lines"
+            },
+            {
+                "milestone": "IT Hardware & POS Turnover",
+                "actor": "Alex Tan (IT Clearance Lead)",
+                "date": "2026-09-20 11:00 AM",
+                "status": "COMPLETED",
+                "details": "POS terminal credentials revoked. Inventory tablet returned and cleared.",
+                "icon": "fa-laptop"
+            },
+            {
+                "milestone": "Facilities & Store Keys Turnover",
+                "actor": "Elena Cruz (Facilities Lead)",
+                "date": "2026-09-20 01:00 PM",
+                "status": "COMPLETED",
+                "details": "Davao branch store keys and safe lock combination surrendered.",
+                "icon": "fa-key"
+            },
+            {
+                "milestone": "Finance & Payroll Audit",
+                "actor": "Roberto Ong (Finance Lead)",
+                "date": "2026-09-20 03:00 PM",
+                "status": "COMPLETED",
+                "details": "All deductions zeroed. Final pay ₱38,200.00 balanced.",
+                "icon": "fa-calculator"
+            },
+            {
+                "milestone": "Quit Claim & Waiver Sign-Off",
+                "actor": "Elena Cruz (Employee)",
+                "date": "2026-09-20 04:30 PM",
+                "status": "COMPLETED",
+                "details": "Notarized Quit Claim & Waiver signed and validated.",
+                "icon": "fa-signature"
+            },
+            {
+                "milestone": "HR Final Pay Release & COE",
+                "actor": "Grace Diaz (HR Operations)",
+                "date": "2026-09-20 05:00 PM",
+                "status": "COMPLETED",
+                "details": "Disbursement executed to BDO account. COE issued and emailed.",
+                "icon": "fa-money-bill-transfer"
+            }
+        ],
+        "comments": [
+            {
+                "id": "cmt-401",
+                "author": "Grace Diaz",
+                "role": "HR_APPROVER",
+                "text": "All departmental clearances complete with 0 AI flags. Automated fast-track release approved.",
+                "timestamp": "2026-09-20T17:05:00Z"
+            }
+        ],
         "docs": [
             {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
             {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
@@ -369,6 +626,71 @@ def submit_clearance_form(data: SubmissionPayload):
         "sample_type": "CLEARANCE_SHEET",
         "ai_flags_count": 0,
         "flags_summary": [],
+        "nodes": {
+            "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "PENDING", "summary": "Asset surrender pending inspection"},
+            "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "PENDING", "summary": "Facilities clearance pending"},
+            "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "PENDING", "summary": "Final ledger pending"},
+            "HR": {"name": "HR Final Release & COE", "signer": "Grace Diaz", "status": "LOCKED", "summary": "Awaiting department clearances"}
+        },
+        "timeline": [
+            {
+                "milestone": "Clearance Request Lodged",
+                "actor": f"{data.employee_name} (Employee)",
+                "date": datetime.now(timezone.utc).strftime("%Y-%m-%d %I:%M %p"),
+                "status": "COMPLETED",
+                "details": f"Clearance request lodged via Lark Form for {data.company} - {data.department}.",
+                "icon": "fa-file-lines"
+            },
+            {
+                "milestone": "Asset Hand-Off & IT Turnover",
+                "actor": "Alex Tan (IT Clearance Lead)",
+                "date": "Pending turnover",
+                "status": "IN_PROGRESS",
+                "details": "Surrender company laptop, charger, and hardware assets at Taguig HQ reception.",
+                "icon": "fa-laptop"
+            },
+            {
+                "milestone": "Facilities & Physical Locker Turnover",
+                "actor": "Elena Cruz (Facilities Lead)",
+                "date": "Pending turnover",
+                "status": "PENDING",
+                "details": "Locker padlock return and security turnstile RFID deactivation.",
+                "icon": "fa-key"
+            },
+            {
+                "milestone": "Finance & Payroll Computation",
+                "actor": "Roberto Ong (Finance Lead)",
+                "date": "Pending audit",
+                "status": "PENDING",
+                "details": "Pro-rated salary, 13th month computation, and deductions ledger audit.",
+                "icon": "fa-calculator"
+            },
+            {
+                "milestone": "Quit Claim & Waiver Sign-Off",
+                "actor": f"{data.employee_name} (Employee)",
+                "date": "Pending release",
+                "status": "PENDING",
+                "details": "Review itemized final pay and sign legally binding waiver & quit claim.",
+                "icon": "fa-signature"
+            },
+            {
+                "milestone": "HR Final Pay Release & COE",
+                "actor": "Grace Diaz (HR Operations)",
+                "date": "Pending release",
+                "status": "PENDING",
+                "details": "Final payout crediting to bank/e-wallet and automated Certificate of Employment release.",
+                "icon": "fa-money-bill-transfer"
+            }
+        ],
+        "comments": [
+            {
+                "id": f"cmt-{uuid.uuid4().hex[:6]}",
+                "author": data.employee_name,
+                "role": "EMPLOYEE",
+                "text": f"Submitted resignation clearance documents. Scheduled for hardware turnover.",
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+        ],
         "docs": [
             {"title": "Clearance Sign-Off Sheet", "file": "clearance_sheet_valid.pdf", "type": "CLEARANCE_SHEET", "has_flags": False},
             {"title": "Quit Claim & Waiver", "file": "quit_claim_valid.pdf", "type": "QUIT_CLAIM", "has_flags": False},
@@ -487,23 +809,53 @@ def nudge_pending_signer(req: NudgeRequest):
     }
 
 
-@app.post("/api/approvals/huddle")
-def create_lark_huddle(req: HuddleRequest):
-    """Creates a temporary 3-way Lark group chat room [Employee, Dept Head, HR] for rapid resolution."""
+@app.post("/api/approvals/transaction-comment")
+def post_transaction_comment(req: TransactionCommentRequest):
+    """Appends an in-dossier transparency comment/update for all stakeholders to see."""
+    dossier = next((d for d in app.state.dossiers if d["dossier_id"] == req.dossier_id), None)
+    if not dossier:
+        raise HTTPException(status_code=404, detail="Dossier not found")
+
+    new_comment = {
+        "id": f"cmt-{uuid.uuid4().hex[:6]}",
+        "author": req.author,
+        "role": req.role,
+        "text": req.message,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    if "comments" not in dossier:
+        dossier["comments"] = []
+    dossier["comments"].append(new_comment)
+
     entry = app.state.audit_logger.log_human_action(
         dossier_id=req.dossier_id,
-        approver_id=f"HUDDLE-{req.sender_role}",
-        role=req.sender_role,
-        action="LARK_HUDDLE_CREATED",
+        approver_id=req.author,
+        role=req.role,
+        action="TRANSACTION_COMMENT_POSTED",
         flags_reviewed=[],
-        override_justification=f"3-way group created for {req.employee_name}: {req.topic}",
+        override_justification=req.message,
     )
     return {
-        "status": "CREATED",
-        "chat_name": f"⚡ Clearance Huddle · {req.dossier_id} ({req.employee_name})",
-        "members": [req.employee_name, "Department Head", "HR Operations Lead"],
-        "dossier_id": req.dossier_id,
+        "status": "SUCCESS",
+        "comment": new_comment,
+        "comments": dossier["comments"],
         "timestamp": entry["timestamp"],
+    }
+
+
+@app.get("/api/approvals/metrics")
+def get_approval_metrics():
+    """Returns live KPI metric numbers for the Executive Clearance Dashboard."""
+    total = len(app.state.dossiers)
+    pending = sum(1 for d in app.state.dossiers if d.get("overall_status") not in ("APPROVED", "CLEARED"))
+    flagged = sum(1 for d in app.state.dossiers if d.get("ai_flags_count", 0) > 0)
+    ready = sum(1 for d in app.state.dossiers if d.get("overall_status") in ("APPROVED", "CLEARED") or d.get("ai_flags_count", 0) == 0)
+    return {
+        "total_requests": total,
+        "pending": pending,
+        "action_needed": flagged,
+        "ready_for_release": ready,
+        "avg_sla_days": 4.2,
     }
 
 
@@ -1063,93 +1415,119 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     <!-- ================================================================= -->
     <section id="viewApprover" class="space-y-6">
       
-      <!-- Top Apple Segmented Control Toolbar: Approver Personas + SLA Cockpit -->
-      <div class="bg-white/80 dark:bg-neutral-900/80 apple-glass p-4 sm:p-5 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] flex flex-col xl:flex-row xl:items-center justify-between gap-4 transition">
-        
-        <!-- Left: Interactive Approver Persona Switcher (Apple Pills) -->
-        <div class="flex flex-col space-y-2">
-          <div class="flex items-center space-x-2 text-[11px] uppercase tracking-wider font-bold text-neutral-400 dark:text-neutral-500">
-            <i class="fa-solid fa-id-badge text-apple-blue"></i>
-            <span>Active Approver Workspace</span>
-            <span class="text-[10px] lowercase font-normal text-neutral-400">(select to switch role perspective)</span>
-          </div>
-
-          <div class="flex flex-wrap items-center p-1 bg-neutral-200/60 dark:bg-neutral-800/80 rounded-2xl gap-1">
-            <button onclick="switchApproverRole('IT_APPROVER')" id="roleBtnIT" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm">
-              <div class="w-5 h-5 rounded-lg bg-blue-500/15 text-apple-blue flex items-center justify-center text-[10px]">
-                <i class="fa-solid fa-laptop-code"></i>
-              </div>
-              <div class="text-left">
-                <div class="leading-none">Alex Tan</div>
-                <div class="text-[9px] text-neutral-400 font-normal">IT Clearance</div>
-              </div>
-            </button>
-
-            <button onclick="switchApproverRole('FINANCE_APPROVER')" id="roleBtnFinance" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2">
-              <div class="w-5 h-5 rounded-lg bg-emerald-500/15 text-apple-green flex items-center justify-center text-[10px]">
-                <i class="fa-solid fa-money-check-dollar"></i>
-              </div>
-              <div class="text-left">
-                <div class="leading-none">Roberto Ong</div>
-                <div class="text-[9px] text-neutral-400 font-normal">Finance & Payroll</div>
-              </div>
-            </button>
-
-            <button onclick="switchApproverRole('HR_APPROVER')" id="roleBtnHR" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2">
-              <div class="w-5 h-5 rounded-lg bg-purple-500/15 text-apple-purple flex items-center justify-center text-[10px]">
-                <i class="fa-solid fa-user-tie"></i>
-              </div>
-              <div class="text-left">
-                <div class="leading-none">Grace Diaz</div>
-                <div class="text-[9px] text-neutral-400 font-normal">HR Operations</div>
-              </div>
-            </button>
-
-            <button onclick="switchApproverRole('ADMIN_APPROVER')" id="roleBtnAdmin" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2">
-              <div class="w-5 h-5 rounded-lg bg-amber-500/15 text-apple-amber flex items-center justify-center text-[10px]">
-                <i class="fa-solid fa-building-user"></i>
-              </div>
-              <div class="text-left">
-                <div class="leading-none">Elena Cruz</div>
-                <div class="text-[9px] text-neutral-400 font-normal">Facilities & Admin</div>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        <!-- Middle: SLA Acceleration Tracker (Track B Primary Success Metric) -->
-        <div class="flex items-center space-x-3.5 px-4 py-2.5 rounded-2xl bg-neutral-100/80 dark:bg-neutral-800/60 border border-black/[0.04] dark:border-white/[0.06]">
-          <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-apple-green flex items-center justify-center text-sm font-bold shadow-sm">
-            <i class="fa-solid fa-bolt"></i>
-          </div>
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">Turnaround SLA Tracker</span>
-              <span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-apple-green font-bold">-68% Velocity</span>
+      <!-- Top Executive Clearance Dashboard with Metric Counters -->
+      <div class="bg-white/80 dark:bg-neutral-900/80 apple-glass p-5 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] space-y-4 transition">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-2xl bg-blue-500/10 text-apple-blue flex items-center justify-center text-sm font-bold shadow-sm">
+              <i class="fa-solid fa-gauge-high"></i>
             </div>
-            <div class="text-xs font-bold text-neutral-800 dark:text-neutral-200 mt-0.5">
-              Current: <span class="text-apple-green font-bold">4.2 Days</span>
-              <span class="text-neutral-400 font-normal ml-1">(Legacy Lark Form: 10–20 Days)</span>
+            <div>
+              <h2 class="text-sm font-bold text-neutral-900 dark:text-white tracking-tight">Executive Clearance Dashboard</h2>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-400">Live operational turnover metrics, clearance bottleneck counters, and SLA velocity</p>
             </div>
           </div>
-        </div>
-
-        <!-- Right: Real-time Queue Counters -->
-        <div class="flex items-center space-x-2">
-          <div class="px-3.5 py-2 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-300 flex items-center space-x-1.5 shadow-sm">
-            <span class="w-2 h-2 rounded-full bg-apple-blue"></span>
-            <span><strong id="statPending" class="text-apple-blue font-bold">3</strong> Pending</span>
-          </div>
-          <div class="px-3.5 py-2 rounded-2xl bg-red-500/10 text-xs font-semibold text-apple-red flex items-center space-x-1.5 shadow-sm">
-            <span class="w-2 h-2 rounded-full bg-apple-red"></span>
-            <span><strong id="statFlagged" class="font-bold">2</strong> Flagged</span>
-          </div>
-          <div class="px-3.5 py-2 rounded-2xl bg-emerald-500/10 text-xs font-semibold text-apple-green flex items-center space-x-1.5 shadow-sm">
-            <span class="w-2 h-2 rounded-full bg-apple-green"></span>
-            <span><strong id="statCleared" class="font-bold">1</strong> Ready</span>
+          <div class="flex items-center space-x-2 text-xs">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-apple-green border border-emerald-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-apple-green apple-pulse-green mr-1.5"></span>
+              Live Sync Active
+            </span>
           </div>
         </div>
 
+        <!-- 5 Interactive Executive Metric KPI Tiles -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
+          <!-- Total Requests -->
+          <div onclick="setQueueFilter('ALL')" class="p-3.5 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-blue/50 cursor-pointer transition shadow-sm group">
+            <div class="flex items-center justify-between text-neutral-400 mb-1">
+              <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-blue transition">Total Requests</span>
+              <i class="fa-solid fa-folder-open text-apple-blue text-xs"></i>
+            </div>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="statKpiTotal" class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-mono">4</span>
+              <span class="text-[10px] text-neutral-400">lodged</span>
+            </div>
+            <div class="text-[10px] text-neutral-400 mt-1 truncate">All clearance dossiers</div>
+          </div>
+
+          <!-- Pendings -->
+          <div onclick="setQueueFilter('PENDING')" class="p-3.5 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-amber/50 cursor-pointer transition shadow-sm group">
+            <div class="flex items-center justify-between text-neutral-400 mb-1">
+              <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-amber transition">Pendings</span>
+              <i class="fa-solid fa-clock text-apple-amber text-xs"></i>
+            </div>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="statKpiPending" class="text-2xl font-bold tracking-tight text-apple-amber font-mono">3</span>
+              <span class="text-[10px] text-neutral-400">in-flight</span>
+            </div>
+            <div class="text-[10px] text-neutral-400 mt-1 truncate">Active turnover & audits</div>
+          </div>
+
+          <!-- For Review / Flags -->
+          <div onclick="setQueueFilter('FLAGGED')" class="p-3.5 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-red/50 cursor-pointer transition shadow-sm group">
+            <div class="flex items-center justify-between text-neutral-400 mb-1">
+              <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-red transition">For Review</span>
+              <i class="fa-solid fa-triangle-exclamation text-apple-red text-xs"></i>
+            </div>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="statKpiFlagged" class="text-2xl font-bold tracking-tight text-apple-red font-mono">2</span>
+              <span class="text-[10px] text-apple-red font-semibold">action needed</span>
+            </div>
+            <div class="text-[10px] text-neutral-400 mt-1 truncate">Discrepancy flags found</div>
+          </div>
+
+          <!-- Ready for Release -->
+          <div onclick="setQueueFilter('CLEARED')" class="p-3.5 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-apple-green/50 cursor-pointer transition shadow-sm group">
+            <div class="flex items-center justify-between text-neutral-400 mb-1">
+              <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-apple-green transition">Ready for Release</span>
+              <i class="fa-solid fa-circle-check text-apple-green text-xs"></i>
+            </div>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="statKpiReady" class="text-2xl font-bold tracking-tight text-apple-green font-mono">1</span>
+              <span class="text-[10px] text-apple-green font-semibold">cleared</span>
+            </div>
+            <div class="text-[10px] text-neutral-400 mt-1 truncate">Ready for final pay & COE</div>
+          </div>
+
+          <!-- SLA Turnaround Metric -->
+          <div class="p-3.5 rounded-2xl bg-emerald-500/[0.06] dark:bg-emerald-950/20 border border-emerald-500/20 shadow-sm">
+            <div class="flex items-center justify-between text-neutral-400 mb-1">
+              <span class="text-[10px] uppercase font-bold tracking-wider text-apple-green">Clearance SLA</span>
+              <i class="fa-solid fa-bolt text-apple-green text-xs"></i>
+            </div>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="statKpiSla" class="text-2xl font-bold tracking-tight text-apple-green font-mono">4.2d</span>
+              <span class="text-[10px] px-1 py-0.2 rounded bg-emerald-500/20 text-apple-green font-bold">-68%</span>
+            </div>
+            <div class="text-[10px] text-neutral-400 mt-1 truncate">Legacy: 14–20 Days</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Approver Persona Switcher Bar -->
+      <div class="bg-white/80 dark:bg-neutral-900/80 apple-glass px-5 py-3.5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
+        <div class="flex items-center space-x-2 text-[11px] uppercase tracking-wider font-bold text-neutral-400 dark:text-neutral-500">
+          <i class="fa-solid fa-id-badge text-apple-blue"></i>
+          <span>Active Approver Perspective:</span>
+        </div>
+        <div class="flex flex-wrap items-center p-1 bg-neutral-200/60 dark:bg-neutral-800/80 rounded-2xl gap-1">
+          <button onclick="switchApproverRole('IT_APPROVER')" id="roleBtnIT" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm">
+            <div class="w-4 h-4 rounded-md bg-blue-500/15 text-apple-blue flex items-center justify-center text-[9px]"><i class="fa-solid fa-laptop-code"></i></div>
+            <span>Alex Tan (IT)</span>
+          </button>
+          <button onclick="switchApproverRole('FINANCE_APPROVER')" id="roleBtnFinance" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2">
+            <div class="w-4 h-4 rounded-md bg-emerald-500/15 text-apple-green flex items-center justify-center text-[9px]"><i class="fa-solid fa-money-check-dollar"></i></div>
+            <span>Roberto Ong (Finance)</span>
+          </button>
+          <button onclick="switchApproverRole('HR_APPROVER')" id="roleBtnHR" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2">
+            <div class="w-4 h-4 rounded-md bg-purple-500/15 text-apple-purple flex items-center justify-center text-[9px]"><i class="fa-solid fa-user-tie"></i></div>
+            <span>Grace Diaz (HR)</span>
+          </button>
+          <button onclick="switchApproverRole('ADMIN_APPROVER')" id="roleBtnAdmin" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-2">
+            <div class="w-4 h-4 rounded-md bg-amber-500/15 text-apple-amber flex items-center justify-center text-[9px]"><i class="fa-solid fa-building-user"></i></div>
+            <span>Elena Cruz (Admin)</span>
+          </button>
+        </div>
       </div>
 
       <!-- Main Workstation Grid -->
