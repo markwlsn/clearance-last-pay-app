@@ -315,5 +315,13 @@ def test_three_portals_rendered(client):
     assert "viewAdminEnd" in html
     # Simulation clutter removed
     assert "viewHarness" not in html
+    assert "Live Simulation" not in html
+
+    # Dedicated routes
+    for path in ["/user", "/approver", "/admin"]:
+        r = client.get(path)
+        assert r.status_code == 200
+        assert r.headers.get("Cache-Control") == "no-cache, no-store, must-revalidate, max-age=0"
+
 
 

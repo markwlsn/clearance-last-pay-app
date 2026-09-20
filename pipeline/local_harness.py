@@ -713,10 +713,28 @@ def get_html_content():
 
 @app.get("/", response_class=HTMLResponse)
 def index_page():
-    """Interactive Apple-minimalist dashboard for clearance and last pay testing."""
-    if template_path.exists():
-        return HTMLResponse(template_path.read_text(encoding="utf-8"))
-    return HTMLResponse(HTML_DASHBOARD)
+    """Portal Landing Gateway."""
+    return HTMLResponse(content=get_html_content())
+
+
+@app.get("/user", response_class=HTMLResponse)
+@app.get("/requester", response_class=HTMLResponse)
+def user_end_page():
+    """User End: Requesting & Timeline Monitoring Portal."""
+    return HTMLResponse(content=get_html_content())
+
+
+@app.get("/approver", response_class=HTMLResponse)
+def approver_end_page():
+    """Approver End: Review Desk & Turn-based Approvals."""
+    return HTMLResponse(content=get_html_content())
+
+
+@app.get("/admin", response_class=HTMLResponse)
+def admin_end_page():
+    """Admin End: Executive Oversight (5 Pending, 5 Review, 5 Release)."""
+    return HTMLResponse(content=get_html_content())
+
 
 
 def main():

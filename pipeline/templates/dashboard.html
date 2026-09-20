@@ -1215,9 +1215,9 @@
       ];
 
       const currentStep = d.stage_step || 1;
-      document.getElementById('reqWorkflowStepSummary').textContent = currentStep >= 4 && d.category === 'FOR_RELEASE' ? 'All 4 Stages Completed' : `Stage ${currentStep} of 4 in progress`;
+      document.getElementById('userWorkflowStepSummary').textContent = currentStep >= 4 && d.category === 'FOR_RELEASE' ? 'All 4 Stages Completed' : `Stage ${currentStep} of 4 in progress`;
 
-      document.getElementById('reqWorkflowStepper').innerHTML = stages.map(s => {
+      document.getElementById('userWorkflowStepper').innerHTML = stages.map(s => {
         const isDone = s.num < currentStep || (currentStep === 4 && d.category === 'FOR_RELEASE');
         const isCurrent = s.num === currentStep && !(currentStep === 4 && d.category === 'FOR_RELEASE');
         
@@ -1247,9 +1247,9 @@
       }).join('');
 
       // Milestone Activity Timeline
-      const timelineBox = document.getElementById('reqTimelineContainer');
+      const timelineBox = document.getElementById('userTimelineContainer');
       if (d.timeline && d.timeline.length) {
-        timelineBox.innerHTML = d.timeline.map((t, idx) => {
+        timelineBox.innerHTML = d.timeline.map(t => {
           const isDone = t.status === 'COMPLETED';
           const isInProg = t.status === 'IN_PROGRESS';
           let dotClass = isDone ? 'bg-apple-green text-white' : (isInProg ? 'bg-apple-blue text-white apple-pulse-blue' : 'bg-neutral-300 dark:bg-neutral-700 text-neutral-500');
@@ -1277,11 +1277,11 @@
         timelineBox.innerHTML = '<p class="text-xs text-neutral-400 italic">No milestone events logged yet.</p>';
       }
 
-      // Discussion Subtitle & Authorized Badges
-      document.getElementById('reqDiscussionSubtitle').innerHTML = `Confidential thread · Restricted strictly to <strong>${d.employee_name}</strong> & Clearance Approvers`;
-      document.getElementById('reqPostingAsName').textContent = `${d.employee_name} (Requester)`;
+      // Discussion Header
+      document.getElementById('userDiscussionSubtitle').innerHTML = `Confidential thread · Restricted strictly to <strong>${d.employee_name}</strong> & Clearance Approvers`;
+      document.getElementById('userPostingAsName').textContent = `${d.employee_name} (Requester)`;
 
-      document.getElementById('reqAuthorizedBadges').innerHTML = `
+      document.getElementById('userAuthorizedBadges').innerHTML = `
         <span class="px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold border border-sky-500/20">👤 ${d.employee_name}</span>
         <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">💻 IT</span>
         <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">🏢 Admin</span>
@@ -1289,12 +1289,11 @@
         <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">👥 HR</span>
       `;
 
-      // Render Comments
-      renderRequesterComments(d);
+      renderUserComments(d);
     }
 
-    function renderRequesterComments(d) {
-      const container = document.getElementById('reqCommentsContainer');
+    function renderUserComments(d) {
+      const container = document.getElementById('userCommentsContainer');
       if (!d.comments || !d.comments.length) {
         container.innerHTML = '<p class="text-xs text-neutral-400 italic py-4 text-center">No notes posted yet. Start the conversation with your approvers below.</p>';
         return;
@@ -1321,12 +1320,12 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    async function postRequesterComment() {
-      const input = document.getElementById('reqCommentInput');
+    async function postUserComment() {
+      const input = document.getElementById('userCommentInput');
       const text = input.value.trim();
       if (!text) return;
 
-      const d = getActiveRequesterDossier();
+      const d = getActiveUserDossier();
       try {
         const res = await fetch('/api/approvals/transaction-comment', {
           method: 'POST',
@@ -1343,8 +1342,8 @@
         const data = await res.json();
         d.comments = data.comments;
         input.value = '';
-        renderRequesterComments(d);
-        showDynamicToast("Note Posted", "Your message is visible to clearance approvers.", "success");
+        renderUserComments(d);
+        showDynamicToast("Note Sent", "Your message is visible to clearance approvers.", "success");
       } catch (err) {
         showDynamicToast("Error", err.message, "error");
       }
@@ -1352,7 +1351,7 @@
 
 
     // =========================================================================
-    // END 2: APPROVER DASHBOARD LOGIC (WHOSE TURN TO APPROVE WHOM)
+    // 2️⃣ APPROVER END LOGIC (DEPARTMENT TURN-BASED REVIEW DESK)
     // =========================================================================
     function switchApproverPersona(role) {
       currentApproverRole = role;
@@ -1368,8 +1367,8 @@
         }
       });
 
-      renderApproverDesk();
-      showDynamicToast("Role Switched", `Viewing queue as ${APPROVER_PROFILES[role].name} (${APPROVER_PROFILES[role].roleName})`, "info");
+      renderApproverEnd();
+      showDynamicToast("Persona Switched", `Active as ${APPROVER_PROFILES[role].name} (${APPROVER_PROFILES[role].roleName})`, "info");
     }
 
     function setApproverQueueFilter(filter) {
@@ -1392,7 +1391,7 @@
       return allDossiers.find(d => d.dossier_id === activeApproverDossierId) || allDossiers[0];
     }
 
-    function renderApproverDesk() {
+    function renderApproverEnd() {
       renderApproverQueue();
       renderApproverWorkstation();
     }
@@ -1401,11 +1400,9 @@
       const q = (document.getElementById('apprQueueSearch')?.value || '').toLowerCase();
       const myNodeKey = APPROVER_PROFILES[currentApproverRole].nodeKey;
 
-      // Calculate count of dossiers waiting specifically on my turn
       const myTurnDossiers = allDossiers.filter(d => d.current_turn_node === myNodeKey);
       document.getElementById('myTurnCountBadge').textContent = myTurnDossiers.length;
 
-      // Filter list
       const filtered = allDossiers.filter(d => {
         const matchSearch = d.employee_name.toLowerCase().includes(q) || 
                             d.dossier_id.toLowerCase().includes(q) || 
@@ -1440,7 +1437,6 @@
         const myNodeCleared = d.nodes && d.nodes[myNodeKey] && d.nodes[myNodeKey].status === 'CLEARED';
         const initials = d.employee_name.split(' ').map(n => n[0]).slice(0, 2).join('');
 
-        // Turn indicator badge
         let turnBadge = '';
         if (isMyTurn) {
           turnBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-apple-blue flex items-center space-x-1"><span class="w-1.5 h-1.5 rounded-full bg-apple-blue apple-pulse-blue mr-1"></span>YOUR TURN</span>';
@@ -1488,7 +1484,7 @@
 
     function selectApproverDossier(id) {
       activeApproverDossierId = id;
-      renderApproverDesk();
+      renderApproverEnd();
       const el = document.getElementById('apprActiveWorkstation');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
@@ -1500,7 +1496,6 @@
       const myNodeKey = APPROVER_PROFILES[currentApproverRole].nodeKey;
       const isMyTurn = d.current_turn_node === myNodeKey;
 
-      // Summary
       const initials = d.employee_name.split(' ').map(n => n[0]).slice(0, 2).join('');
       document.getElementById('workstationAvatar').textContent = initials;
       document.getElementById('workstationEmpName').textContent = d.employee_name;
@@ -1512,7 +1507,6 @@
       document.getElementById('workstationTurnHolderName').textContent = d.current_turn_name || 'Department clearance';
       document.getElementById('workstationTurnActionGuidance').textContent = d.current_turn_action || 'Review in progress';
 
-      // Overall Badge
       let ovBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-apple-amber">PENDING</span>';
       if (d.category === 'FOR_RELEASE' || d.overall_status === 'CLEARED' || d.overall_status === 'APPROVED') {
         ovBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-apple-green">READY FOR RELEASE</span>';
@@ -1521,7 +1515,6 @@
       }
       document.getElementById('workstationOverallBadge').outerHTML = `<span id="workstationOverallBadge">${ovBadge}</span>`;
 
-      // Linear Department Sequence: IT -> Admin -> Finance -> HR
       const sequence = [
         { key: 'IT', name: 'IT Clearance', signer: 'Alex Tan' },
         { key: 'ADMIN', name: 'Facilities/Admin', signer: 'Elena Cruz' },
@@ -1562,13 +1555,9 @@
         `;
       }).join('');
 
-      // Render Documents
       renderApproverDocs(d);
-
-      // Render Timeline
       renderApproverTimeline(d);
 
-      // Decision Dock Setup
       const btnApprove = document.getElementById('btnApprovePassTurn');
       const btnSplit = document.getElementById('btnSplitEscrowRelease');
       const promptTitle = document.getElementById('dockTurnPrompt');
@@ -1585,14 +1574,12 @@
         btnApprove.innerHTML = `<i class="fa-solid fa-check mr-1.5"></i> Sign-off (Waiting on Turn)`;
       }
 
-      // Show Split Escrow Button for Finance / HR on disputed amounts
       if ((currentApproverRole === 'FINANCE_APPROVER' || currentApproverRole === 'HR_APPROVER') && d.escrow_details) {
         btnSplit.classList.remove('hidden');
       } else {
         btnSplit.classList.add('hidden');
       }
 
-      // Discussion Header & Comments
       document.getElementById('apprDiscussionSubtitle').innerHTML = `Confidential thread · Restricted strictly to <strong>${d.employee_name}</strong> & Clearance Approvers`;
       document.getElementById('apprPostingAsLabel').textContent = `${APPROVER_PROFILES[currentApproverRole].name} (${APPROVER_PROFILES[currentApproverRole].roleName})`;
 
@@ -1775,10 +1762,9 @@
         if (!res.ok) throw new Error('Failed to record sign-off decision');
         const data = await res.json();
         
-        // Update local object
         Object.assign(d, data.dossier);
-        renderApproverDesk();
-        renderAdminDashboard();
+        renderApproverEnd();
+        renderAdminEnd();
 
         showDynamicToast(
           action === 'APPROVE' ? "Step Cleared & Turn Passed" : "Discrepancy Flagged",
@@ -1792,7 +1778,7 @@
 
 
     // =========================================================================
-    // END 3: ADMIN DASHBOARD LOGIC (5 PENDING, 5 REVIEW, 5 RELEASE)
+    // 3️⃣ ADMIN END LOGIC (EXECUTIVE 5 PENDING, 5 REVIEW, 5 RELEASE)
     // =========================================================================
     function setAdminBucketFilter(bucket) {
       currentAdminBucketFilter = bucket;
@@ -1813,8 +1799,7 @@
       renderAdminDeck();
     }
 
-    function renderAdminDashboard() {
-      // Update KPIs
+    function renderAdminEnd() {
       const total = allDossiers.length;
       const pending = allDossiers.filter(d => d.category === 'PENDING').length;
       const forReview = allDossiers.filter(d => d.category === 'FOR_REVIEW').length;
@@ -1895,7 +1880,7 @@
             <div class="pt-3 border-t border-black/[0.04] flex items-center justify-between gap-2">
               <span class="text-[10px] text-neutral-400">EOC: ${d.eoc_date}</span>
               <div class="flex items-center space-x-1.5">
-                <button onclick="adminInspectInRequester('${d.dossier_id}')" class="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 text-[10px] font-bold transition" title="View Timeline in Requester Portal">
+                <button onclick="adminInspectInUser('${d.dossier_id}')" class="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 text-[10px] font-bold transition" title="View Timeline in User End">
                   Timeline
                 </button>
                 <button onclick="adminInspectInApprover('${d.dossier_id}')" class="px-2.5 py-1 rounded-lg bg-apple-blue hover:bg-apple-blueHover text-white text-[10px] font-bold transition">
@@ -1908,15 +1893,15 @@
       }).join('');
     }
 
-    function adminInspectInRequester(id) {
-      activeRequesterDossierId = id;
-      switchPortal('requester');
-      document.getElementById('requesterAccountSelect').value = id;
+    function adminInspectInUser(id) {
+      activeUserDossierId = id;
+      navigateToPortal('user');
+      document.getElementById('userAccountSelect').value = id;
     }
 
     function adminInspectInApprover(id) {
       activeApproverDossierId = id;
-      switchPortal('approver');
+      navigateToPortal('approver');
     }
 
 
@@ -1963,8 +1948,8 @@
         
         await fetchDossiers();
         closeNewClearanceModal();
-        activeRequesterDossierId = data.dossier.dossier_id;
-        renderAllViews();
+        activeUserDossierId = data.dossier.dossier_id;
+        applyPortalView();
         showDynamicToast("Request Submitted", `Clearance application ${data.dossier.dossier_id} lodged via Lark Form.`, "success");
       } catch (err) {
         showDynamicToast("Error", err.message, "error");
@@ -2008,15 +1993,14 @@
         if (!res.ok) throw new Error('Split escrow failed');
         closeSplitEscrowModal();
         d.overall_status = 'PARTIALLY_DISBURSED';
-        renderApproverDesk();
-        renderAdminDashboard();
+        renderApproverEnd();
+        renderAdminEnd();
         showDynamicToast("Split Payout Executed", `₱${d.escrow_details.undisputed_amount.toLocaleString()} credited to employee. Disputed balance isolated into 7-day arbitration escrow.`, "success");
       } catch (err) {
         showDynamicToast("Error", err.message, "error");
       }
     }
 
-    // Theme Switcher (Light / Dark)
     function toggleTheme() {
       const html = document.documentElement;
       const isDark = html.classList.contains('dark');
@@ -2035,7 +2019,6 @@
       }
     }
 
-    // Dynamic Island Toast
     function showDynamicToast(title, message, type = 'success') {
       const toast = document.getElementById('dynamicIslandToast');
       const icon = document.getElementById('toastIcon');
