@@ -1673,71 +1673,41 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                   </span>
                   <span id="linStage2Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">PENDING</span>
                 </div>
-                <div class="text-[10px] text-neutral-400 lowercase font-normal">
-                  <i class="fa-solid fa-arrow-right-long mr-1 text-apple-blue"></i> sequential milestone gate
-                </div>
+                <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage2Detail">Final Pay Ledger & Deductions</div>
+                <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage2Sub">Roberto Ong (Finance)</div>
               </div>
 
-              <!-- Linear 4-Stage Stepper Grid -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs" id="linearStepperContainer">
-                
-                <!-- Stage 1: Asset Hand-Off & Turnover -->
-                <div id="linStage1Box" class="p-3.5 rounded-2xl border transition space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
-                      <span id="linStage1Num" class="w-5 h-5 rounded-full bg-blue-500/15 text-apple-blue font-mono text-[10px] flex items-center justify-center font-bold">1</span>
-                      <span>Asset Hand-Off</span>
-                    </span>
-                    <span id="linStage1Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">IN REVIEW</span>
-                  </div>
-                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage1Detail">IT Laptop & Locker Surrender</div>
-                  <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage1Sub">Alex Tan · Elena Cruz</div>
+              <!-- Stage 3: Quit Claim & Waiver -->
+              <div id="linStage3Box" class="p-3.5 rounded-2xl border transition space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
+                    <span id="linStage3Num" class="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-500 font-mono text-[10px] flex items-center justify-center font-bold">3</span>
+                    <span>Quit Claim & Bank</span>
+                  </span>
+                  <span id="linStage3Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">PENDING</span>
                 </div>
-
-                <!-- Stage 2: Finance & Payroll Audit -->
-                <div id="linStage2Box" class="p-3.5 rounded-2xl border transition space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
-                      <span id="linStage2Num" class="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-500 font-mono text-[10px] flex items-center justify-center font-bold">2</span>
-                      <span>Finance & Payroll</span>
-                    </span>
-                    <span id="linStage2Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">PENDING</span>
-                  </div>
-                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage2Detail">Final Pay Ledger & Deductions</div>
-                  <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage2Sub">Roberto Ong (Finance)</div>
-                </div>
-
-                <!-- Stage 3: Quit Claim & Waiver -->
-                <div id="linStage3Box" class="p-3.5 rounded-2xl border transition space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
-                      <span id="linStage3Num" class="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-500 font-mono text-[10px] flex items-center justify-center font-bold">3</span>
-                      <span>Quit Claim & Bank</span>
-                    </span>
-                    <span id="linStage3Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">PENDING</span>
-                  </div>
-                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage3Detail">Legal Release & Bank Proof</div>
-                  <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage3Sub">Employee & Notary Verification</div>
-                </div>
-
-                <!-- Stage 4: HR Final Release & COE -->
-                <div id="linStage4Box" class="p-3.5 rounded-2xl border transition space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
-                      <span id="linStage4Num" class="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-500 font-mono text-[10px] flex items-center justify-center font-bold">4</span>
-                      <span>HR Final Release</span>
-                    </span>
-                    <span id="linStage4Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">LOCKED</span>
-                  </div>
-                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage4Detail">Bank Disbursement & COE</div>
-                  <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage4Sub">Grace Diaz (HR Operations)</div>
-                </div>
-
+                <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage3Detail">Legal Release & Bank Proof</div>
+                <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage3Sub">Employee & Notary Verification</div>
               </div>
+
+              <!-- Stage 4: HR Final Release & COE -->
+              <div id="linStage4Box" class="p-3.5 rounded-2xl border transition space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
+                    <span id="linStage4Num" class="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-500 font-mono text-[10px] flex items-center justify-center font-bold">4</span>
+                    <span>HR Final Release</span>
+                  </span>
+                  <span id="linStage4Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">LOCKED</span>
+                </div>
+                <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage4Detail">Bank Disbursement & COE</div>
+                <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage4Sub">Grace Diaz (HR Operations)</div>
+              </div>
+
             </div>
+          </div>
 
-            <!-- 2b. Detailed Minimalist Hand-Off & Milestone Activity Timeline -->
-            <div class="p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3.5">
+          <!-- 2b. Detailed Minimalist Hand-Off & Milestone Activity Timeline -->
+          <div id="timelineMilestoneSection" class="p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3.5">
               <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
                 <div class="flex items-center space-x-2.5">
                   <div class="w-7 h-7 rounded-xl bg-blue-500/15 text-apple-blue flex items-center justify-center text-xs shadow-sm">
@@ -1963,8 +1933,6 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           </div>
 
         </div>
-
-      </div>
 
     </section>
 
@@ -2273,33 +2241,48 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         const hasFlags = d.ai_flags_count > 0;
         const initials = d.employee_name.split(' ').map(n => n[0]).slice(0, 2).join('');
         
-        let statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-apple-green">CLEARED</span>';
+        let statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-apple-green uppercase">CLEARED</span>';
         if (d.overall_status === 'APPROVED') {
-          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-apple-green">APPROVED</span>';
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-apple-green uppercase">APPROVED</span>';
         } else if (hasFlags) {
-          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-apple-red">FLAGGED</span>';
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-apple-red uppercase">FLAGGED</span>';
         } else {
-          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-apple-amber">IN PROGRESS</span>';
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-apple-amber uppercase">IN PROGRESS</span>';
         }
 
-        const borderClass = isActive ? 'border-l-4 border-apple-blue bg-blue-50/40 dark:bg-neutral-800 shadow-sm' : 'border border-black/[0.04] dark:border-white/[0.06] bg-neutral-50/70 dark:bg-apple-elevatedDark hover:bg-neutral-100/60 dark:hover:bg-neutral-700/50';
+        // Active state with Apple blue curved accent on left edge, exactly matching media_1789957661584.png
+        const borderClass = isActive 
+          ? 'border-l-[5px] border-apple-blue bg-blue-50/50 dark:bg-blue-950/25 shadow-md ring-1 ring-apple-blue/25 border-y border-r border-black/[0.06] dark:border-white/[0.08]' 
+          : 'border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-apple-elevatedDark hover:border-black/20 dark:hover:border-white/20 hover:shadow-sm';
 
         return `
-          <div onclick="selectDossier('${d.dossier_id}')" class="p-3 rounded-xl ${borderClass} cursor-pointer transition flex items-center space-x-3 group">
-            <div class="w-10 h-10 rounded-xl bg-neutral-200/80 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 font-bold text-xs flex items-center justify-center shrink-0">
-              ${initials}
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-neutral-800 dark:text-neutral-200 truncate group-hover:text-apple-blue transition">${d.employee_name}</span>
-                ${statusBadge}
+          <div onclick="selectDossier('${d.dossier_id}', true)" class="p-4 rounded-2xl ${borderClass} cursor-pointer transition flex flex-col justify-between group relative select-none">
+            <div class="flex items-start space-x-3.5">
+              <div class="w-11 h-11 rounded-2xl bg-neutral-200/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                ${initials}
               </div>
-              <div class="text-[11px] text-neutral-400 truncate mt-0.5">${d.department} · ${d.dossier_id}</div>
-              <div class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
-                <span>${hasFlags ? `<span class="text-apple-red font-semibold"><i class="fa-solid fa-triangle-exclamation mr-1"></i>${d.ai_flags_count} flag(s)</span>` : '<span class="text-apple-green"><i class="fa-solid fa-check mr-1"></i>Clean pre-check</span>'}</span>
-                <span>EOC: ${d.eoc_date}</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate group-hover:text-apple-blue transition">${d.employee_name}</span>
+                  ${statusBadge}
+                </div>
+                <div class="text-[11px] text-neutral-400 dark:text-neutral-500 truncate mt-0.5">${d.department} · ${d.dossier_id}</div>
+                <div class="text-[10px] text-neutral-400 mt-2 flex items-center justify-between">
+                  <span>${hasFlags ? `<span class="text-apple-red font-semibold flex items-center"><i class="fa-solid fa-triangle-exclamation mr-1.5 text-[9px]"></i>${d.ai_flags_count} flag(s)</span>` : '<span class="text-apple-green font-semibold flex items-center"><i class="fa-solid fa-check mr-1.5 text-[9px]"></i>Clean pre-check</span>'}</span>
+                  <span class="font-mono text-[10px]">EOC: ${d.eoc_date}</span>
+                </div>
               </div>
             </div>
+            ${isActive ? `
+              <div class="mt-2.5 pt-2 border-t border-apple-blue/20 flex items-center justify-between text-[10px] font-bold text-apple-blue">
+                <span class="flex items-center"><i class="fa-solid fa-circle-dot mr-1 text-[8px] animate-pulse"></i> Selected</span>
+                <span class="flex items-center">Timeline Below <i class="fa-solid fa-arrow-down ml-1 text-[9px]"></i></span>
+              </div>
+            ` : `
+              <div class="mt-2.5 pt-2 border-t border-transparent flex items-center justify-end text-[10px] text-neutral-400 group-hover:text-apple-blue transition">
+                <span>View timeline →</span>
+              </div>
+            `}
           </div>
         `;
       }).join('');
@@ -2941,7 +2924,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       }
     }
 
-    async function selectDossier(dossierId) {
+    async function selectDossier(dossierId, shouldScroll = false) {
       const d = allDossiersCache.find(item => item.dossier_id === dossierId);
       if (!d) return;
 
@@ -3022,6 +3005,14 @@ HTML_DASHBOARD = """<!DOCTYPE html>
 
       // Load Pre-check on primary document
       await inspectDossierDocument(d.sample_file, d.sample_type);
+
+      // Smooth scroll to timeline & approver desk if clicked by user
+      if (shouldScroll) {
+        const desk = document.getElementById('approverActiveCard');
+        if (desk) {
+          desk.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
     }
 
     function updateProgressPipeline(d) {
