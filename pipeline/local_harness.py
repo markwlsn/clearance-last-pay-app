@@ -1530,110 +1530,148 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- Main Workstation Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <!-- Clearance Requests Board (Directly Under KPI Stats) -->
+      <div id="requestsQueueSection" class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-5 sm:p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-4">
         
-        <!-- Left Pane (4 cols): Master Queue with Search & Status Filter -->
-        <div class="lg:col-span-4 space-y-4">
-          <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-5 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-3.5">
-            
-            <!-- Queue Header & Search -->
-            <div class="flex items-center justify-between">
+        <!-- Queue Header, Search & Filter Bar -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3.5 pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-apple-blue flex items-center justify-center text-sm shadow-sm">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div>
               <div class="flex items-center space-x-2">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                  Clearance Queue
+                <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
+                  Clearance Requests
                 </h3>
-                <span class="w-1.5 h-1.5 rounded-full bg-apple-blue"></span>
-              </div>
-              <div class="flex items-center space-x-1.5">
-                <button onclick="batchApproveCleanDossiers()" id="batchSignBtn" class="px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-apple-green text-[10px] font-bold border border-emerald-500/20 transition flex items-center space-x-1 shadow-sm active:scale-95" title="Batch sign-off all clean dossiers with 0 AI flags">
-                  <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i>
-                  <span>Fast-Track</span>
-                </button>
-                <span id="queueCount" class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-500">
+                <span id="queueCount" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-bold border border-black/[0.04] dark:border-white/[0.06]">
                   4 dossiers
                 </span>
               </div>
+              <p class="text-[11px] text-neutral-500 dark:text-neutral-400">Click any clearance card below to view its physical hand-off timeline and approver clearance audit</p>
             </div>
+          </div>
 
+          <!-- Controls: Search, Filter Segmented Tabs, Fast-Track Button -->
+          <div class="flex flex-wrap items-center gap-2">
             <!-- Search Box with Apple Style -->
-            <div class="relative">
-              <input type="text" id="queueSearchInput" placeholder="Search employee, ID, branch..." oninput="filterQueue()" class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-neutral-900 rounded-xl pl-8 pr-12 py-2.5 outline-none transition shadow-inner" />
-              <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-neutral-400 text-xs"></i>
-              <span class="absolute right-2.5 top-2.5 text-[10px] font-mono text-neutral-400 px-1.5 py-0.5 rounded bg-neutral-200/50 dark:bg-neutral-700/50">⌘K</span>
+            <div class="relative w-full sm:w-64">
+              <input type="text" id="queueSearchInput" placeholder="Search employee, ID, branch..." oninput="filterQueue()" class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-neutral-900 rounded-xl pl-8 pr-10 py-2 outline-none transition shadow-inner" />
+              <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-neutral-400 text-xs"></i>
+              <span class="absolute right-2 top-2 text-[9px] font-mono text-neutral-400 px-1 py-0.5 rounded bg-neutral-200/50 dark:bg-neutral-700/50">⌘K</span>
             </div>
 
             <!-- Filter Segmented Tabs -->
             <div class="flex items-center p-1 bg-neutral-100 dark:bg-neutral-800/60 rounded-xl text-[11px] font-medium text-neutral-500 space-x-1">
-              <button onclick="setQueueFilter('ALL')" id="filterAll" class="flex-1 py-1.5 rounded-lg font-bold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition">All</button>
-              <button onclick="setQueueFilter('FLAGGED')" id="filterFlagged" class="flex-1 py-1.5 rounded-lg hover:text-neutral-900 dark:hover:text-white transition">Action Needed</button>
-              <button onclick="setQueueFilter('CLEARED')" id="filterCleared" class="flex-1 py-1.5 rounded-lg hover:text-neutral-900 dark:hover:text-white transition">Ready</button>
+              <button onclick="setQueueFilter('ALL')" id="filterAll" class="px-2.5 py-1 rounded-lg font-bold bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition">All</button>
+              <button onclick="setQueueFilter('FLAGGED')" id="filterFlagged" class="px-2.5 py-1 rounded-lg hover:text-neutral-900 dark:hover:text-white transition">Action Needed</button>
+              <button onclick="setQueueFilter('CLEARED')" id="filterCleared" class="px-2.5 py-1 rounded-lg hover:text-neutral-900 dark:hover:text-white transition">Ready</button>
             </div>
 
-            <!-- Queue List -->
-            <div id="dossiersQueue" class="space-y-2.5 max-h-[640px] overflow-y-auto pr-1">
-              <!-- Rendered via JS -->
-            </div>
-
+            <!-- Fast-Track Sign-off -->
+            <button onclick="batchApproveCleanDossiers()" id="batchSignBtn" class="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-apple-green text-xs font-bold border border-emerald-500/20 transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Batch sign-off all clean dossiers with 0 AI flags">
+              <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i>
+              <span>Fast-Track</span>
+            </button>
           </div>
         </div>
 
-        <!-- Right Pane (8 cols): Workstation Details, AI Inspection & Document Viewer -->
-        <div class="lg:col-span-8 space-y-6">
-          
-          <div id="approverActiveCard" class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-7 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] space-y-6 transition">
-            
-            <!-- 1. Hero Dossier Identity Card with Apple Squircle Avatar -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/[0.06] dark:border-white/[0.08] pb-6">
-              <div class="flex items-center space-x-4">
-                <!-- Large Squircle Monogram Avatar -->
-                <div id="apprAvatar" class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 text-white font-bold text-xl flex items-center justify-center shadow-md tracking-tight shrink-0">
-                  JD
-                </div>
-                <div>
-                  <div class="flex items-center space-x-2">
-                    <h3 id="apprEmpName" class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">Juan Dela Cruz</h3>
-                    <span id="apprEmpIdBadge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700">
-                      EMP-94812
-                    </span>
-                  </div>
-                  <p id="apprDeptRole" class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                    Information Technology · Senior Specialist
-                  </p>
-                  <p id="apprSubText" class="text-[11px] text-neutral-400 mt-0.5">
-                    Taguig HQ · Separation Date: 2026-08-31 (Resignation)
-                  </p>
-                </div>
-              </div>
+        <!-- Clearance Requests Cards Grid (Responsive 4 columns on desktop, matching user layout) -->
+        <div id="dossiersQueue" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <!-- Rendered via JS -->
+        </div>
 
-              <!-- Top Right Status Badge & Quick Actions -->
-              <div class="flex flex-col items-start sm:items-end space-y-2">
+      </div>
+
+      <!-- Approver Workstation & Timeline Desk (Stacked Directly Below the Requests Queue) -->
+      <div id="approverActiveCardContainer" class="w-full">
+        <div id="approverActiveCard" class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-7 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] space-y-6 transition">
+          
+          <!-- 1. Hero Dossier Identity Card with Apple Squircle Avatar -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/[0.06] dark:border-white/[0.08] pb-6">
+            <div class="flex items-center space-x-4">
+              <!-- Large Squircle Monogram Avatar -->
+              <div id="apprAvatar" class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 text-white font-bold text-xl flex items-center justify-center shadow-md tracking-tight shrink-0">
+                JD
+              </div>
+              <div>
                 <div class="flex items-center space-x-2">
-                  <span id="apprStatusBadge" class="text-xs font-bold px-3 py-1.5 rounded-full bg-red-500/10 text-apple-red border border-red-500/20 flex items-center space-x-1.5">
-                    <span id="apprPulseDot" class="w-2 h-2 rounded-full bg-apple-red apple-pulse-red"></span>
-                    <span id="apprStatusText">FLAGGED FOR REVIEW</span>
+                  <h3 id="apprEmpName" class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">Juan Dela Cruz</h3>
+                  <span id="apprEmpIdBadge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700">
+                    EMP-94812
                   </span>
                 </div>
-                
-                <div class="flex items-center space-x-2">
-                  <button onclick="pingLarkEmployee()" class="px-3 py-1 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-lark-blue text-xs font-semibold border border-blue-500/20 transition flex items-center space-x-1.5" title="Direct Lark Bot Ping to Employee">
-                    <i class="fa-brands fa-rocketchat text-xs"></i>
-                    <span>Ping on Lark</span>
-                  </button>
-                  <span id="apprSlaText" class="text-[11px] font-medium text-neutral-400">
-                    <i class="fa-regular fa-clock mr-1"></i> Submitted 3 days ago
-                  </span>
-                </div>
+                <p id="apprDeptRole" class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                  Information Technology · Senior Specialist
+                </p>
+                <p id="apprSubText" class="text-[11px] text-neutral-400 mt-0.5">
+                  Taguig HQ · Separation Date: 2026-08-31 (Resignation)
+                </p>
               </div>
             </div>
 
-            <!-- 2. Strict Linear Clearance Workflow Stepper -->
-            <div class="p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3.5">
-              <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-400">
-                <div class="flex items-center space-x-2">
-                  <i class="fa-solid fa-timeline text-apple-blue"></i>
-                  <span>Linear Clearance Pipeline</span>
-                  <span class="text-[9px] px-2 py-0.5 rounded-full bg-blue-500/10 text-apple-blue font-mono lowercase">stage <span id="linearCurrentStepNum">1</span> of 4</span>
+            <!-- Top Right Status Badge & Quick Actions -->
+            <div class="flex flex-col items-start sm:items-end space-y-2">
+              <div class="flex items-center space-x-2">
+                <span id="apprStatusBadge" class="text-xs font-bold px-3 py-1.5 rounded-full bg-red-500/10 text-apple-red border border-red-500/20 flex items-center space-x-1.5">
+                  <span id="apprPulseDot" class="w-2 h-2 rounded-full bg-apple-red apple-pulse-red"></span>
+                  <span id="apprStatusText">FLAGGED FOR REVIEW</span>
+                </span>
+              </div>
+              
+              <div class="flex items-center space-x-2">
+                <button onclick="document.getElementById('timelineMilestoneSection').scrollIntoView({behavior:'smooth', block:'start'})" class="px-3 py-1 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-xs font-semibold border border-black/[0.05] dark:border-white/[0.08] transition flex items-center space-x-1.5" title="Jump to Hand-Off Milestone Activity Timeline">
+                  <i class="fa-solid fa-timeline text-apple-blue text-xs"></i>
+                  <span>Timeline</span>
+                </button>
+                <button onclick="pingLarkEmployee()" class="px-3 py-1 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-lark-blue text-xs font-semibold border border-blue-500/20 transition flex items-center space-x-1.5" title="Direct Lark Bot Ping to Employee">
+                  <i class="fa-brands fa-rocketchat text-xs"></i>
+                  <span>Ping on Lark</span>
+                </button>
+                <span id="apprSlaText" class="text-[11px] font-medium text-neutral-400">
+                  <i class="fa-regular fa-clock mr-1"></i> Submitted 3 days ago
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Strict Linear Clearance Workflow Stepper -->
+          <div class="p-5 rounded-2xl bg-neutral-50/80 dark:bg-neutral-800/40 border border-black/[0.04] dark:border-white/[0.06] space-y-3.5">
+            <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+              <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-timeline text-apple-blue"></i>
+                <span>Linear Clearance Pipeline</span>
+                <span class="text-[9px] px-2 py-0.5 rounded-full bg-blue-500/10 text-apple-blue font-mono lowercase">stage <span id="linearCurrentStepNum">1</span> of 4</span>
+              </div>
+              <div class="text-[10px] text-neutral-400 lowercase font-normal">
+                <i class="fa-solid fa-arrow-right-long mr-1 text-apple-blue"></i> sequential milestone gate
+              </div>
+            </div>
+
+            <!-- Linear 4-Stage Stepper Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs" id="linearStepperContainer">
+              
+              <!-- Stage 1: Asset Hand-Off & Turnover -->
+              <div id="linStage1Box" class="p-3.5 rounded-2xl border transition space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
+                    <span id="linStage1Num" class="w-5 h-5 rounded-full bg-blue-500/15 text-apple-blue font-mono text-[10px] flex items-center justify-center font-bold">1</span>
+                    <span>Asset Hand-Off</span>
+                  </span>
+                  <span id="linStage1Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">IN REVIEW</span>
+                </div>
+                <div class="text-[10px] text-neutral-500 dark:text-neutral-400" id="linStage1Detail">IT Laptop & Locker Surrender</div>
+                <div class="text-[9px] font-mono text-neutral-400 truncate" id="linStage1Sub">Alex Tan · Elena Cruz</div>
+              </div>
+
+              <!-- Stage 2: Finance & Payroll Audit -->
+              <div id="linStage2Box" class="p-3.5 rounded-2xl border transition space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold flex items-center space-x-1.5 text-neutral-900 dark:text-white">
+                    <span id="linStage2Num" class="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-500 font-mono text-[10px] flex items-center justify-center font-bold">2</span>
+                    <span>Finance & Payroll</span>
+                  </span>
+                  <span id="linStage2Badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full">PENDING</span>
                 </div>
                 <div class="text-[10px] text-neutral-400 lowercase font-normal">
                   <i class="fa-solid fa-arrow-right-long mr-1 text-apple-blue"></i> sequential milestone gate
