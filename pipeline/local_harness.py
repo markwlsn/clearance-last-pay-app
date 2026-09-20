@@ -2344,24 +2344,146 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       }
     }
 
-    async function openLarkHuddle() {
+    async function postTransactionComment() {
       if (!activeDossier) return;
+      const input = document.getElementById('transactionCommentInput');
+      const text = input ? input.value.trim() : '';
+      if (!text) return;
+
+      const btn = document.getElementById('btnPostTransactionComment');
+      if (btn) btn.disabled = true;
+
+      const signerName = currentApproverRole === 'IT_APPROVER' ? 'Alex Tan (IT Lead)' :
+                         currentApproverRole === 'FINANCE_APPROVER' ? 'Roberto Ong (Finance Lead)' :
+                         currentApproverRole === 'HR_APPROVER' ? 'Grace Diaz (HR Operations)' : 'Elena Cruz (Facilities Lead)';
+
       try {
-        const res = await fetch('/api/approvals/huddle', {
+        const res = await fetch('/api/approvals/transaction-comment', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
             dossier_id: activeDossier.dossier_id,
-            employee_name: activeDossier.employee_name,
-            sender_role: currentApproverRole,
-            topic: `Resolve clearance flags: ${activeDossier.flags_summary && activeDossier.flags_summary.length ? activeDossier.flags_summary.join(', ') : 'Standard Final Pay Handover'}`
+            author: signerName,
+            role: currentApproverRole,
+            message: text
           })
         });
         const data = await res.json();
-        showDynamicToast("Lark Huddle Room Active", `Group chat created with ${activeDossier.employee_name}, Dept Head & HR.`, "info");
+        if (data.status === 'SUCCESS') {
+          activeDossier.comments = data.comments;
+          renderTransactionComments(activeDossier);
+          if (input) input.value = '';
+          showDynamicToast("Note Posted", `Transaction remark published to ${activeDossier.dossier_id}.`, "info");
+        }
       } catch (err) {
-        showDynamicToast("Huddle Failed", err.message, "error");
+        showDynamicToast("Post Failed", err.message, "error");
+      } finally {
+        if (btn) btn.disabled = false;
       }
+    }
+
+    function renderTransactionComments(d) {
+      const container = document.getElementById('transactionCommentsList');
+      if (!container) return;
+
+      const comments = d.comments || [];
+      if (!comments.length) {
+        container.innerHTML = `
+          <div class="text-center py-6 text-neutral-400 text-xs">
+            <i class="fa-solid fa-comments text-neutral-300 dark:text-neutral-600 text-xl mb-1.5 block"></i>
+            <span>No transaction remarks posted yet. Be the first to leave a transparent audit note.</span>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = comments.map(c => {
+        const roleLabel = c.role === 'IT_APPROVER' ? 'IT Lead' :
+                          c.role === 'FINANCE_APPROVER' ? 'Finance Lead' :
+                          c.role === 'HR_APPROVER' ? 'HR Operations' :
+                          c.role === 'ADMIN_APPROVER' ? 'Facilities Lead' : 'Employee';
+        
+        let roleBadgeClass = "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300";
+        if (c.role === 'IT_APPROVER') roleBadgeClass = "bg-blue-500/10 text-apple-blue";
+        if (c.role === 'FINANCE_APPROVER') roleBadgeClass = "bg-emerald-500/10 text-apple-green";
+        if (c.role === 'HR_APPROVER') roleBadgeClass = "bg-purple-500/10 text-apple-purple";
+        if (c.role === 'ADMIN_APPROVER') roleBadgeClass = "bg-amber-500/10 text-apple-amber";
+
+        const timeStr = c.timestamp ? new Date(c.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', month:'short', day:'numeric'}) : 'Recently';
+
+        return `
+          <div class="p-3 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06] shadow-sm space-y-1.5 transition">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-bold text-neutral-900 dark:text-white">${c.author}</span>
+                <span class="text-[9px] font-bold px-2 py-0.2 rounded-full ${roleBadgeClass}">${roleLabel}</span>
+              </div>
+              <span class="text-[10px] text-neutral-400 font-mono">${timeStr}</span>
+            </div>
+            <p class="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed font-sans">${c.text}</p>
+          </div>
+        `;
+      }).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function renderTimeline(d) {
+      const container = document.getElementById('dossierMilestoneTimeline');
+      const badge = document.getElementById('timelineCountBadge');
+      if (!container) return;
+
+      const timeline = d.timeline || [];
+      if (badge) badge.textContent = `${timeline.length} Milestones`;
+
+      if (!timeline.length) {
+        container.innerHTML = `<div class="text-xs text-neutral-400 py-3 text-center">No turnover milestones recorded yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="relative pl-6 space-y-3.5 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200 dark:before:bg-neutral-700">
+          ${timeline.map((item) => {
+            const isCompleted = item.status === 'COMPLETED';
+            const isInProgress = item.status === 'IN_PROGRESS';
+            
+            let dotClass = "bg-neutral-300 dark:bg-neutral-600 text-neutral-500 ring-4 ring-white dark:ring-neutral-800";
+            let statusBadge = `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 uppercase">Upcoming</span>`;
+            
+            if (isCompleted) {
+              dotClass = "bg-apple-green text-white ring-4 ring-emerald-500/20";
+              statusBadge = `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/15 text-apple-green uppercase">Completed ✓</span>`;
+            } else if (isInProgress) {
+              dotClass = "bg-apple-blue text-white ring-4 ring-blue-500/20 apple-pulse-blue";
+              statusBadge = `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-500/15 text-apple-blue uppercase">In Progress</span>`;
+            }
+
+            return `
+              <div class="relative group">
+                <!-- Circular Icon Pin on the Spine -->
+                <div class="absolute -left-6 top-1 w-5 h-5 rounded-full ${dotClass} flex items-center justify-center text-[9px] shadow-sm transition">
+                  <i class="fa-solid ${item.icon || 'fa-circle-check'}"></i>
+                </div>
+
+                <!-- Milestone Content Squircle -->
+                <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-1 transition hover:border-black/[0.1] dark:hover:border-white/[0.1]">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-neutral-900 dark:text-white">${item.milestone}</span>
+                    ${statusBadge}
+                  </div>
+                  <div class="text-[10px] text-neutral-400 flex items-center space-x-2">
+                    <span class="font-medium text-neutral-600 dark:text-neutral-300">${item.actor}</span>
+                    <span>•</span>
+                    <span>${item.date}</span>
+                  </div>
+                  <div class="text-[11px] text-neutral-700 dark:text-neutral-300 pt-0.5 leading-relaxed font-sans">
+                    ${item.details}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
     }
 
     async function escalateTicket() {
@@ -2848,6 +2970,12 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       // Progression Steps
       updateProgressPipeline(d);
 
+      // Render Hand-off Milestone Activity Timeline
+      renderTimeline(d);
+
+      // Render Centralized Transaction Discussion
+      renderTransactionComments(d);
+
       // Render Role-Specific Work Desk
       renderRoleWorkDesk(currentApproverRole, d);
 
@@ -2859,168 +2987,102 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     }
 
     function updateProgressPipeline(d) {
-      // 1. Update Parallel Matrix Nodes
-      const nodes = d.nodes || {
-        "IT": {"name": "IT Clearance", "signer": "Alex Tan", "status": "PENDING", "summary": "Awaiting IT check"},
-        "ADMIN": {"name": "Facilities & Lockers", "signer": "Elena Cruz", "status": "CLEARED", "summary": "Locker cleared"},
-        "FINANCE": {"name": "Finance & Payroll", "signer": "Roberto Ong", "status": "PENDING", "summary": "Auditing payroll ledger"},
-        "HR": {"name": "HR Final Release", "signer": "Grace Diaz", "status": "LOCKED", "summary": "Requires 3 depts"}
+      const step = d.stage_step || 1;
+      const stepNumEl = document.getElementById('linearCurrentStepNum');
+      if (stepNumEl) stepNumEl.textContent = step;
+
+      const s1Box = document.getElementById('linStage1Box');
+      const s1Badge = document.getElementById('linStage1Badge');
+      const s1Num = document.getElementById('linStage1Num');
+
+      const s2Box = document.getElementById('linStage2Box');
+      const s2Badge = document.getElementById('linStage2Badge');
+      const s2Num = document.getElementById('linStage2Num');
+
+      const s3Box = document.getElementById('linStage3Box');
+      const s3Badge = document.getElementById('linStage3Badge');
+      const s3Num = document.getElementById('linStage3Num');
+
+      const s4Box = document.getElementById('linStage4Box');
+      const s4Badge = document.getElementById('linStage4Badge');
+      const s4Num = document.getElementById('linStage4Num');
+
+      const isApproved = d.overall_status === 'APPROVED' || d.overall_status === 'CLEARED';
+
+      const styleCompleted = (box, badge, num, text = "CLEARED ✓") => {
+        if (!box) return;
+        box.className = "p-3.5 rounded-2xl bg-emerald-500/[0.05] dark:bg-emerald-950/20 border border-emerald-500/20 transition space-y-2 shadow-sm";
+        if (badge) {
+          badge.textContent = text;
+          badge.className = "text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-apple-green";
+        }
+        if (num) num.className = "w-5 h-5 rounded-full bg-apple-green text-white font-mono text-[10px] flex items-center justify-center font-bold";
       };
 
-      function styleNode(key, boxId, badgeId, signerId, summaryId, btnId) {
-        const node = nodes[key] || {status: "PENDING", signer: "", summary: ""};
-        const badge = document.getElementById(badgeId);
-        const signer = document.getElementById(signerId);
-        const summary = document.getElementById(summaryId);
-        const btn = document.getElementById(btnId);
-        const box = document.getElementById(boxId);
-
-        if (signer) signer.textContent = `Signer: ${node.signer || 'Unassigned'}`;
-        if (summary) summary.textContent = node.summary || (node.status === 'CLEARED' ? 'Verified ✓' : 'In review');
-
-        if (node.status === 'CLEARED') {
+      const styleActive = (box, badge, num, text = "ACTIVE", isFlagged = false) => {
+        if (!box) return;
+        if (isFlagged) {
+          box.className = "p-3.5 rounded-2xl bg-red-500/[0.05] dark:bg-red-950/20 border border-red-500/30 transition space-y-2 shadow-sm";
           if (badge) {
-            badge.textContent = 'CLEARED ✓';
-            badge.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-apple-green';
+            badge.textContent = "ACTION NEEDED";
+            badge.className = "text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-500/15 text-apple-red";
           }
-          if (box) box.className = 'p-3.5 rounded-2xl bg-emerald-500/[0.04] dark:bg-emerald-950/20 border border-emerald-500/20 shadow-sm space-y-2 transition';
-          if (btn) {
-            btn.innerHTML = '<i class="fa-solid fa-check mr-1 text-[9px]"></i><span>Cleared ✓</span>';
-            btn.className = 'w-full py-1.5 rounded-xl bg-emerald-500/10 text-apple-green text-[10px] font-bold transition flex items-center justify-center space-x-1 cursor-default';
-            btn.disabled = true;
-          }
-        } else if (node.status === 'FLAGGED') {
-          if (badge) {
-            badge.textContent = 'FLAGGED';
-            badge.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-500/10 text-apple-red';
-          }
-          if (box) box.className = 'p-3.5 rounded-2xl bg-red-500/[0.04] dark:bg-red-950/20 border border-red-500/20 shadow-sm space-y-2 transition';
-          if (btn) {
-            btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1 text-[9px]"></i><span>Sign & Override</span>';
-            btn.className = 'w-full py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-apple-red text-[10px] font-bold transition flex items-center justify-center space-x-1';
-            btn.disabled = false;
-          }
+          if (num) num.className = "w-5 h-5 rounded-full bg-apple-red text-white font-mono text-[10px] flex items-center justify-center font-bold";
         } else {
+          box.className = "p-3.5 rounded-2xl bg-blue-500/[0.05] dark:bg-blue-950/20 border border-blue-500/30 transition space-y-2 shadow-sm";
           if (badge) {
-            badge.textContent = 'PENDING';
-            badge.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-apple-amber';
+            badge.textContent = text;
+            badge.className = "text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-apple-blue animate-pulse";
           }
-          if (box) box.className = 'p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-2 transition';
-          if (btn) {
-            btn.innerHTML = '<i class="fa-solid fa-pen-nib mr-1 text-[9px]"></i><span>Sign ' + key + ' Node</span>';
-            btn.className = 'w-full py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-[10px] font-bold transition flex items-center justify-center space-x-1';
-            btn.disabled = false;
-          }
+          if (num) num.className = "w-5 h-5 rounded-full bg-apple-blue text-white font-mono text-[10px] flex items-center justify-center font-bold";
         }
-      }
+      };
 
-      styleNode('IT', 'pNodeBoxIT', 'pNodeBadgeIT', 'pNodeSignerIT', 'pNodeSummaryIT', 'btnSignNodeIT');
-      styleNode('ADMIN', 'pNodeBoxAdmin', 'pNodeBadgeAdmin', 'pNodeSignerAdmin', 'pNodeSummaryAdmin', 'btnSignNodeAdmin');
-      styleNode('FINANCE', 'pNodeBoxFinance', 'pNodeBadgeFinance', 'pNodeSignerFinance', 'pNodeSummaryFinance', 'btnSignNodeFinance');
-
-      // Check HR Node Convergence
-      const itClear = nodes.IT && nodes.IT.status === 'CLEARED';
-      const adminClear = nodes.ADMIN && nodes.ADMIN.status === 'CLEARED';
-      const finClear = nodes.FINANCE && nodes.FINANCE.status === 'CLEARED';
-      const hrNode = nodes.HR || {status: "LOCKED"};
-
-      let clearedCount = (itClear ? 1 : 0) + (adminClear ? 1 : 0) + (finClear ? 1 : 0);
-      const allDeptsClear = clearedCount === 3;
-
-      const badgeHR = document.getElementById('pNodeBadgeHR');
-      const signerHR = document.getElementById('pNodeSignerHR');
-      const summaryHR = document.getElementById('pNodeSummaryHR');
-      const btnHR = document.getElementById('btnSignNodeHR');
-      const boxHR = document.getElementById('pNodeBoxHR');
-
-      if (signerHR) signerHR.textContent = `Signer: Grace Diaz`;
-
-      if (hrNode.status === 'CLEARED' || d.overall_status === 'APPROVED') {
-        if (badgeHR) {
-          badgeHR.textContent = 'DISBURSED ✓';
-          badgeHR.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-apple-green';
+      const stylePending = (box, badge, num, text = "PENDING") => {
+        if (!box) return;
+        box.className = "p-3.5 rounded-2xl bg-neutral-100/50 dark:bg-neutral-900/50 border border-black/[0.05] dark:border-white/[0.06] transition space-y-2 opacity-60";
+        if (badge) {
+          badge.textContent = text;
+          badge.className = "text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 text-neutral-500";
         }
-        if (summaryHR) summaryHR.textContent = 'Final pay sent, COE released';
-        if (boxHR) boxHR.className = 'p-3.5 rounded-2xl bg-emerald-500/[0.06] dark:bg-emerald-950/20 border border-emerald-500/30 shadow-sm space-y-2 transition';
-        if (btnHR) {
-          btnHR.innerHTML = '<i class="fa-solid fa-circle-check mr-1 text-[9px]"></i><span>Release Complete</span>';
-          btnHR.className = 'w-full py-1.5 rounded-xl bg-emerald-500/15 text-apple-green text-[10px] font-bold cursor-default flex items-center justify-center space-x-1';
-          btnHR.disabled = true;
-        }
-      } else if (allDeptsClear) {
-        if (badgeHR) {
-          badgeHR.textContent = '🔓 READY';
-          badgeHR.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-lark-blue animate-pulse';
-        }
-        if (summaryHR) summaryHR.textContent = 'All 3 parallel nodes cleared!';
-        if (boxHR) boxHR.className = 'p-3.5 rounded-2xl bg-blue-500/[0.04] dark:bg-blue-950/20 border border-blue-500/30 shadow-sm space-y-2 transition';
-        if (btnHR) {
-          btnHR.innerHTML = '<i class="fa-solid fa-signature mr-1 text-[9px]"></i><span>Disburse Final Pay</span>';
-          btnHR.className = 'w-full py-1.5 rounded-xl bg-apple-green hover:bg-emerald-600 text-white text-[10px] font-bold shadow-sm transition flex items-center justify-center space-x-1';
-          btnHR.disabled = false;
-        }
+        if (num) num.className = "w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-500 font-mono text-[10px] flex items-center justify-center font-bold";
+      };
+
+      // Stage 1: Asset Hand-off
+      if (step > 1 || isApproved) {
+        styleCompleted(s1Box, s1Badge, s1Num);
       } else {
-        if (badgeHR) {
-          badgeHR.textContent = `🔒 ${clearedCount}/3 CLEARED`;
-          badgeHR.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-200/80 dark:bg-neutral-800 text-neutral-500 font-mono';
-        }
-        if (summaryHR) summaryHR.textContent = `Waiting on ${!itClear ? 'IT ' : ''}${!adminClear ? 'Admin ' : ''}${!finClear ? 'Finance' : ''}`;
-        if (boxHR) boxHR.className = 'p-3.5 rounded-2xl bg-neutral-100/50 dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.05] shadow-sm space-y-2 opacity-80';
-        if (btnHR) {
-          btnHR.innerHTML = '<i class="fa-solid fa-lock mr-1 text-[9px]"></i><span>Release Final Pay</span>';
-          btnHR.className = 'w-full py-1.5 rounded-xl bg-neutral-200/60 dark:bg-neutral-800 text-neutral-400 text-[10px] font-bold cursor-not-allowed flex items-center justify-center space-x-1';
-          btnHR.disabled = true;
-        }
+        const hasS1Flag = d.flags_summary && (d.flags_summary.includes("FLAG_ACCOUNTABILITY_NOTED") || d.flags_summary.includes("FLAG_MISSING_FIELD"));
+        styleActive(s1Box, s1Badge, s1Num, "TURNOVER", hasS1Flag);
       }
 
-      // 2. Also update Sequential Boxes (for fallback view)
-      const step = d.stage_step || 1;
-      const s1 = document.getElementById('step1Box');
-      const s2 = document.getElementById('step2Box');
-      const s3 = document.getElementById('step3Box');
-      const s4 = document.getElementById('step4Box');
-      const s1Status = document.getElementById('step1Status');
-      const s2Status = document.getElementById('step2Status');
-      const s3Status = document.getElementById('step3Status');
-      const s4Status = document.getElementById('step4Status');
+      // Stage 2: Finance & Payroll
+      if (step > 2 || isApproved) {
+        styleCompleted(s2Box, s2Badge, s2Num);
+      } else if (step === 2) {
+        const hasS2Flag = d.flags_summary && d.flags_summary.includes("FLAG_AMOUNT_MISMATCH");
+        styleActive(s2Box, s2Badge, s2Num, "PAYROLL AUDIT", hasS2Flag);
+      } else {
+        stylePending(s2Box, s2Badge, s2Num);
+      }
 
-      const baseInactive = "p-3 rounded-xl border border-black/[0.05] dark:border-white/[0.08] bg-white dark:bg-neutral-800 text-neutral-400 transition";
-      const baseActive = "p-3 rounded-xl border border-lark-blue bg-blue-50/60 dark:bg-blue-950/30 text-lark-blue font-semibold transition";
-      const baseCleared = "p-3 rounded-xl border border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/20 text-apple-green font-semibold transition";
+      // Stage 3: Quit Claim & Bank
+      if (step > 3 || isApproved) {
+        styleCompleted(s3Box, s3Badge, s3Num);
+      } else if (step === 3) {
+        const hasS3Flag = d.flags_summary && d.flags_summary.includes("FLAG_FORMAT_MISMATCH");
+        styleActive(s3Box, s3Badge, s3Num, "VERIFICATION", hasS3Flag);
+      } else {
+        stylePending(s3Box, s3Badge, s3Num);
+      }
 
-      if (s1 && s2 && s3 && s4) {
-        s1.className = baseInactive;
-        s2.className = baseInactive;
-        s3.className = baseInactive;
-        s4.className = baseInactive;
-
-        if (d.ai_flags_count > 0 && d.flags_summary && d.flags_summary.includes("FLAG_ACCOUNTABILITY_NOTED")) {
-          s1.className = "p-3 rounded-xl border border-red-500/30 bg-red-50/50 dark:bg-red-950/20 text-apple-red font-semibold transition";
-          if (s1Status) s1Status.textContent = "IT Hold";
-        } else {
-          s1.className = baseCleared;
-          if (s1Status) s1Status.textContent = "Cleared ✓";
-        }
-
-        if (step >= 2) {
-          if (d.flags_summary && d.flags_summary.includes("FLAG_AMOUNT_MISMATCH")) {
-            s2.className = "p-3 rounded-xl border border-red-500/30 bg-red-50/50 dark:bg-red-950/20 text-apple-red font-semibold transition";
-            if (s2Status) s2Status.textContent = "Disparity";
-          } else {
-            s2.className = step > 2 ? baseCleared : baseActive;
-            if (s2Status) s2Status.textContent = step > 2 ? "Audited ✓" : "In Review";
-          }
-        }
-
-        if (step >= 3) {
-          s3.className = step > 3 ? baseCleared : baseActive;
-          if (s3Status) s3Status.textContent = step > 3 ? "Signed ✓" : "Reviewing";
-        }
-
-        if (step >= 4) {
-          s4.className = d.overall_status === 'APPROVED' ? baseCleared : baseActive;
-          if (s4Status) s4Status.textContent = d.overall_status === 'APPROVED' ? "Released ✓" : "Disbursement";
-        }
+      // Stage 4: HR Final Release
+      if (isApproved) {
+        styleCompleted(s4Box, s4Badge, s4Num, "RELEASED ✓");
+      } else if (step === 4) {
+        styleActive(s4Box, s4Badge, s4Num, "FINAL RELEASE");
+      } else {
+        stylePending(s4Box, s4Badge, s4Num, "LOCKED");
       }
     }
 
