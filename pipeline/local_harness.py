@@ -1857,10 +1857,22 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                     </p>
                   </div>
                 </div>
-                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-apple-green flex items-center space-x-1">
-                  <i class="fa-solid fa-shield-check text-[9px]"></i>
-                  <span>Zero Silos · Transparent Audit</span>
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-apple-blue border border-blue-500/20 flex items-center space-x-1 shadow-sm self-start sm:self-center">
+                  <i class="fa-solid fa-lock text-[9px]"></i>
+                  <span>Requester & Approvers Only</span>
                 </span>
+              </div>
+
+              <!-- Authorized Access Roster for this Transaction -->
+              <div class="px-3.5 py-2 rounded-xl bg-neutral-100/70 dark:bg-neutral-800/60 border border-black/[0.04] dark:border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px]">
+                <div class="flex items-center space-x-1.5 text-neutral-500 dark:text-neutral-400 shrink-0">
+                  <i class="fa-solid fa-user-shield text-apple-blue text-xs"></i>
+                  <span class="font-semibold text-[10px] uppercase tracking-wider">Access Scope:</span>
+                  <span class="text-neutral-700 dark:text-neutral-300 font-medium text-[10px]">1 Requester + 4 Assigned Department Heads</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-1.5" id="authorizedParticipantsBadges">
+                  <!-- Injected via JS -->
+                </div>
               </div>
 
               <!-- Discussion Messages Stream -->
@@ -1868,13 +1880,28 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                 <!-- Rendered dynamically via renderTransactionComments(d) -->
               </div>
 
-              <!-- Add Comment Input Box -->
-              <div class="pt-2 border-t border-black/[0.05] dark:border-white/[0.06] flex items-center space-x-2">
-                <input type="text" id="transactionCommentInput" placeholder="Add a transparent update, turnover note, or audit override for this transaction..." class="flex-1 text-xs bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 border border-black/[0.08] dark:border-white/[0.1] rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-apple-blue transition" onkeydown="if(event.key==='Enter') postTransactionComment()" />
-                <button onclick="postTransactionComment()" id="btnPostTransactionComment" class="px-4 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold rounded-xl shadow-sm hover:opacity-90 active:scale-95 transition flex items-center space-x-1.5 shrink-0">
-                  <i class="fa-solid fa-paper-plane text-[10px]"></i>
-                  <span>Post Note</span>
-                </button>
+              <!-- Add Comment Input Box (Scoped: Choose Requester or Approver sender) -->
+              <div class="pt-2.5 border-t border-black/[0.05] dark:border-white/[0.06] space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">Post note as:</span>
+                    <select id="commentSenderRoleSelect" onchange="onCommentSenderChanged()" class="text-xs font-semibold bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 border border-black/[0.08] dark:border-white/[0.1] rounded-xl px-2.5 py-1 focus:outline-none focus:ring-2 focus:ring-apple-blue shadow-sm cursor-pointer transition">
+                      <!-- Populated dynamically via JS -->
+                    </select>
+                  </div>
+                  <div class="text-[10px] text-neutral-400 font-mono flex items-center space-x-1">
+                    <i class="fa-solid fa-shield-check text-apple-green text-[9px]"></i>
+                    <span>Internal Clearance Thread · Zero Public Visibility</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                  <input type="text" id="transactionCommentInput" placeholder="Add a confidential note or reply for this transaction..." class="flex-1 text-xs bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 border border-black/[0.08] dark:border-white/[0.1] rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-apple-blue transition shadow-inner" onkeydown="if(event.key==='Enter') postTransactionComment()" />
+                  <button onclick="postTransactionComment()" id="btnPostTransactionComment" class="px-4 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold rounded-xl shadow-sm hover:opacity-90 active:scale-95 transition flex items-center space-x-1.5 shrink-0">
+                    <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                    <span>Post Note</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1946,8 +1973,19 @@ HTML_DASHBOARD = """<!DOCTYPE html>
                 </div>
               </div>
 
+              <!-- Requester Perspective Notice Banner -->
+              <div id="requesterNoticeBanner" class="hidden p-4 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-xs text-neutral-700 dark:text-neutral-300 space-y-1.5 shadow-sm">
+                <div class="font-bold text-sky-600 dark:text-sky-400 flex items-center space-x-1.5 text-xs">
+                  <i class="fa-solid fa-user-lock text-sm"></i>
+                  <span>Requesting Employee Perspective</span>
+                </div>
+                <p class="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                  You are viewing this clearance transaction as the requesting employee (<span id="requesterNoticeName" class="font-bold text-neutral-800 dark:text-neutral-200">Juan Dela Cruz</span>). Department clearance sign-offs, deductions, and escrows are executed strictly by designated department leads. You can post notes or queries directly to your approvers in the confidential discussion thread above.
+                </p>
+              </div>
+
               <!-- Action CTAs -->
-              <div class="flex flex-wrap items-center justify-end gap-2.5 pt-1">
+              <div id="approverActionButtonsGroup" class="flex flex-wrap items-center justify-end gap-2.5 pt-1 transition">
                 <button onclick="openSplitEscrowModal()" id="btnSplitEscrowAction" class="hidden px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold rounded-xl shadow-sm active:scale-[0.98] transition flex items-center" title="Execute partial release: disburse undisputed pay now and escrow disputed variance">
                   <i class="fa-solid fa-scale-balanced mr-2"></i> Split Escrow Release
                 </button>
@@ -2411,9 +2449,24 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       const btn = document.getElementById('btnPostTransactionComment');
       if (btn) btn.disabled = true;
 
-      const signerName = currentApproverRole === 'IT_APPROVER' ? 'Alex Tan (IT Lead)' :
-                         currentApproverRole === 'FINANCE_APPROVER' ? 'Roberto Ong (Finance Lead)' :
-                         currentApproverRole === 'HR_APPROVER' ? 'Grace Diaz (HR Operations)' : 'Elena Cruz (Facilities Lead)';
+      const roleSelect = document.getElementById('commentSenderRoleSelect');
+      const chosenRole = roleSelect ? roleSelect.value : currentApproverRole;
+
+      let authorName = '';
+      let senderRole = chosenRole;
+
+      if (chosenRole === 'REQUESTER' || chosenRole === 'EMPLOYEE') {
+        authorName = activeDossier.employee_name;
+        senderRole = 'REQUESTER';
+      } else if (chosenRole === 'IT_APPROVER') {
+        authorName = 'Alex Tan';
+      } else if (chosenRole === 'FINANCE_APPROVER') {
+        authorName = 'Roberto Ong';
+      } else if (chosenRole === 'HR_APPROVER') {
+        authorName = 'Grace Diaz';
+      } else if (chosenRole === 'ADMIN_APPROVER') {
+        authorName = 'Elena Cruz';
+      }
 
       try {
         const res = await fetch('/api/approvals/transaction-comment', {
@@ -2421,8 +2474,8 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
             dossier_id: activeDossier.dossier_id,
-            author: signerName,
-            role: currentApproverRole,
+            author: authorName,
+            role: senderRole,
             message: text
           })
         });
@@ -2431,12 +2484,30 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           activeDossier.comments = data.comments;
           renderTransactionComments(activeDossier);
           if (input) input.value = '';
-          showDynamicToast("Note Posted", `Transaction remark published to ${activeDossier.dossier_id}.`, "info");
+          showDynamicToast("Note Posted", `Confidential transaction remark published for ${activeDossier.employee_name}.`, "info");
         }
       } catch (err) {
         showDynamicToast("Post Failed", err.message, "error");
       } finally {
         if (btn) btn.disabled = false;
+      }
+    }
+
+    function onCommentSenderChanged() {
+      const select = document.getElementById('commentSenderRoleSelect');
+      const input = document.getElementById('transactionCommentInput');
+      if (!select || !input) return;
+      const role = select.value;
+      if (role === 'REQUESTER') {
+        input.placeholder = `Write reply to approvers as ${activeDossier ? activeDossier.employee_name : 'Requester'}...`;
+      } else if (role === 'IT_APPROVER') {
+        input.placeholder = "Write IT clearance update as Alex Tan...";
+      } else if (role === 'FINANCE_APPROVER') {
+        input.placeholder = "Write finance calculation/escrow update as Roberto Ong...";
+      } else if (role === 'HR_APPROVER') {
+        input.placeholder = "Write HR final release/COE update as Grace Diaz...";
+      } else if (role === 'ADMIN_APPROVER') {
+        input.placeholder = "Write facilities/locker update as Elena Cruz...";
       }
     }
 
@@ -2448,15 +2519,17 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       if (!comments.length) {
         container.innerHTML = `
           <div class="text-center py-6 text-neutral-400 text-xs">
-            <i class="fa-solid fa-comments text-neutral-300 dark:text-neutral-600 text-xl mb-1.5 block"></i>
-            <span>No transaction remarks posted yet. Be the first to leave a transparent audit note.</span>
+            <i class="fa-solid fa-lock text-neutral-300 dark:text-neutral-600 text-xl mb-1.5 block"></i>
+            <span>No confidential transaction notes yet. Scoped strictly to ${d.employee_name} & clearance approvers.</span>
           </div>
         `;
         return;
       }
 
       container.innerHTML = comments.map(c => {
-        const roleLabel = c.role === 'IT_APPROVER' ? 'IT Lead' :
+        const isRequester = c.role === 'REQUESTER' || c.role === 'EMPLOYEE';
+        const roleLabel = isRequester ? 'Requester' :
+                          c.role === 'IT_APPROVER' ? 'IT Lead' :
                           c.role === 'FINANCE_APPROVER' ? 'Finance Lead' :
                           c.role === 'HR_APPROVER' ? 'HR Operations' :
                           c.role === 'ADMIN_APPROVER' ? 'Facilities Lead' : 'Employee';

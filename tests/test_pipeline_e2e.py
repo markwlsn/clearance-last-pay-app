@@ -213,6 +213,27 @@ def test_transaction_comments(client):
     assert "20WM-0045PH" in data["comment"]["text"]
     assert len(data["comments"]) >= 1
 
+    # Requester post
+    resp_req = client.post("/api/approvals/transaction-comment", json={
+        "dossier_id": "DOS-2026-001",
+        "author": "Juan Dela Cruz",
+        "role": "REQUESTER",
+        "message": "Acknowledging charger deduction from final pay computation."
+    })
+    assert resp_req.status_code == 200
+    data_req = resp_req.json()
+    assert data_req["status"] == "SUCCESS"
+    assert data_req["comment"]["role"] == "REQUESTER"
+
+    # Unauthorized party rejection (403 Forbidden)
+    resp_unauth = client.post("/api/approvals/transaction-comment", json={
+        "dossier_id": "DOS-2026-001",
+        "author": "Unrelated Employee",
+        "role": "EXTERNAL_STAFF",
+        "message": "Trying to view or post on someone else's clearance."
+    })
+    assert resp_unauth.status_code == 403
+
     # Verify audit log was recorded
     logs_resp = client.get("/api/audit-logs?limit=5")
     assert logs_resp.status_code == 200
