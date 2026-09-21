@@ -409,7 +409,7 @@
           <span class="text-[10px] font-mono text-neutral-400">Auto-Logged</span>
         </div>
 
-        <div id="userTimelineContainer" class="relative pl-6 space-y-6 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200 dark:before:bg-neutral-800">
+        <div id="userTimelineContainer">
           <!-- Timeline items rendered via JS -->
         </div>
       </div>
@@ -616,7 +616,7 @@
           </div>
 
           <div id="apprPanelTimeline" class="hidden space-y-4">
-            <div id="apprTimelineList" class="relative pl-6 space-y-5 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200 dark:before:bg-neutral-800">
+            <div id="apprTimelineList">
               <!-- Timeline items rendered via JS -->
             </div>
           </div>
@@ -1179,6 +1179,151 @@
       return allDossiers.find(d => d.dossier_id === activeUserDossierId) || allDossiers[0];
     }
 
+    function renderAlignedTimeline(timeline) {
+      if (!timeline || !timeline.length) {
+        return '<p class="text-xs text-neutral-400 italic py-4 text-center">No milestone events logged yet.</p>';
+      }
+
+      const cleared = timeline.filter(t => t.status === 'COMPLETED');
+      const pending = timeline.filter(t => t.status !== 'COMPLETED');
+
+      // Sort pending so IN_PROGRESS comes first, then PENDING
+      pending.sort((a, b) => {
+        if (a.status === 'IN_PROGRESS' && b.status !== 'IN_PROGRESS') return -1;
+        if (b.status === 'IN_PROGRESS' && a.status !== 'IN_PROGRESS') return 1;
+        return 0;
+      });
+
+      const clearedHtml = cleared.length ? cleared.map((t, idx) => {
+        const seqLabel = idx === 0 ? '#1 Done First' : `#${idx + 1} Done Next`;
+        return `
+          <div class="relative flex items-start space-x-3 group">
+            <div class="w-6 h-6 rounded-full bg-apple-green text-white flex items-center justify-center text-[10px] shrink-0 -ml-[25px] shadow-sm ring-2 ring-emerald-500/20">
+              <i class="fa-solid fa-check"></i>
+            </div>
+            <div class="flex-1 min-w-0 bg-emerald-50/50 dark:bg-emerald-950/20 p-3.5 rounded-2xl border border-emerald-500/20 text-xs transition">
+              <div class="flex flex-wrap items-center justify-between gap-1.5">
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-neutral-900 dark:text-white text-xs">${t.milestone}</span>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-apple-green border border-emerald-500/30 font-mono">
+                    ${seqLabel}
+                  </span>
+                </div>
+                <span class="text-[10px] font-mono text-neutral-500 dark:text-neutral-400 font-semibold bg-white/60 dark:bg-neutral-800/60 px-2 py-0.5 rounded-md border border-black/[0.04] dark:border-white/[0.04]">${t.date}</span>
+              </div>
+              <p class="text-[11px] text-neutral-600 dark:text-neutral-300 mt-1.5 leading-relaxed">${t.details}</p>
+              <div class="text-[10px] text-neutral-400 mt-1.5 flex items-center space-x-1">
+                <i class="fa-solid fa-user-circle text-[9px]"></i>
+                <span class="font-medium text-neutral-500 dark:text-neutral-400">${t.actor}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('') : `
+        <div class="p-6 rounded-2xl bg-neutral-50 dark:bg-neutral-800/40 border border-black/[0.04] text-center text-xs text-neutral-400 italic">
+          <i class="fa-solid fa-hourglass-start text-sm mb-1 block text-neutral-300"></i>
+          No clearance milestones cleared yet.
+        </div>
+      `;
+
+      const pendingHtml = pending.length ? pending.map((t) => {
+        const isInProg = t.status === 'IN_PROGRESS';
+        const dotClass = isInProg 
+          ? 'bg-apple-blue text-white apple-pulse-blue ring-2 ring-blue-500/30' 
+          : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400';
+        const cardBg = isInProg 
+          ? 'bg-blue-50/60 dark:bg-blue-950/25 border-apple-blue/30 shadow-sm' 
+          : 'bg-neutral-50/80 dark:bg-neutral-800/40 border-black/[0.04]';
+        const badge = isInProg 
+          ? '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-apple-blue border border-blue-500/30 uppercase">⚡ Current Turn</span>' 
+          : '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 border border-black/[0.04] uppercase">⏳ Awaiting Turn</span>';
+
+        return `
+          <div class="relative flex items-start space-x-3 group">
+            <div class="w-6 h-6 rounded-full ${dotClass} flex items-center justify-center text-[10px] shrink-0 -ml-[25px] shadow-sm">
+              <i class="fa-solid ${t.icon || (isInProg ? 'fa-hourglass-half' : 'fa-clock')}"></i>
+            </div>
+            <div class="flex-1 min-w-0 ${cardBg} p-3.5 rounded-2xl border text-xs transition">
+              <div class="flex flex-wrap items-center justify-between gap-1.5">
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-neutral-900 dark:text-white text-xs">${t.milestone}</span>
+                  ${badge}
+                </div>
+                <span class="text-[10px] font-mono text-neutral-400 bg-white/60 dark:bg-neutral-800/60 px-2 py-0.5 rounded-md border border-black/[0.04] dark:border-white/[0.04]">${t.date}</span>
+              </div>
+              <p class="text-[11px] text-neutral-600 dark:text-neutral-300 mt-1.5 leading-relaxed">${t.details}</p>
+              <div class="text-[10px] text-neutral-400 mt-1.5 flex items-center space-x-1">
+                <i class="fa-solid fa-user-circle text-[9px]"></i>
+                <span class="font-medium text-neutral-500 dark:text-neutral-400">${t.actor}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('') : `
+        <div class="p-6 rounded-2xl bg-emerald-500/[0.06] border border-emerald-500/20 text-center space-y-1.5">
+          <div class="w-8 h-8 rounded-full bg-emerald-500/15 text-apple-green flex items-center justify-center text-sm mx-auto shadow-sm">
+            <i class="fa-solid fa-check-double"></i>
+          </div>
+          <div class="text-xs font-bold text-neutral-900 dark:text-white">100% Cleared · Zero Pending</div>
+          <p class="text-[11px] text-neutral-500 dark:text-neutral-400">All requirements and departmental sign-offs completed.</p>
+        </div>
+      `;
+
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          
+          <!-- 1. CLEARED MILESTONES (ALIGNED TOGETHER, WHAT WAS DONE FIRST) -->
+          <div class="bg-white dark:bg-apple-surfaceDark p-4 sm:p-5 rounded-2xl border border-black/[0.05] dark:border-white/[0.06] shadow-sm flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between pb-2.5 border-b border-black/[0.04] dark:border-white/[0.04]">
+                <div class="flex items-center space-x-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-apple-green shadow-sm"></span>
+                  <h5 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
+                    Cleared Milestones
+                  </h5>
+                  <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-emerald-500/15 text-apple-green font-mono">
+                    ${cleared.length} Cleared
+                  </span>
+                </div>
+                <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                  Ordered: Done First ➔ Last
+                </span>
+              </div>
+
+              <div class="relative pl-6 space-y-3 before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-emerald-500/30 pt-1">
+                ${clearedHtml}
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. PENDING & IN-PROGRESS MILESTONES (ALIGNED TOGETHER) -->
+          <div class="bg-white dark:bg-apple-surfaceDark p-4 sm:p-5 rounded-2xl border border-black/[0.05] dark:border-white/[0.06] shadow-sm flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between pb-2.5 border-b border-black/[0.04] dark:border-white/[0.04]">
+                <div class="flex items-center space-x-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-apple-blue shadow-sm"></span>
+                  <h5 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
+                    Pending & In Progress
+                  </h5>
+                  <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-blue-500/15 text-apple-blue font-mono">
+                    ${pending.length} Remaining
+                  </span>
+                </div>
+                <span class="text-[10px] font-semibold text-neutral-500 dark:text-neutral-400">
+                  Awaiting Turn
+                </span>
+              </div>
+
+              <div class="relative pl-6 space-y-3 before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-blue-500/20 pt-1">
+                ${pendingHtml}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
     function renderUserEnd() {
       renderUserAccountDropdown();
       const d = getActiveUserDossier();
@@ -1219,15 +1364,21 @@
         { num: 4, title: 'HR Final Release', desc: 'Disbursement & COE' }
       ];
 
-      const currentStep = d.stage_step || 1;
-      document.getElementById('userWorkflowStepSummary').textContent = currentStep >= 4 && d.category === 'FOR_RELEASE' ? 'All 4 Stages Completed' : `Stage ${currentStep} of 4 in progress`;
+      const stepperBox = document.getElementById('userWorkflowStepper');
+      stepperBox.innerHTML = stages.map(s => {
+        let isDone = false;
+        let isCurrent = false;
 
-      document.getElementById('userWorkflowStepper').innerHTML = stages.map(s => {
-        const isDone = s.num < currentStep || (currentStep === 4 && d.category === 'FOR_RELEASE');
-        const isCurrent = s.num === currentStep && !(currentStep === 4 && d.category === 'FOR_RELEASE');
-        
-        let cardStyle = '';
-        let iconHtml = '';
+        if (d.stage_step > s.num || d.category === 'FOR_RELEASE') {
+          isDone = true;
+        } else if (d.stage_step === s.num) {
+          isCurrent = true;
+        }
+
+        let bg = 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400';
+        let border = 'border-black/[0.04] dark:border-white/[0.06]';
+        let badge = `<span class="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-[10px] flex items-center justify-center font-bold">${s.num}</span>`;
+
         if (isDone) {
           cardStyle = 'bg-emerald-500/[0.08] dark:bg-emerald-950/20 border-emerald-500/30 text-apple-green';
           iconHtml = '<i class="fa-solid fa-circle-check text-apple-green"></i>';
