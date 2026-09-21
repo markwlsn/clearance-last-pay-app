@@ -1545,5 +1545,3 @@ def get_initial_dossiers() -> List[Dict[str, Any]]:
             ]
         }
     ]
-
-# Single whole padding architecture verified
