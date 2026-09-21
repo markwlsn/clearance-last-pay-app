@@ -926,7 +926,8 @@
           <button type="button" onclick="closeNewClearanceModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-red-600 dark:text-red-400 bg-red-50/80 hover:bg-red-100 dark:bg-red-950/30 dark:hover:bg-red-950/50 border border-red-200 dark:border-red-900/40 transition">
             Cancel
           </button>
-          <button type="submit" id="larkSubmitBtn" class="px-5 py-2.5 rounded-xl bg-lark-blue hover:bg-lark-blueHover text-white text-xs font-bold shadow-md transition active:scale-95 flex items-center space-x-1.5">
+          <!-- Minimal Black and White Submit Button -->
+          <button type="submit" id="larkSubmitBtn" class="px-5 py-2.5 rounded-xl bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-bold shadow-md transition active:scale-95 flex items-center space-x-1.5">
             <i class="fa-solid fa-paper-plane text-xs"></i>
             <span>Submit Clearance Request</span>
           </button>
@@ -942,7 +943,7 @@
     <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark max-w-lg w-full rounded-3xl p-6 border border-black/[0.08] dark:border-white/[0.1] shadow-2xl space-y-5">
       <div class="flex items-center justify-between pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-2xl bg-amber-500/15 text-apple-amber flex items-center justify-center text-base shadow-sm">
+          <div class="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-base shadow-sm border border-black/[0.06] dark:border-white/[0.08]">
             <i class="fa-solid fa-scale-balanced"></i>
           </div>
           <div>
@@ -950,14 +951,15 @@
             <p class="text-[11px] text-neutral-400">DOLE Labor Advisory #06 Compliance Safeguard</p>
           </div>
         </div>
-        <button onclick="closeSplitEscrowModal()" class="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 hover:text-neutral-700 dark:hover:text-white flex items-center justify-center transition">
+        <!-- Minimal Apple Red Close Button -->
+        <button onclick="closeSplitEscrowModal()" class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-red-50 text-neutral-400 hover:text-red-600 dark:bg-neutral-800 dark:hover:bg-red-950/40 dark:hover:text-red-400 flex items-center justify-center transition" title="Close">
           <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
 
-      <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-neutral-700 dark:text-neutral-300 space-y-1">
-        <div class="font-bold text-apple-green flex items-center space-x-1.5">
-          <i class="fa-solid fa-shield-check"></i>
+      <div class="p-3.5 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/60 border border-black/[0.06] dark:border-white/[0.08] text-xs text-neutral-700 dark:text-neutral-300 space-y-1">
+        <div class="font-bold text-neutral-900 dark:text-white flex items-center space-x-1.5">
+          <i class="fa-solid fa-shield-halved"></i>
           <span>Zero-Dispute Final Pay Protocol</span>
         </div>
         <p class="text-[11px] text-neutral-600 dark:text-neutral-400">
@@ -971,15 +973,15 @@
             <div class="font-bold text-neutral-800 dark:text-neutral-200">Undisputed Net Pay (Disburse Now)</div>
             <div class="text-[10px] text-neutral-400">Direct credit to employee verified account</div>
           </div>
-          <div class="font-mono text-base font-bold text-apple-green" id="splitModalUndisputed">₱48,500.00</div>
+          <div class="font-mono text-base font-bold text-neutral-900 dark:text-white" id="splitModalUndisputed">₱48,500.00</div>
         </div>
 
         <div class="flex items-center justify-between p-3 rounded-xl bg-neutral-100/80 dark:bg-neutral-800/80 border border-black/[0.04]">
           <div>
             <div class="font-bold text-neutral-800 dark:text-neutral-200">Disputed Hold Amount (Escrowed)</div>
-            <div class="text-[10px] text-apple-red">Held in payroll escrow pending transaction resolution</div>
+            <div class="text-[10px] text-red-600 dark:text-red-400">Held in payroll escrow pending transaction resolution</div>
           </div>
-          <div class="font-mono text-base font-bold text-apple-red" id="splitModalEscrow">₱3,500.00</div>
+          <div class="font-mono text-base font-bold text-red-600 dark:text-red-400" id="splitModalEscrow">₱3,500.00</div>
         </div>
 
         <div class="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-black/[0.04] space-y-1">
@@ -991,10 +993,12 @@
       </div>
 
       <div class="pt-2 flex items-center justify-end space-x-2.5">
-        <button onclick="closeSplitEscrowModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+        <!-- Minimal Apple Red Cancel Button -->
+        <button onclick="closeSplitEscrowModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-red-600 dark:text-red-400 bg-red-50/80 hover:bg-red-100 dark:bg-red-950/30 dark:hover:bg-red-950/50 border border-red-200 dark:border-red-900/40 transition">
           Cancel
         </button>
-        <button onclick="confirmSplitEscrowDisbursement()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-md transition active:scale-95 flex items-center space-x-1.5">
+        <!-- Minimal Black and White Submit Button -->
+        <button onclick="confirmSplitEscrowDisbursement()" class="px-5 py-2.5 rounded-xl bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-bold shadow-md transition active:scale-95 flex items-center space-x-1.5">
           <i class="fa-solid fa-paper-plane text-xs"></i>
           <span>Execute Split Disbursement</span>
         </button>
@@ -1114,8 +1118,8 @@
         vUser.classList.remove('hidden');
         if (indicator) {
           indicator.innerHTML = `
-            <div class="px-3.5 py-1.5 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold text-xs border border-sky-500/20 flex items-center space-x-2">
-              <i class="fa-solid fa-user"></i>
+            <div class="px-3.5 py-1.5 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-bold text-xs border border-black/[0.06] dark:border-white/[0.08] flex items-center space-x-2">
+              <i class="fa-solid fa-user text-neutral-500"></i>
               <span>User End (Employee Clearance)</span>
             </div>
           `;
@@ -1126,8 +1130,8 @@
         vAppr.classList.remove('hidden');
         if (indicator) {
           indicator.innerHTML = `
-            <div class="px-3.5 py-1.5 rounded-2xl bg-emerald-500/10 text-apple-green font-bold text-xs border border-emerald-500/20 flex items-center space-x-2">
-              <i class="fa-solid fa-user-check"></i>
+            <div class="px-3.5 py-1.5 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-bold text-xs border border-black/[0.06] dark:border-white/[0.08] flex items-center space-x-2">
+              <i class="fa-solid fa-user-check text-neutral-500"></i>
               <span>Approver End (Review Desk)</span>
             </div>
           `;
@@ -1138,8 +1142,8 @@
         vAdmin.classList.remove('hidden');
         if (indicator) {
           indicator.innerHTML = `
-            <div class="px-3.5 py-1.5 rounded-2xl bg-purple-500/10 text-apple-purple font-bold text-xs border border-purple-500/20 flex items-center space-x-2">
-              <i class="fa-solid fa-shield-halved"></i>
+            <div class="px-3.5 py-1.5 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-bold text-xs border border-black/[0.06] dark:border-white/[0.08] flex items-center space-x-2">
+              <i class="fa-solid fa-shield-halved text-neutral-500"></i>
               <span>Admin End (Executive Oversight)</span>
             </div>
           `;
@@ -1203,14 +1207,14 @@
         const seqLabel = idx === 0 ? '#1 Done First' : `#${idx + 1} Done Next`;
         return `
           <div class="relative flex items-start space-x-3 group">
-            <div class="w-6 h-6 rounded-full bg-apple-green text-white flex items-center justify-center text-[10px] shrink-0 -ml-[25px] shadow-sm ring-2 ring-emerald-500/20">
+            <div class="w-6 h-6 rounded-full bg-black text-white dark:bg-white dark:text-black flex items-center justify-center text-[10px] shrink-0 -ml-[25px] shadow-sm">
               <i class="fa-solid fa-check"></i>
             </div>
-            <div class="flex-1 min-w-0 bg-emerald-50/50 dark:bg-emerald-950/20 p-3.5 rounded-2xl border border-emerald-500/20 text-xs transition">
+            <div class="flex-1 min-w-0 bg-neutral-50/90 dark:bg-neutral-800/50 p-3.5 rounded-2xl border border-black/[0.05] dark:border-white/[0.06] text-xs transition">
               <div class="flex flex-wrap items-center justify-between gap-1.5">
                 <div class="flex items-center space-x-2">
                   <span class="font-bold text-neutral-900 dark:text-white text-xs">${t.milestone}</span>
-                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-apple-green border border-emerald-500/30 font-mono">
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-200/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-mono">
                     ${seqLabel}
                   </span>
                 </div>
@@ -1234,14 +1238,14 @@
       const pendingHtml = pending.length ? pending.map((t) => {
         const isInProg = t.status === 'IN_PROGRESS';
         const dotClass = isInProg 
-          ? 'bg-apple-blue text-white apple-pulse-blue ring-2 ring-blue-500/30' 
+          ? 'bg-black text-white dark:bg-white dark:text-black ring-2 ring-neutral-300 dark:ring-neutral-600' 
           : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400';
         const cardBg = isInProg 
-          ? 'bg-blue-50/60 dark:bg-blue-950/25 border-apple-blue/30 shadow-sm' 
+          ? 'bg-neutral-100/90 dark:bg-neutral-800/80 border-black/[0.1] dark:border-white/[0.1] shadow-sm' 
           : 'bg-neutral-50/80 dark:bg-neutral-800/40 border-black/[0.04]';
         const badge = isInProg 
-          ? '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-apple-blue border border-blue-500/30 uppercase">⚡ Current Turn</span>' 
-          : '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 border border-black/[0.04] uppercase">⏳ Awaiting Turn</span>';
+          ? '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-black text-white dark:bg-white dark:text-black uppercase shadow-sm">⚡ Current Turn</span>' 
+          : '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-200/60 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 border border-black/[0.04] uppercase">⏳ Awaiting Turn</span>';
 
         return `
           <div class="relative flex items-start space-x-3 group">
@@ -1265,8 +1269,8 @@
           </div>
         `;
       }).join('') : `
-        <div class="p-6 rounded-2xl bg-emerald-500/[0.06] border border-emerald-500/20 text-center space-y-1.5">
-          <div class="w-8 h-8 rounded-full bg-emerald-500/15 text-apple-green flex items-center justify-center text-sm mx-auto shadow-sm">
+        <div class="p-6 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-black/[0.06] dark:border-white/[0.08] text-center space-y-1.5">
+          <div class="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-sm mx-auto shadow-sm">
             <i class="fa-solid fa-check-double"></i>
           </div>
           <div class="text-xs font-bold text-neutral-900 dark:text-white">100% Cleared · Zero Pending</div>
@@ -1282,20 +1286,20 @@
             <div class="space-y-3">
               <div class="flex items-center justify-between pb-2.5 border-b border-black/[0.04] dark:border-white/[0.04]">
                 <div class="flex items-center space-x-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-apple-green shadow-sm"></span>
+                  <span class="w-2 h-2 rounded-full bg-black dark:bg-white shadow-sm"></span>
                   <h5 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
                     Cleared Milestones
                   </h5>
-                  <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-emerald-500/15 text-apple-green font-mono">
+                  <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-mono">
                     ${cleared.length} Cleared
                   </span>
                 </div>
-                <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                <span class="text-[10px] font-semibold text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full border border-black/[0.04]">
                   Ordered: Done First ➔ Last
                 </span>
               </div>
 
-              <div class="relative pl-6 space-y-3 before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-emerald-500/30 pt-1">
+              <div class="relative pl-6 space-y-3 before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-300 dark:before:bg-neutral-700 pt-1">
                 ${clearedHtml}
               </div>
             </div>
@@ -1306,11 +1310,11 @@
             <div class="space-y-3">
               <div class="flex items-center justify-between pb-2.5 border-b border-black/[0.04] dark:border-white/[0.04]">
                 <div class="flex items-center space-x-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-apple-blue shadow-sm"></span>
+                  <span class="w-2 h-2 rounded-full bg-neutral-400 shadow-sm"></span>
                   <h5 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
                     Pending & In Progress
                   </h5>
-                  <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-blue-500/15 text-apple-blue font-mono">
+                  <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-mono">
                     ${pending.length} Remaining
                   </span>
                 </div>
@@ -1319,7 +1323,7 @@
                 </span>
               </div>
 
-              <div class="relative pl-6 space-y-3 before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-blue-500/20 pt-1">
+              <div class="relative pl-6 space-y-3 before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200 dark:before:bg-neutral-800 pt-1">
                 ${pendingHtml}
               </div>
             </div>
@@ -1345,13 +1349,13 @@
 
       let statusBadge = '';
       if (d.category === 'FOR_RELEASE' || d.overall_status === 'CLEARED' || d.overall_status === 'APPROVED') {
-        statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-apple-green uppercase">READY FOR RELEASE</span>';
+        statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 uppercase border border-black/[0.06] dark:border-white/[0.08]">READY FOR RELEASE</span>';
         document.getElementById('userCategoryBadge').textContent = 'All Clearances Signed Off';
       } else if (d.category === 'FOR_REVIEW' || d.overall_status === 'FLAGGED') {
-        statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-500/10 text-apple-red uppercase">UNDER REVIEW</span>';
+        statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50 uppercase">UNDER REVIEW</span>';
         document.getElementById('userCategoryBadge').textContent = 'Action / Discrepancy Under Review';
       } else {
-        statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-apple-amber uppercase">PENDING</span>';
+        statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 uppercase border border-black/[0.04]">PENDING</span>';
         document.getElementById('userCategoryBadge').textContent = 'Pending Standard Turnover';
       }
       document.getElementById('userStatusBadge').outerHTML = `<span id="userStatusBadge">${statusBadge}</span>`;
@@ -1380,18 +1384,18 @@
           isCurrent = true;
         }
 
-        let bg = 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400';
+        let bg = 'bg-neutral-100/60 dark:bg-neutral-800/40 text-neutral-400';
         let border = 'border-black/[0.04] dark:border-white/[0.06]';
         let badge = `<span class="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-[10px] flex items-center justify-center font-bold">${s.num}</span>`;
 
         if (isDone) {
-          bg = 'bg-emerald-500/10 dark:bg-emerald-950/20 text-neutral-800 dark:text-neutral-100';
-          border = 'border-emerald-500/30';
-          badge = `<span class="w-5 h-5 rounded-full bg-apple-green text-white text-[10px] flex items-center justify-center font-bold shadow-sm"><i class="fa-solid fa-check"></i></span>`;
+          bg = 'bg-neutral-100/90 dark:bg-neutral-800/80 text-neutral-900 dark:text-white';
+          border = 'border-black/[0.08] dark:border-white/[0.08]';
+          badge = `<span class="w-5 h-5 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] flex items-center justify-center font-bold shadow-sm"><i class="fa-solid fa-check"></i></span>`;
         } else if (isCurrent) {
-          bg = 'bg-blue-50/80 dark:bg-blue-950/30 text-neutral-900 dark:text-white';
-          border = 'border-apple-blue shadow-sm';
-          badge = `<span class="w-5 h-5 rounded-full bg-apple-blue text-white text-[10px] flex items-center justify-center font-bold apple-pulse-blue shadow-sm">${s.num}</span>`;
+          bg = 'bg-neutral-200/80 dark:bg-neutral-700/80 text-neutral-900 dark:text-white';
+          border = 'border-black dark:border-white shadow-sm';
+          badge = `<span class="w-5 h-5 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] flex items-center justify-center font-bold shadow-sm">${s.num}</span>`;
         }
 
         return `
@@ -1416,7 +1420,7 @@
       document.getElementById('userPostingAsName').textContent = `${d.employee_name} (Requester)`;
 
       document.getElementById('userAuthorizedBadges').innerHTML = `
-        <span class="px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold border border-sky-500/20">👤 ${d.employee_name}</span>
+        <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-bold border border-black/[0.06] dark:border-white/[0.08]">👤 ${d.employee_name}</span>
         <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">💻 IT</span>
         <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">🏢 Admin</span>
         <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">💼 Finance</span>
@@ -1435,8 +1439,8 @@
 
       container.innerHTML = d.comments.map(c => {
         const isRequester = c.role === 'REQUESTER' || c.role === 'EMPLOYEE' || c.author.includes(d.employee_name);
-        const cardBg = isRequester ? 'bg-sky-500/[0.06] border-sky-500/20' : 'bg-neutral-100/80 dark:bg-neutral-800/80 border-black/[0.04]';
-        const badgeClass = isRequester ? 'bg-sky-500/20 text-sky-700 dark:text-sky-300' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200';
+        const cardBg = isRequester ? 'bg-neutral-100/90 dark:bg-neutral-800/80 border-black/[0.06] dark:border-white/[0.08]' : 'bg-neutral-50/80 dark:bg-neutral-850/60 border-black/[0.04]';
+        const badgeClass = isRequester ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200';
 
         return `
           <div class="p-3.5 rounded-2xl border ${cardBg} text-xs space-y-1">
@@ -1495,7 +1499,7 @@
         const btn = document.getElementById(`apprPersona${r.replace('_APPROVER', '')}`);
         if (!btn) return;
         if (r === role) {
-          btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm";
+          btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 bg-black text-white dark:bg-white dark:text-black shadow-sm";
         } else {
           btn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition flex items-center space-x-1.5";
         }
@@ -1511,7 +1515,7 @@
       const bAll = document.getElementById('filterAllBtn');
       const bFlag = document.getElementById('filterFlaggedBtn');
 
-      const activeClass = "px-3 py-1 rounded-lg font-bold bg-white dark:bg-apple-elevatedDark text-apple-blue shadow-sm transition flex items-center space-x-1";
+      const activeClass = "px-3 py-1 rounded-lg font-bold bg-black text-white dark:bg-white dark:text-black shadow-sm transition flex items-center space-x-1.5";
       const inactiveClass = "px-3 py-1 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition";
 
       bMy.className = filter === 'MY_TURN' ? activeClass : inactiveClass;
@@ -1556,8 +1560,8 @@
       const grid = document.getElementById('apprQueueGrid');
       if (!filtered.length) {
         grid.innerHTML = `
-          <div class="col-span-full py-10 text-center text-xs text-neutral-400 bg-neutral-50 dark:bg-neutral-800/40 rounded-3xl border border-dashed border-neutral-300 dark:border-neutral-700">
-            <i class="fa-solid fa-circle-check text-2xl text-apple-green mb-2"></i>
+          <div class="py-10 text-center text-xs text-neutral-400 bg-neutral-50 dark:bg-neutral-800/40 rounded-3xl border border-dashed border-neutral-300 dark:border-neutral-700">
+            <i class="fa-solid fa-circle-check text-2xl text-neutral-500 mb-2"></i>
             <p class="font-semibold text-neutral-700 dark:text-neutral-300">All caught up!</p>
             <p class="text-[11px] text-neutral-400">No clearance dossiers are currently waiting on your department's turn.</p>
           </div>
@@ -1565,6 +1569,7 @@
         return;
       }
 
+      // Strictly 1 Request Per Line Full-Width Rows (Unstacked)
       grid.innerHTML = filtered.map(d => {
         const isActive = d.dossier_id === activeApproverDossierId;
         const isMyTurn = d.current_turn_node === myNodeKey;
@@ -1573,43 +1578,54 @@
 
         let turnBadge = '';
         if (isMyTurn) {
-          turnBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-apple-blue flex items-center space-x-1"><span class="w-1.5 h-1.5 rounded-full bg-apple-blue apple-pulse-blue mr-1"></span>YOUR TURN</span>';
+          turnBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-black text-white dark:bg-white dark:text-black flex items-center space-x-1.5 shadow-sm shrink-0"><span class="w-1.5 h-1.5 rounded-full bg-white dark:bg-black mr-1"></span>YOUR TURN</span>';
         } else if (myNodeCleared) {
-          turnBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-apple-green flex items-center"><i class="fa-solid fa-check mr-1 text-[8px]"></i>Signed by You</span>';
+          turnBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-black/[0.06] dark:border-white/[0.08] flex items-center shrink-0"><i class="fa-solid fa-check mr-1 text-[9px]"></i>Signed by You</span>';
         } else {
-          turnBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-500 truncate max-w-[110px]">Turn: ${d.current_turn_node}</span>`;
+          turnBadge = `<span class="px-2.5 py-1 rounded-full text-[10px] font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-500 border border-black/[0.04] shrink-0 truncate max-w-[130px]">Turn: ${d.current_turn_node}</span>`;
         }
 
         const activeBorder = isActive 
-          ? 'border-l-[5px] border-apple-blue bg-blue-50/50 dark:bg-blue-950/25 shadow-md ring-1 ring-apple-blue/20' 
-          : 'border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-apple-elevatedDark hover:border-black/20 dark:hover:border-white/20';
+          ? 'border-black dark:border-white shadow-md ring-1 ring-black/10 dark:ring-white/10 bg-neutral-50/80 dark:bg-neutral-800/40' 
+          : 'border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-apple-elevatedDark hover:border-black/30 dark:hover:border-white/30';
+
+        const flagIndicator = d.ai_flags_count > 0 
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50 shrink-0">⚠️ ${d.ai_flags_count} flag</span>`
+          : '<span class="text-[10px] text-neutral-400 font-medium shrink-0">✓ Clean</span>';
 
         return `
-          <div onclick="selectApproverDossier('${d.dossier_id}')" class="p-4 rounded-2xl ${activeBorder} cursor-pointer transition flex flex-col justify-between select-none group">
-            <div>
-              <div class="flex items-start justify-between gap-1 mb-2">
-                <div class="flex items-center space-x-2.5">
-                  <div class="w-8 h-8 rounded-xl bg-neutral-200/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-bold text-xs flex items-center justify-center shrink-0">
-                    ${initials}
-                  </div>
-                  <div class="min-w-0">
-                    <h4 class="text-xs font-bold text-neutral-900 dark:text-white truncate group-hover:text-apple-blue transition">${d.employee_name}</h4>
-                    <div class="text-[10px] text-neutral-400 font-mono">${d.dossier_id}</div>
-                  </div>
-                </div>
-                ${turnBadge}
+          <div onclick="selectApproverDossier('${d.dossier_id}')" class="p-3.5 sm:p-4 rounded-2xl border ${activeBorder} cursor-pointer transition flex flex-col md:flex-row md:items-center justify-between gap-3 select-none group">
+            <!-- Left info: avatar, employee name, dossier id, department -->
+            <div class="flex items-center space-x-3.5 min-w-[240px] shrink-0">
+              <div class="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-bold text-xs flex items-center justify-center border border-black/[0.06] dark:border-white/[0.08] shrink-0 shadow-inner">
+                ${initials}
               </div>
-
-              <div class="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">${d.department}</div>
-              <div class="text-[10px] text-neutral-400 mt-1 flex items-center justify-between">
-                <span>EOC: ${d.eoc_date}</span>
-                <span>${d.ai_flags_count > 0 ? `<span class="text-apple-red font-bold">⚠️ ${d.ai_flags_count} flag</span>` : '<span class="text-apple-green font-semibold">✓ Clean</span>'}</span>
+              <div class="min-w-0">
+                <div class="flex items-center space-x-2">
+                  <h4 class="text-xs font-bold text-neutral-900 dark:text-white truncate group-hover:text-black dark:group-hover:text-white transition">${d.employee_name}</h4>
+                  <span class="text-[10px] text-neutral-400 font-mono font-semibold">${d.dossier_id}</span>
+                </div>
+                <div class="text-[11px] text-neutral-500 dark:text-neutral-400 truncate mt-0.5">
+                  ${d.department} · <span class="text-neutral-400">EOC: ${d.eoc_date}</span>
+                </div>
               </div>
             </div>
 
-            <div class="mt-3 pt-2 border-t border-black/[0.04] flex items-center justify-between text-[10px] text-neutral-400">
-              <span class="truncate">${d.stage_name || 'Stage 1'}</span>
-              <span class="font-bold ${isActive ? 'text-apple-blue' : 'group-hover:text-apple-blue'}">Inspect →</span>
+            <!-- Middle: Turn badge, Stage name & AI flags status -->
+            <div class="flex items-center space-x-3 text-xs flex-1 min-w-0 md:justify-center">
+              ${turnBadge}
+              <div class="hidden sm:flex items-center space-x-1.5 text-[11px] text-neutral-600 dark:text-neutral-400 truncate">
+                <span>Stage:</span>
+                <strong class="text-neutral-900 dark:text-white font-semibold truncate">${d.stage_name || 'Stage 1'}</strong>
+              </div>
+              ${flagIndicator}
+            </div>
+
+            <!-- Right: Minimal Black/White Inspect Button -->
+            <div class="flex items-center justify-end space-x-2 shrink-0">
+              <button class="px-4 py-1.5 rounded-xl text-xs font-bold ${isActive ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm' : 'bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200 group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition'}">
+                Inspect Dossier →
+              </button>
             </div>
           </div>
         `;
@@ -1641,11 +1657,11 @@
       document.getElementById('workstationTurnHolderName').textContent = d.current_turn_name || 'Department clearance';
       document.getElementById('workstationTurnActionGuidance').textContent = d.current_turn_action || 'Review in progress';
 
-      let ovBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-apple-amber">PENDING</span>';
+      let ovBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-black/[0.04]">PENDING</span>';
       if (d.category === 'FOR_RELEASE' || d.overall_status === 'CLEARED' || d.overall_status === 'APPROVED') {
-        ovBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-apple-green">READY FOR RELEASE</span>';
+        ovBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-black/[0.06] dark:border-white/[0.08]">READY FOR RELEASE</span>';
       } else if (d.category === 'FOR_REVIEW' || d.overall_status === 'FLAGGED') {
-        ovBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-500/10 text-apple-red">UNDER REVIEW</span>';
+        ovBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50">UNDER REVIEW</span>';
       }
       document.getElementById('workstationOverallBadge').outerHTML = `<span id="workstationOverallBadge">${ovBadge}</span>`;
 
@@ -1664,14 +1680,14 @@
         let cardBg = '';
         let statusText = '';
         if (status === 'CLEARED') {
-          cardBg = 'bg-emerald-500/[0.08] dark:bg-emerald-950/20 border-emerald-500/30 text-apple-green';
-          statusText = '<span class="text-apple-green font-bold">✓ Cleared</span>';
+          cardBg = 'bg-neutral-100/90 dark:bg-neutral-800/80 border-black/[0.08] dark:border-white/[0.08] text-neutral-900 dark:text-white';
+          statusText = '<span class="text-neutral-900 dark:text-white font-bold">✓ Cleared</span>';
         } else if (isCurrentTurn) {
-          cardBg = 'bg-blue-500/[0.08] dark:bg-blue-950/30 border-apple-blue shadow-sm ring-1 ring-apple-blue/25';
-          statusText = '<span class="text-apple-blue font-bold flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-apple-blue apple-pulse-blue mr-1"></span>Active Turn</span>';
+          cardBg = 'bg-neutral-200/80 dark:bg-neutral-700/80 border-black dark:border-white shadow-sm';
+          statusText = '<span class="text-neutral-900 dark:text-white font-bold flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-black dark:bg-white mr-1"></span>Active Turn</span>';
         } else if (status === 'FLAGGED') {
-          cardBg = 'bg-red-500/[0.08] dark:bg-red-950/20 border-red-500/30 text-apple-red';
-          statusText = '<span class="text-apple-red font-bold">⚠️ Flagged</span>';
+          cardBg = 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/40 text-red-600 dark:text-red-400';
+          statusText = '<span class="text-red-600 dark:text-red-400 font-bold">⚠️ Flagged</span>';
         } else {
           cardBg = 'bg-neutral-100/60 dark:bg-neutral-800/40 border-transparent text-neutral-400 opacity-60';
           statusText = '<span class="text-neutral-400">Waiting</span>';
@@ -1718,11 +1734,11 @@
       document.getElementById('apprPostingAsLabel').textContent = `${APPROVER_PROFILES[currentApproverRole].name} (${APPROVER_PROFILES[currentApproverRole].roleName})`;
 
       document.getElementById('apprAuthorizedBadges').innerHTML = `
-        <span class="px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold border border-sky-500/20">👤 ${d.employee_name}</span>
-        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'IT_APPROVER' ? 'bg-blue-500/20 text-apple-blue font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">💻 IT</span>
-        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'ADMIN_APPROVER' ? 'bg-amber-500/20 text-apple-amber font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">🏢 Admin</span>
-        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'FINANCE_APPROVER' ? 'bg-emerald-500/20 text-apple-green font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">💼 Finance</span>
-        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'HR_APPROVER' ? 'bg-purple-500/20 text-apple-purple font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">👥 HR</span>
+        <span class="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-bold border border-black/[0.06] dark:border-white/[0.08]">👤 ${d.employee_name}</span>
+        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'IT_APPROVER' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">💻 IT</span>
+        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'ADMIN_APPROVER' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">🏢 Admin</span>
+        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'FINANCE_APPROVER' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">💼 Finance</span>
+        <span class="px-2 py-0.5 rounded-full ${currentApproverRole === 'HR_APPROVER' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}">👥 HR</span>
       `;
 
       renderApproverComments(d);
@@ -1735,7 +1751,7 @@
       const pDocs = document.getElementById('apprPanelDocs');
       const pTime = document.getElementById('apprPanelTimeline');
 
-      const activeClass = "px-3.5 py-1.5 rounded-lg bg-white dark:bg-apple-elevatedDark text-neutral-900 dark:text-white shadow-sm transition";
+      const activeClass = "px-3.5 py-1.5 rounded-lg bg-black text-white dark:bg-white dark:text-black shadow-sm transition";
       const inactiveClass = "px-3.5 py-1.5 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition";
 
       if (tab === 'DOCS') {
@@ -1757,10 +1773,10 @@
 
       list.innerHTML = d.docs.map(doc => {
         return `
-          <div class="p-3.5 rounded-2xl border ${doc.has_flags ? 'border-apple-red/30 bg-red-500/[0.04]' : 'border-black/[0.05] bg-neutral-50/80 dark:bg-neutral-800/60'} text-xs space-y-2">
+          <div class="p-3.5 rounded-2xl border ${doc.has_flags ? 'border-red-200 dark:border-red-900/40 bg-red-50/50 dark:bg-red-950/20' : 'border-black/[0.05] bg-neutral-50/80 dark:bg-neutral-800/60'} text-xs space-y-2">
             <div class="flex items-center justify-between">
               <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">${doc.type}</span>
-              ${doc.has_flags ? '<span class="text-[10px] text-apple-red font-bold">⚠️ Flagged</span>' : '<span class="text-[10px] text-apple-green font-bold">✓ Valid</span>'}
+              ${doc.has_flags ? '<span class="text-[10px] text-red-600 dark:text-red-400 font-bold">⚠️ Flagged</span>' : '<span class="text-[10px] text-neutral-700 dark:text-neutral-300 font-semibold">✓ Valid</span>'}
             </div>
             <div class="font-bold text-neutral-900 dark:text-white truncate">${doc.title}</div>
             <div class="text-[10px] text-neutral-400 font-mono truncate">${doc.file}</div>
@@ -1771,7 +1787,7 @@
       const detail = document.getElementById('apprDocFlagsDetail');
       if (d.ai_flags_count > 0) {
         detail.innerHTML = `
-          <div class="flex items-center space-x-2 text-apple-red font-bold text-xs">
+          <div class="flex items-center space-x-2 text-red-600 dark:text-red-400 font-bold text-xs">
             <i class="fa-solid fa-triangle-exclamation"></i>
             <span>${d.ai_flags_count} AI Discrepancy Flag(s) Detected</span>
           </div>
@@ -1782,7 +1798,7 @@
         `;
       } else {
         detail.innerHTML = `
-          <div class="flex items-center space-x-2 text-apple-green font-bold text-xs">
+          <div class="flex items-center space-x-2 text-neutral-800 dark:text-neutral-200 font-bold text-xs">
             <i class="fa-solid fa-circle-check"></i>
             <span>0 Pre-Check Discrepancies · Clean Clearance Submission</span>
           </div>
@@ -1808,8 +1824,8 @@
 
       container.innerHTML = d.comments.map(c => {
         const isRequester = c.role === 'REQUESTER' || c.role === 'EMPLOYEE';
-        const cardBg = isRequester ? 'bg-sky-500/[0.06] border-sky-500/20' : 'bg-neutral-100/80 dark:bg-neutral-800/80 border-black/[0.04]';
-        const badgeClass = isRequester ? 'bg-sky-500/20 text-sky-700 dark:text-sky-300' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200';
+        const cardBg = isRequester ? 'bg-neutral-100/90 dark:bg-neutral-800/80 border-black/[0.06] dark:border-white/[0.08]' : 'bg-neutral-50/80 dark:bg-neutral-850/60 border-black/[0.04]';
+        const badgeClass = isRequester ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200';
 
         return `
           <div class="p-3.5 rounded-2xl border ${cardBg} text-xs space-y-1">
@@ -1957,29 +1973,26 @@
         
         let categoryBadge = '';
         let borderAccent = '';
-        let avatarBg = '';
+        let avatarBg = 'bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-black/[0.06] dark:border-white/[0.08]';
         if (d.category === 'FOR_RELEASE') {
-          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-apple-green uppercase shrink-0">READY FOR RELEASE</span>';
-          borderAccent = 'border-l-4 border-l-apple-green';
-          avatarBg = 'bg-emerald-500/15 text-apple-green';
+          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-black/[0.06] dark:border-white/[0.08] uppercase shrink-0">READY FOR RELEASE</span>';
+          borderAccent = '';
         } else if (d.category === 'FOR_REVIEW') {
-          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-apple-red uppercase shrink-0">FOR REVIEW</span>';
-          borderAccent = 'border-l-4 border-l-apple-red';
-          avatarBg = 'bg-red-500/15 text-apple-red';
+          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50 uppercase shrink-0">FOR REVIEW</span>';
+          borderAccent = 'border-l-4 border-l-red-500';
         } else {
-          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-apple-amber uppercase shrink-0">PENDING</span>';
-          borderAccent = 'border-l-4 border-l-apple-amber';
-          avatarBg = 'bg-amber-500/15 text-apple-amber';
+          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04] uppercase shrink-0">PENDING</span>';
+          borderAccent = '';
         }
 
         const flagsCount = (d.flags_summary || []).length;
         const flagsBadge = flagsCount > 0 
-          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-apple-red border border-red-500/20 shrink-0" title="${(d.flags_summary||[]).join('; ')}"><i class="fa-solid fa-triangle-exclamation mr-1"></i>${flagsCount} Flag${flagsCount > 1 ? 's' : ''}</span>`
+          ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50 shrink-0" title="${(d.flags_summary||[]).join('; ')}"><i class="fa-solid fa-triangle-exclamation mr-1"></i>${flagsCount} Flag${flagsCount > 1 ? 's' : ''}</span>`
           : '';
 
         const flagsBanner = flagsCount > 0
           ? `
-            <div class="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-apple-red font-semibold flex items-center space-x-2.5">
+            <div class="p-3.5 rounded-2xl bg-red-50/80 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 text-xs text-red-600 dark:text-red-400 font-semibold flex items-center space-x-2.5">
               <i class="fa-solid fa-triangle-exclamation text-base shrink-0"></i>
               <div class="flex-1 min-w-0">
                 <div class="font-bold text-[11px] uppercase tracking-wider">Discrepancy Flags Requiring Review:</div>
@@ -1991,12 +2004,12 @@
 
         const escrowBanner = d.escrow_details
           ? `
-            <div class="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-xs text-apple-purple font-semibold flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="p-3.5 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/60 border border-black/[0.06] dark:border-white/[0.08] text-xs text-neutral-800 dark:text-neutral-200 font-semibold flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div class="flex items-center space-x-2">
                 <i class="fa-solid fa-scale-balanced text-sm"></i>
                 <span>Split Escrow Active: Disputed ₱${Number(d.escrow_details.disputed_amount || 3500).toLocaleString()} isolated in escrow.</span>
               </div>
-              <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-apple-purple text-white font-bold shrink-0">Undisputed ₱${Number(d.escrow_details.undisputed_amount || 48500).toLocaleString()} Cleared</span>
+              <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-black text-white dark:bg-white dark:text-black font-bold shrink-0">Undisputed ₱${Number(d.escrow_details.undisputed_amount || 48500).toLocaleString()} Cleared</span>
             </div>
           `
           : '';
@@ -2014,10 +2027,10 @@
                 </div>
                 <div class="min-w-0">
                   <div class="flex items-center space-x-2">
-                    <h4 onclick="toggleAdminTimeline('${d.dossier_id}')" class="text-sm font-bold text-neutral-900 dark:text-white hover:text-apple-blue transition cursor-pointer truncate" title="Click to toggle timeline">
+                    <h4 onclick="toggleAdminTimeline('${d.dossier_id}')" class="text-sm font-bold text-neutral-900 dark:text-white hover:text-black dark:hover:text-white transition cursor-pointer truncate" title="Click to toggle timeline">
                       ${d.employee_name}
                     </h4>
-                    <span class="text-[10px] font-mono font-bold text-apple-blue shrink-0">${d.dossier_id}</span>
+                    <span class="text-[10px] font-mono font-bold text-neutral-900 dark:text-white shrink-0">${d.dossier_id}</span>
                   </div>
                   <div class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5 truncate">
                     ${d.department} · <span class="text-neutral-400">${d.branch}</span>
@@ -2032,7 +2045,7 @@
                     <div class="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-wider">
                       <span class="text-neutral-700 dark:text-neutral-300">${d.stage_name || 'Stage 1'}</span>
                       <span class="text-neutral-300 dark:text-neutral-600">•</span>
-                      <span class="text-apple-blue font-bold">Turn: ${d.current_turn_node}</span>
+                      <span class="text-neutral-900 dark:text-white font-bold">Turn: ${d.current_turn_node}</span>
                     </div>
                     <div class="text-neutral-700 dark:text-neutral-300 font-medium truncate text-xs mt-0.5" title="${d.current_turn_action}">
                       ${d.current_turn_action}
@@ -2053,14 +2066,14 @@
 
                 <div class="flex items-center space-x-1.5">
                   <!-- Timeline Dropdown Button (dropdox) -->
-                  <button onclick="toggleAdminTimeline('${d.dossier_id}')" id="adminTimelineBtn_${d.dossier_id}" class="px-3 py-1.5 rounded-xl ${isExpanded ? 'bg-sky-500/20 text-sky-700 dark:text-sky-300' : 'bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400'} text-xs font-bold transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Toggle milestone timeline dropdown">
+                  <button onclick="toggleAdminTimeline('${d.dossier_id}')" id="adminTimelineBtn_${d.dossier_id}" class="px-3.5 py-1.5 rounded-xl ${isExpanded ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-200'} text-xs font-bold transition flex items-center space-x-1.5 border border-black/[0.06] dark:border-white/[0.08] shadow-sm active:scale-95" title="Toggle milestone timeline dropdown">
                     <i class="fa-solid fa-clock-rotate-left text-xs"></i>
                     <span>Timeline</span>
                     <i id="adminTimelineChevron_${d.dossier_id}" class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}"></i>
                   </button>
 
                   <!-- Review Desk CTA -->
-                  <button onclick="adminInspectInApprover('${d.dossier_id}')" class="px-3 py-1.5 rounded-xl bg-apple-blue hover:bg-apple-blueHover text-white text-xs font-bold transition flex items-center space-x-1.5 shadow-sm active:scale-95">
+                  <button onclick="adminInspectInApprover('${d.dossier_id}')" class="px-3.5 py-1.5 rounded-xl bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-bold transition flex items-center space-x-1.5 shadow-sm active:scale-95">
                     <span>Review Desk</span>
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                   </button>
@@ -2075,7 +2088,7 @@
               <!-- Stage & Current Turn Status Bar -->
               <div class="p-3.5 rounded-2xl bg-white dark:bg-apple-surfaceDark border border-black/[0.05] dark:border-white/[0.06] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div class="flex items-center space-x-3">
-                  <div class="w-8 h-8 rounded-xl bg-apple-blue/10 text-apple-blue flex items-center justify-center text-sm shrink-0">
+                  <div class="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-sm shrink-0 border border-black/[0.06] dark:border-white/[0.08]">
                     <i class="fa-solid fa-diagram-project"></i>
                   </div>
                   <div>
@@ -2085,7 +2098,7 @@
                 </div>
                 <div class="flex items-center space-x-2">
                   <span class="text-[10px] text-neutral-400 uppercase font-bold">Active Turn Holder:</span>
-                  <span class="px-2.5 py-0.5 rounded-full bg-apple-blue text-white font-bold text-xs">
+                  <span class="px-2.5 py-0.5 rounded-full bg-black text-white dark:bg-white dark:text-black font-bold text-xs shadow-sm">
                     ${d.current_turn_name || d.current_turn_node}
                   </span>
                 </div>
@@ -2099,7 +2112,7 @@
 
               <!-- Dropdown Bottom Bar -->
               <div class="flex flex-wrap items-center justify-between pt-1 text-xs">
-                <button onclick="adminInspectInUser('${d.dossier_id}')" class="text-sky-600 dark:text-sky-400 hover:underline font-semibold flex items-center space-x-1.5">
+                <button onclick="adminInspectInUser('${d.dossier_id}')" class="text-neutral-700 dark:text-neutral-300 hover:underline font-semibold flex items-center space-x-1.5">
                   <i class="fa-solid fa-user-circle text-xs"></i>
                   <span>Switch to User End perspective for ${d.employee_name}</span>
                 </button>
@@ -2127,14 +2140,16 @@
         box.classList.remove('hidden');
         if (chevron) chevron.classList.add('rotate-180');
         if (btn) {
-          btn.classList.add('bg-sky-500/20', 'text-sky-700', 'dark:text-sky-300');
+          btn.classList.add('bg-black', 'text-white', 'dark:bg-white', 'dark:text-black');
+          btn.classList.remove('bg-neutral-100', 'text-neutral-800', 'dark:bg-neutral-800', 'dark:text-neutral-200');
         }
         expandedAdminTimelines.add(id);
       } else {
         box.classList.add('hidden');
         if (chevron) chevron.classList.remove('rotate-180');
         if (btn) {
-          btn.classList.remove('bg-sky-500/20', 'text-sky-700', 'dark:text-sky-300');
+          btn.classList.remove('bg-black', 'text-white', 'dark:bg-white', 'dark:text-black');
+          btn.classList.add('bg-neutral-100', 'text-neutral-800', 'dark:bg-neutral-800', 'dark:text-neutral-200');
         }
         expandedAdminTimelines.delete(id);
       }
