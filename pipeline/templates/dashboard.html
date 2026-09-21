@@ -603,9 +603,9 @@
           </div>
         </div>
 
-        <!-- Inspection Tabs -->
-        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-5">
-          <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
+        <!-- SECTION 2: INSPECTION & VERIFICATION TABS -->
+        <div class="pt-5 border-t border-black/[0.05] dark:border-white/[0.06] space-y-4">
+          <div class="flex items-center justify-between pb-2">
             <div class="flex items-center p-1 bg-neutral-100 dark:bg-neutral-800/60 rounded-xl space-x-1 text-xs font-semibold border border-black/[0.04] dark:border-white/[0.06]">
               <button id="tabApprDocs" onclick="switchApproverInspectionTab('DOCS')" class="px-3.5 py-1.5 rounded-lg bg-black text-white dark:bg-white dark:text-black shadow-sm transition">
                 <i class="fa-solid fa-file-shield mr-1.5"></i> Documents & Pre-Checks
@@ -633,46 +633,48 @@
           </div>
         </div>
 
-        <!-- Approver Decision Dock -->
-        <div class="bg-white/90 dark:bg-neutral-900/90 apple-glass p-5 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div class="flex items-center space-x-3">
-            <div id="dockTurnIcon" class="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-lg shadow-sm shrink-0 border border-black/[0.06] dark:border-white/[0.08]">
-              <i class="fa-solid fa-signature"></i>
-            </div>
-            <div>
-              <div class="text-xs font-bold text-neutral-900 dark:text-white" id="dockTurnPrompt">
-                Ready to sign off this step?
+        <!-- SECTION 3: APPROVER DECISION & SIGN-OFF DOCK -->
+        <div class="pt-5 border-t border-black/[0.05] dark:border-white/[0.06]">
+          <div class="p-4 sm:p-5 rounded-2xl bg-neutral-50/90 dark:bg-neutral-800/60 border border-black/[0.04] dark:border-white/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+              <div id="dockTurnIcon" class="w-10 h-10 rounded-2xl bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-lg shadow-sm shrink-0 border border-black/[0.06] dark:border-white/[0.08]">
+                <i class="fa-solid fa-signature"></i>
               </div>
-              <p class="text-[11px] text-neutral-500 dark:text-neutral-400" id="dockTurnSubtext">
-                Signing as CLEARED will record an immutable audit stamp and automatically advance the turn to the next department.
-              </p>
+              <div>
+                <div class="text-xs font-bold text-neutral-900 dark:text-white" id="dockTurnPrompt">
+                  Ready to sign off this step?
+                </div>
+                <p class="text-[11px] text-neutral-500 dark:text-neutral-400" id="dockTurnSubtext">
+                  Signing as CLEARED will record an immutable audit stamp and automatically advance the turn to the next department.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div class="flex flex-wrap items-center gap-2 shrink-0" id="approverActionButtons">
-            <!-- Minimal Apple Red for Flag/Reject -->
-            <button onclick="handleApproverDecision('FLAG')" class="px-4 py-2.5 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50/80 hover:bg-red-100 dark:bg-red-950/30 dark:hover:bg-red-950/50 text-red-600 dark:text-red-400 text-xs font-bold transition flex items-center space-x-1.5 shadow-sm">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-              <span>Flag Discrepancy</span>
-            </button>
+            <div class="flex flex-wrap items-center gap-2 shrink-0" id="approverActionButtons">
+              <!-- Minimal Apple Red for Flag/Reject -->
+              <button onclick="handleApproverDecision('FLAG')" class="px-4 py-2.5 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50/80 hover:bg-red-100 dark:bg-red-950/30 dark:hover:bg-red-950/50 text-red-600 dark:text-red-400 text-xs font-bold transition flex items-center space-x-1.5 shadow-sm">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Flag Discrepancy</span>
+              </button>
 
-            <!-- Minimal Monochrome Bordered Button for Split Escrow -->
-            <button id="btnSplitEscrowRelease" onclick="openSplitEscrowModal()" class="hidden px-4 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-bold transition flex items-center space-x-1.5 shadow-sm">
-              <i class="fa-solid fa-scale-balanced"></i>
-              <span>Split Escrow Release</span>
-            </button>
+              <!-- Minimal Monochrome Bordered Button for Split Escrow -->
+              <button id="btnSplitEscrowRelease" onclick="openSplitEscrowModal()" class="hidden px-4 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-bold transition flex items-center space-x-1.5 shadow-sm">
+                <i class="fa-solid fa-scale-balanced"></i>
+                <span>Split Escrow Release</span>
+              </button>
 
-            <!-- Minimal Black & White Button for Approve & Pass Turn -->
-            <button id="btnApprovePassTurn" onclick="handleApproverDecision('APPROVE')" class="px-5 py-2.5 rounded-xl bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-bold shadow-md transition active:scale-95 flex items-center space-x-2">
-              <i class="fa-solid fa-check"></i>
-              <span>Approve & Pass Turn</span>
-            </button>
+              <!-- Minimal Black & White Button for Approve & Pass Turn -->
+              <button id="btnApprovePassTurn" onclick="handleApproverDecision('APPROVE')" class="px-5 py-2.5 rounded-xl bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-bold shadow-md transition active:scale-95 flex items-center space-x-2">
+                <i class="fa-solid fa-check"></i>
+                <span>Approve & Pass Turn</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Centralized Transaction Discussion in Approver End -->
-        <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06] gap-2">
+        <!-- SECTION 4: CENTRALIZED DISCUSSION THREAD (REQUESTER & APPROVERS ONLY) -->
+        <div class="pt-5 border-t border-black/[0.05] dark:border-white/[0.06] space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2 gap-2">
             <div>
               <div class="flex items-center space-x-2">
                 <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Centralized Transaction Discussion</h4>
