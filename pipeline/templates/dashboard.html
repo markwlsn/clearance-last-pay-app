@@ -335,6 +335,17 @@
           </button>
         </div>
       </div>
+      
+      <!-- Clickable Employee Names Roster (Turns Black When Selected!) -->
+      <div class="bg-white/80 dark:bg-neutral-900/80 apple-glass p-3.5 sm:p-4 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-2">
+        <div class="flex items-center justify-between px-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Select Employee to View Dossier (Click Name):</span>
+          <span class="text-[10px] text-neutral-400 font-mono">15 Tester Accounts</span>
+        </div>
+        <div id="userAccountPills" class="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-thin">
+          <!-- Populated via JS with 15 Tester Account Names -->
+        </div>
+      </div>
 
       <!-- Active Employee Profile Card -->
       <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col md:flex-row md:items-center justify-between gap-5">
@@ -749,28 +760,28 @@
             <div class="text-[10px] text-neutral-400 mt-1 truncate">Standard turnover underway</div>
           </div>
 
-          <div onclick="setAdminBucketFilter('FOR_REVIEW')" class="p-4 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-red-500/40 cursor-pointer transition shadow-sm group">
+          <div onclick="setAdminBucketFilter('FOR_REVIEW')" class="p-4 rounded-2xl bg-red-50/40 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 hover:border-red-500/60 cursor-pointer transition shadow-sm group">
             <div class="flex items-center justify-between text-neutral-400 mb-1">
-              <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-red-600 dark:group-hover:text-red-400 transition">5 For Review</span>
+              <span class="text-[10px] uppercase font-bold tracking-wider text-red-700 dark:text-red-400 transition">5 For Review</span>
               <i class="fa-solid fa-triangle-exclamation text-red-500 text-xs"></i>
             </div>
             <div class="flex items-baseline space-x-1.5">
               <span id="adminKpiFlagged" class="text-2xl font-bold tracking-tight text-red-600 dark:text-red-400 font-mono">5</span>
-              <span class="text-[10px] text-red-600 dark:text-red-400 font-semibold">action needed</span>
+              <span class="text-[10px] text-red-600 dark:text-red-400 font-bold">action needed</span>
             </div>
-            <div class="text-[10px] text-neutral-400 mt-1 truncate">Discrepancy flags noted</div>
+            <div class="text-[10px] text-red-600/80 dark:text-red-400/80 mt-1 truncate">Discrepancy flags noted</div>
           </div>
 
-          <div onclick="setAdminBucketFilter('FOR_RELEASE')" class="p-4 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] hover:border-black/30 dark:hover:border-white/30 cursor-pointer transition shadow-sm group">
+          <div onclick="setAdminBucketFilter('FOR_RELEASE')" class="p-4 rounded-2xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 hover:border-emerald-500/60 cursor-pointer transition shadow-sm group">
             <div class="flex items-center justify-between text-neutral-400 mb-1">
-              <span class="text-[10px] uppercase font-bold tracking-wider group-hover:text-neutral-900 dark:group-hover:text-white transition">5 Ready for Release</span>
-              <i class="fa-solid fa-circle-check text-neutral-400 text-xs"></i>
+              <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-700 dark:text-emerald-400 transition">5 Ready for Release</span>
+              <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
             </div>
             <div class="flex items-baseline space-x-1.5">
-              <span id="adminKpiReady" class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-mono">5</span>
-              <span class="text-[10px] text-neutral-400 font-semibold">cleared</span>
+              <span id="adminKpiReady" class="text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-400 font-mono">5</span>
+              <span class="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">cleared</span>
             </div>
-            <div class="text-[10px] text-neutral-400 mt-1 truncate">Ready for pay & COE</div>
+            <div class="text-[10px] text-emerald-700/80 dark:text-emerald-400/80 mt-1 truncate">Ready for pay & COE</div>
           </div>
 
           <div class="p-4 rounded-2xl bg-neutral-50/90 dark:bg-apple-elevatedDark border border-black/[0.05] dark:border-white/[0.06] shadow-sm">
@@ -780,7 +791,7 @@
             </div>
             <div class="flex items-baseline space-x-1.5">
               <span class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white font-mono">4.2d</span>
-              <span class="text-[10px] px-1.5 py-0.2 rounded bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-bold">-68%</span>
+              <span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-bold">-68%</span>
             </div>
             <div class="text-[10px] text-neutral-400 mt-1 truncate">DOLE 30-Day Velocity</div>
           </div>
@@ -1207,14 +1218,14 @@
         const seqLabel = idx === 0 ? '#1 Done First' : `#${idx + 1} Done Next`;
         return `
           <div class="relative flex items-start space-x-3 group">
-            <div class="w-6 h-6 rounded-full bg-black text-white dark:bg-white dark:text-black flex items-center justify-center text-[10px] shrink-0 -ml-[25px] shadow-sm">
+            <div class="w-6 h-6 rounded-full bg-emerald-600 text-white dark:bg-emerald-500 dark:text-black flex items-center justify-center text-[10px] shrink-0 -ml-[25px] shadow-sm">
               <i class="fa-solid fa-check"></i>
             </div>
             <div class="flex-1 min-w-0 bg-neutral-50/90 dark:bg-neutral-800/50 p-3.5 rounded-2xl border border-black/[0.05] dark:border-white/[0.06] text-xs transition">
               <div class="flex flex-wrap items-center justify-between gap-1.5">
                 <div class="flex items-center space-x-2">
                   <span class="font-bold text-neutral-900 dark:text-white text-xs">${t.milestone}</span>
-                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-200/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-mono">
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800/50 font-mono">
                     ${seqLabel}
                   </span>
                 </div>
@@ -1237,20 +1248,26 @@
 
       const pendingHtml = pending.length ? pending.map((t) => {
         const isInProg = t.status === 'IN_PROGRESS';
-        const dotClass = isInProg 
-          ? 'bg-black text-white dark:bg-white dark:text-black ring-2 ring-neutral-300 dark:ring-neutral-600' 
-          : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400';
-        const cardBg = isInProg 
-          ? 'bg-neutral-100/90 dark:bg-neutral-800/80 border-black/[0.1] dark:border-white/[0.1] shadow-sm' 
-          : 'bg-neutral-50/80 dark:bg-neutral-800/40 border-black/[0.04]';
-        const badge = isInProg 
-          ? '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-black text-white dark:bg-white dark:text-black uppercase shadow-sm">⚡ Current Turn</span>' 
-          : '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-200/60 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 border border-black/[0.04] uppercase">⏳ Awaiting Turn</span>';
+        const isFlagged = (t.details && (t.details.includes('discrepancy') || t.details.includes('missing') || t.details.includes('Hold') || t.details.includes('truncated'))) || (t.milestone && t.milestone.includes('Hold'));
+        
+        let dotClass = 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400';
+        let cardBg = 'bg-neutral-50/80 dark:bg-neutral-800/40 border-black/[0.04]';
+        let badge = '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-200/60 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 border border-black/[0.04] uppercase">⏳ Awaiting Turn</span>';
+
+        if (isFlagged) {
+          dotClass = 'bg-red-600 text-white shadow-sm ring-2 ring-red-200 dark:ring-red-900/40';
+          cardBg = 'bg-red-50/40 dark:bg-red-950/20 border-red-200 dark:border-red-900/40 shadow-sm';
+          badge = '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50 uppercase shadow-sm">⚠️ Action Needed</span>';
+        } else if (isInProg) {
+          dotClass = 'bg-black text-white dark:bg-white dark:text-black ring-2 ring-neutral-300 dark:ring-neutral-600';
+          cardBg = 'bg-neutral-100/90 dark:bg-neutral-800/80 border-black/[0.1] dark:border-white/[0.1] shadow-sm';
+          badge = '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-black text-white dark:bg-white dark:text-black uppercase shadow-sm">⚡ Current Turn</span>';
+        }
 
         return `
           <div class="relative flex items-start space-x-3 group">
             <div class="w-6 h-6 rounded-full ${dotClass} flex items-center justify-center text-[10px] shrink-0 -ml-[25px] shadow-sm">
-              <i class="fa-solid ${t.icon || (isInProg ? 'fa-hourglass-half' : 'fa-clock')}"></i>
+              <i class="fa-solid ${t.icon || (isInProg ? 'fa-hourglass-half' : (isFlagged ? 'fa-triangle-exclamation' : 'fa-clock'))}"></i>
             </div>
             <div class="flex-1 min-w-0 ${cardBg} p-3.5 rounded-2xl border text-xs transition">
               <div class="flex flex-wrap items-center justify-between gap-1.5">
@@ -1269,12 +1286,12 @@
           </div>
         `;
       }).join('') : `
-        <div class="p-6 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-black/[0.06] dark:border-white/[0.08] text-center space-y-1.5">
-          <div class="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-sm mx-auto shadow-sm">
+        <div class="p-6 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-center space-y-1.5">
+          <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm mx-auto shadow-sm">
             <i class="fa-solid fa-check-double"></i>
           </div>
-          <div class="text-xs font-bold text-neutral-900 dark:text-white">100% Cleared · Zero Pending</div>
-          <p class="text-[11px] text-neutral-500 dark:text-neutral-400">All requirements and departmental sign-offs completed.</p>
+          <div class="text-xs font-bold text-emerald-900 dark:text-emerald-100">100% Cleared · Zero Pending</div>
+          <p class="text-[11px] text-emerald-700 dark:text-emerald-400">All requirements and departmental sign-offs completed.</p>
         </div>
       `;
 
@@ -1286,20 +1303,20 @@
             <div class="space-y-3">
               <div class="flex items-center justify-between pb-2.5 border-b border-black/[0.04] dark:border-white/[0.04]">
                 <div class="flex items-center space-x-2">
-                  <span class="w-2 h-2 rounded-full bg-black dark:bg-white shadow-sm"></span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-sm"></span>
                   <h5 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
                     Cleared Milestones
                   </h5>
-                  <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-mono">
+                  <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/50 font-mono">
                     ${cleared.length} Cleared
                   </span>
                 </div>
-                <span class="text-[10px] font-semibold text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full border border-black/[0.04]">
+                <span class="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/40">
                   Ordered: Done First ➔ Last
                 </span>
               </div>
 
-              <div class="relative pl-6 space-y-3 before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-300 dark:before:bg-neutral-700 pt-1">
+              <div class="relative pl-6 space-y-3 before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-emerald-200 dark:before:bg-emerald-800/50 pt-1">
                 ${clearedHtml}
               </div>
             </div>
@@ -1338,6 +1355,23 @@
       const d = getActiveUserDossier();
       if (!d) return;
 
+      // Render Clickable Employee Names Roster (Turns Black When Selected!)
+      const pillsContainer = document.getElementById('userAccountPills');
+      if (pillsContainer) {
+        pillsContainer.innerHTML = allDossiers.map(emp => {
+          const isSelected = emp.dossier_id === activeUserDossierId;
+          const selectedClass = isSelected
+            ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm ring-1 ring-black dark:ring-white font-bold'
+            : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white hover:bg-neutral-200 dark:hover:bg-neutral-700 border border-black/[0.04] font-medium';
+          return `
+            <button onclick="onSelectUserAccount('${emp.dossier_id}')" class="px-3 py-1.5 rounded-xl text-xs transition flex items-center space-x-1.5 shrink-0 select-none ${selectedClass}">
+              <span>${emp.employee_name}</span>
+              ${isSelected ? '<i class="fa-solid fa-check text-[9px]"></i>' : ''}
+            </button>
+          `;
+        }).join('');
+      }
+
       const initials = d.employee_name.split(' ').map(n => n[0]).slice(0, 2).join('');
       document.getElementById('userAvatar').textContent = initials;
       document.getElementById('userEmpName').textContent = d.employee_name;
@@ -1349,7 +1383,7 @@
 
       let statusBadge = '';
       if (d.category === 'FOR_RELEASE' || d.overall_status === 'CLEARED' || d.overall_status === 'APPROVED') {
-        statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 uppercase border border-black/[0.06] dark:border-white/[0.08]">READY FOR RELEASE</span>';
+        statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/50 uppercase flex items-center space-x-1"><i class="fa-solid fa-circle-check text-[10px] text-emerald-600 dark:text-emerald-400"></i><span>READY FOR RELEASE</span></span>';
         document.getElementById('userCategoryBadge').textContent = 'All Clearances Signed Off';
       } else if (d.category === 'FOR_REVIEW' || d.overall_status === 'FLAGGED') {
         statusBadge = '<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50 uppercase">UNDER REVIEW</span>';
