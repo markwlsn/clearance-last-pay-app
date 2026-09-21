@@ -347,71 +347,97 @@
         </div>
       </div>
 
-      <!-- Active Employee Profile Card -->
-      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col md:flex-row md:items-center justify-between gap-5">
-        <div class="flex items-start space-x-4">
-          <div id="userAvatar" class="w-16 h-16 rounded-3xl bg-neutral-200/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 text-xl font-bold flex items-center justify-center shadow-inner shrink-0">
-            JD
-          </div>
-          <div>
-            <div class="flex flex-wrap items-center gap-2">
-              <h3 id="userEmpName" class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">Juan Dela Cruz</h3>
-              <span id="userEmpIdBadge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">
-                EMP-94812
-              </span>
-              <span id="userStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 uppercase border border-black/[0.04]">
-                PENDING
-              </span>
+      <!-- Selected Employee Unified Dossier (Single Master Container with Whole 1 Padding) -->
+      <div id="userSelectedDossierCard" class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 sm:p-8 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] space-y-6">
+        
+        <!-- SECTION 1: REQUESTER PROFILE IDENTITY & LIVE STATUS -->
+        <div class="space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
+            <div class="flex items-start space-x-4">
+              <div id="userAvatar" class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-neutral-200/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 text-xl font-bold flex items-center justify-center shadow-inner shrink-0">
+                JD
+              </div>
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 id="userEmpName" class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">Juan Dela Cruz</h3>
+                  <span id="userEmpIdBadge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">
+                    EMP-94812
+                  </span>
+                  <span id="userStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 uppercase border border-black/[0.04]">
+                    PENDING
+                  </span>
+                </div>
+                <div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+                  <span id="userDeptTitle"><i class="fa-solid fa-briefcase mr-1.5 text-neutral-400"></i>Information Technology · Senior Specialist</span>
+                  <span id="userBranch"><i class="fa-solid fa-building mr-1.5 text-neutral-400"></i>Taguig HQ - 24th Floor</span>
+                  <span id="userEocDate"><i class="fa-solid fa-calendar-check mr-1.5 text-neutral-400"></i>EOC: 2026-08-31</span>
+                </div>
+              </div>
             </div>
-            <div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
-              <span id="userDeptTitle"><i class="fa-solid fa-briefcase mr-1.5 text-neutral-400"></i>Information Technology · Senior Specialist</span>
-              <span id="userBranch"><i class="fa-solid fa-building mr-1.5 text-neutral-400"></i>Taguig HQ - 24th Floor</span>
-              <span id="userEocDate"><i class="fa-solid fa-calendar-check mr-1.5 text-neutral-400"></i>EOC: 2026-08-31</span>
+
+            <div class="flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 pt-3 md:pt-0 border-black/[0.05] dark:border-white/[0.06]">
+              <span class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">Clearance Dossier</span>
+              <span id="userDossierId" class="text-sm font-mono font-bold text-neutral-900 dark:text-white">DOS-2026-001</span>
+              <span id="userCategoryBadge" class="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 mt-0.5">Pending Asset Turnover</span>
+            </div>
+          </div>
+
+          <!-- Embedded "Whose Turn" Live Banner inside Section 1 -->
+          <div id="userWhoseTurnCard" class="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-neutral-100/90 dark:bg-neutral-800/60 border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex items-start space-x-3.5 sm:space-x-4">
+            <div class="w-10 h-10 rounded-2xl bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-base sm:text-lg shrink-0 mt-0.5 border border-black/[0.04] dark:border-white/[0.06]">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider" id="userCurrentPhaseTitle">Current Phase: Stage 1 - Asset Hand-Off</span>
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-black text-white dark:bg-white dark:text-black shadow-sm" id="userWhoseTurnHolderBadge">Turn: IT Clearance (Alex Tan)</span>
+              </div>
+              <p id="userWhoseTurnActionText" class="text-xs text-neutral-600 dark:text-neutral-300 font-medium mt-1">
+                Alex Tan (IT Clearance Lead) is currently inspecting your Lenovo ThinkPad T14s serial number and sanitizing corporate data.
+              </p>
             </div>
           </div>
         </div>
 
-        <div class="flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 pt-3 md:pt-0 border-black/[0.05]">
-          <span class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider">Clearance Dossier</span>
-          <span id="userDossierId" class="text-sm font-mono font-bold text-neutral-900 dark:text-white">DOS-2026-001</span>
-          <span id="userCategoryBadge" class="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 mt-0.5">Pending Asset Turnover</span>
-        </div>
-      </div>
-
-      <!-- "Whose Turn" Prominent Notification Banner -->
-      <div id="userWhoseTurnCard" class="p-5 rounded-3xl bg-neutral-100/90 dark:bg-neutral-800/60 border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex items-start space-x-4">
-        <div class="w-10 h-10 rounded-2xl bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-lg shrink-0 mt-0.5 border border-black/[0.04] dark:border-white/[0.06]">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between gap-2">
-            <span class="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider" id="userCurrentPhaseTitle">Current Phase: Stage 1 - Asset Hand-Off</span>
-            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-black text-white dark:bg-white dark:text-black shadow-sm" id="userWhoseTurnHolderBadge">Turn: IT Clearance (Alex Tan)</span>
-          </div>
-          <p id="userWhoseTurnActionText" class="text-xs text-neutral-600 dark:text-neutral-300 font-medium mt-1">
-            Alex Tan (IT Clearance Lead) is currently inspecting your Lenovo ThinkPad T14s serial number and sanitizing corporate data.
-          </p>
-        </div>
-      </div>
-
-      <!-- Linear Clearance Workflow Stepper (4 Stages) -->
-      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-400">Clearance Linear Workflow Progress</h4>
-          <span id="userWorkflowStepSummary" class="text-xs font-bold text-neutral-700 dark:text-neutral-300">Stage 1 of 4 in progress</span>
-        </div>
-        <div id="userWorkflowStepper" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-          <!-- Rendered via JS -->
-        </div>
-      </div>
-
-      <!-- Hand-Off & Milestone Activity Timeline -->
-      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-5">
-        <div class="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
-          <div class="flex items-center space-x-2.5">
-            <div class="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-sm shadow-sm border border-black/[0.06] dark:border-white/[0.08]">
-              <i class="fa-solid fa-timeline"></i>
+        <!-- SECTION 2: LINEAR CLEARANCE WORKFLOW PROGRESS -->
+        <div class="pt-6 border-t border-black/[0.05] dark:border-white/[0.06] space-y-4">
+          <div class="flex items-center justify-between pb-1">
+            <div class="flex items-center space-x-2">
+              <div class="w-6 h-6 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-xs shadow-sm border border-black/[0.06] dark:border-white/[0.08]">
+                <i class="fa-solid fa-bars-staggered"></i>
+              </div>
+              <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Clearance Linear Workflow Progress</h4>
             </div>
+            <span id="userWorkflowStepSummary" class="text-xs font-bold text-neutral-700 dark:text-neutral-300">Stage 1 of 4 in progress</span>
+          </div>
+          <div id="userWorkflowStepper" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- SECTION 3: HAND-OFF & MILESTONE ACTIVITY TIMELINE -->
+        <div class="pt-6 border-t border-black/[0.05] dark:border-white/[0.06] space-y-4">
+          <div class="flex items-center justify-between pb-1">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-xs shadow-sm border border-black/[0.06] dark:border-white/[0.08]">
+                <i class="fa-solid fa-timeline"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Hand-Off & Milestone Timeline</h4>
+                <p class="text-[11px] text-neutral-400">Chronological verification of company hardware, keys, and payroll audits</p>
+              </div>
+            </div>
+            <span class="text-[10px] font-mono text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full border border-black/[0.04]">Auto-Logged</span>
+          </div>
+
+          <div id="userTimelineContainer">
+            <!-- Timeline items rendered via JS -->
+          </div>
+        </div>
+
+        <!-- SECTION 4: CENTRALIZED CONFIDENTIAL TRANSACTION DISCUSSION -->
+        <div class="pt-6 border-t border-black/[0.05] dark:border-white/[0.06] space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-1 gap-2">
             <div>
               <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Hand-Off & Milestone Timeline</h4>
               <p class="text-[11px] text-neutral-400">Chronological verification of company hardware, keys, and payroll audits</p>
