@@ -817,11 +817,16 @@
                 🚀 5 Ready for Release
               </button>
             </div>
+
+            <button onclick="toggleAllAdminTimelines()" id="btnToggleAllTimelines" class="px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-xs font-semibold transition flex items-center space-x-1.5 border border-black/[0.04] dark:border-white/[0.06] shadow-sm active:scale-95">
+              <i class="fa-solid fa-clock-rotate-left text-apple-blue text-xs"></i>
+              <span id="labelToggleAllTimelines">Expand All Timelines</span>
+            </button>
           </div>
         </div>
 
-        <!-- Cards Grid -->
-        <div id="adminCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Clearance Requests (Strictly 1 Request Per Line) -->
+        <div id="adminCardsGrid" class="flex flex-col space-y-3">
           <!-- Populated via JS -->
         </div>
       </div>
@@ -1813,6 +1818,8 @@
       renderAdminDeck();
     }
 
+    let expandedAdminTimelines = new Set();
+
     function renderAdminDeck() {
       const q = (document.getElementById('adminSearchInput')?.value || '').toLowerCase();
       
@@ -1830,21 +1837,26 @@
       });
 
       document.getElementById('adminQueueCountBadge').textContent = `${filtered.length} accounts`;
+      updateToggleAllButtonLabel();
 
       const grid = document.getElementById('adminCardsGrid');
       grid.innerHTML = filtered.map(d => {
         const initials = d.employee_name.split(' ').map(n => n[0]).slice(0, 2).join('');
+        const isExpanded = expandedAdminTimelines.has(d.dossier_id);
         
         let categoryBadge = '';
         let borderAccent = '';
+        let avatarBg = '';
         if (d.category === 'FOR_RELEASE') {
-          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-apple-green uppercase">READY FOR RELEASE</span>';
+          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-apple-green uppercase shrink-0">READY FOR RELEASE</span>';
           borderAccent = 'border-l-4 border-l-apple-green';
+          avatarBg = 'bg-emerald-500/15 text-apple-green';
         } else if (d.category === 'FOR_REVIEW') {
-          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-apple-red uppercase">FOR REVIEW</span>';
+          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-apple-red uppercase shrink-0">FOR REVIEW</span>';
           borderAccent = 'border-l-4 border-l-apple-red';
+          avatarBg = 'bg-red-500/15 text-apple-red';
         } else {
-          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-apple-amber uppercase">PENDING</span>';
+          categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-apple-amber uppercase shrink-0">PENDING</span>';
           borderAccent = 'border-l-4 border-l-apple-amber';
         }
 
