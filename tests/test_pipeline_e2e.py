@@ -325,5 +325,3 @@ def test_three_portals_rendered(client):
 
 
 
-
-# Verified: Single whole padding container regression pass
