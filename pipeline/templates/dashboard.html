@@ -439,53 +439,42 @@
         <div class="pt-6 border-t border-black/[0.05] dark:border-white/[0.06] space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-1 gap-2">
             <div>
-              <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Hand-Off & Milestone Timeline</h4>
-              <p class="text-[11px] text-neutral-400">Chronological verification of company hardware, keys, and payroll audits</p>
+              <div class="flex items-center space-x-2">
+                <div class="w-7 h-7 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center text-xs shadow-sm border border-black/[0.06] dark:border-white/[0.08]">
+                  <i class="fa-solid fa-comments"></i>
+                </div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Centralized Transaction Discussion</h4>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">
+                  🔒 Requester & Approvers Only
+                </span>
+              </div>
+              <p class="text-[11px] text-neutral-400 mt-1" id="userDiscussionSubtitle">
+                Confidential thread · Restricted strictly to Juan Dela Cruz & Clearance Approvers
+              </p>
+            </div>
+            <div id="userAuthorizedBadges" class="flex flex-wrap items-center gap-1.5 text-[10px]">
+              <!-- Populated via JS -->
             </div>
           </div>
-          <span class="text-[10px] font-mono text-neutral-400">Auto-Logged</span>
-        </div>
 
-        <div id="userTimelineContainer">
-          <!-- Timeline items rendered via JS -->
-        </div>
-      </div>
+          <!-- Message Thread Box -->
+          <div id="userCommentsContainer" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+            <!-- Comments rendered via JS -->
+          </div>
 
-      <!-- Centralized Confidential Transaction Discussion (Requester & Approvers Only) -->
-      <div class="bg-apple-surfaceLight dark:bg-apple-surfaceDark p-6 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06] gap-2">
-          <div>
-            <div class="flex items-center space-x-2">
-              <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Centralized Transaction Discussion</h4>
-              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border border-black/[0.04]">
-                🔒 Requester & Approvers Only
-              </span>
+          <!-- Comment Input -->
+          <div class="pt-3 border-t border-black/[0.05] dark:border-white/[0.06] space-y-2">
+            <textarea id="userCommentInput" rows="2" placeholder="Post an update or reply to your clearance approvers..." class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-black dark:focus:border-white focus:bg-white dark:focus:bg-neutral-900 rounded-2xl p-3 outline-none transition"></textarea>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-neutral-400">Posting as: <strong id="userPostingAsName">Juan Dela Cruz (Requester)</strong></span>
+              <button onclick="postUserComment()" class="px-4 py-2 rounded-xl bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-bold shadow-sm transition active:scale-95 flex items-center space-x-1.5">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+                <span>Post Note to Approvers</span>
+              </button>
             </div>
-            <p class="text-[11px] text-neutral-400 mt-0.5" id="userDiscussionSubtitle">
-              Confidential thread · Restricted strictly to Juan Dela Cruz & Clearance Approvers
-            </p>
-          </div>
-          <div id="userAuthorizedBadges" class="flex flex-wrap items-center gap-1.5 text-[10px]">
-            <!-- Populated via JS -->
           </div>
         </div>
 
-        <!-- Message Thread Box -->
-        <div id="userCommentsContainer" class="space-y-3 max-h-80 overflow-y-auto pr-1">
-          <!-- Comments rendered via JS -->
-        </div>
-
-        <!-- Comment Input -->
-        <div class="pt-2 border-t border-black/[0.05] dark:border-white/[0.06] space-y-2">
-          <textarea id="userCommentInput" rows="2" placeholder="Post an update or reply to your clearance approvers..." class="w-full text-xs bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white placeholder-neutral-400 border border-transparent focus:border-black dark:focus:border-white focus:bg-white dark:focus:bg-neutral-900 rounded-2xl p-3 outline-none transition"></textarea>
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] text-neutral-400">Posting as: <strong id="userPostingAsName">Juan Dela Cruz (Requester)</strong></span>
-            <button onclick="postUserComment()" class="px-4 py-2 rounded-xl bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-bold shadow-sm transition active:scale-95 flex items-center space-x-1.5">
-              <i class="fa-solid fa-paper-plane text-xs"></i>
-              <span>Post Note to Approvers</span>
-            </button>
-          </div>
-        </div>
       </div>
 
     </section>
