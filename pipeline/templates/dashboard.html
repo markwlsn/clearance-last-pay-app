@@ -1858,51 +1858,244 @@
         } else {
           categoryBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-apple-amber uppercase shrink-0">PENDING</span>';
           borderAccent = 'border-l-4 border-l-apple-amber';
+          avatarBg = 'bg-amber-500/15 text-apple-amber';
         }
 
+        const flagsCount = (d.flags_summary || []).length;
+        const flagsBadge = flagsCount > 0 
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-apple-red border border-red-500/20 shrink-0" title="${(d.flags_summary||[]).join('; ')}"><i class="fa-solid fa-triangle-exclamation mr-1"></i>${flagsCount} Flag${flagsCount > 1 ? 's' : ''}</span>`
+          : '';
+
+        const flagsBanner = flagsCount > 0
+          ? `
+            <div class="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-apple-red font-semibold flex items-center space-x-2.5">
+              <i class="fa-solid fa-triangle-exclamation text-base shrink-0"></i>
+              <div class="flex-1 min-w-0">
+                <div class="font-bold text-[11px] uppercase tracking-wider">Discrepancy Flags Requiring Review:</div>
+                <div class="text-xs font-normal mt-0.5">${d.flags_summary.join(' · ')}</div>
+              </div>
+            </div>
+          `
+          : '';
+
+        const escrowBanner = d.escrow_details
+          ? `
+            <div class="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-xs text-apple-purple font-semibold flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-scale-balanced text-sm"></i>
+                <span>Split Escrow Active: Disputed ₱${Number(d.escrow_details.disputed_amount || 3500).toLocaleString()} isolated in escrow.</span>
+              </div>
+              <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-apple-purple text-white font-bold shrink-0">Undisputed ₱${Number(d.escrow_details.undisputed_amount || 48500).toLocaleString()} Cleared</span>
+            </div>
+          `
+          : '';
+
+        const timelineHtml = (d.timeline && d.timeline.length) ? d.timeline.map(t => {
+          const isDone = t.status === 'COMPLETED';
+          const isInProg = t.status === 'IN_PROGRESS';
+          const dotClass = isDone 
+            ? 'bg-apple-green text-white' 
+            : (isInProg ? 'bg-apple-blue text-white apple-pulse-blue' : 'bg-neutral-300 dark:bg-neutral-700 text-neutral-500');
+          
+          const badge = isDone 
+            ? '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-apple-green uppercase">Cleared</span>'
+            : (isInProg 
+                ? '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-apple-blue uppercase">In Progress</span>' 
+                : '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 uppercase">Pending</span>');
+
+          return `
+            <div class="relative flex items-start space-x-3.5 group">
+              <div class="w-6 h-6 rounded-full ${dotClass} flex items-center justify-center text-[10px] shrink-0 -ml-[25px] shadow-sm">
+                <i class="fa-solid ${t.icon || 'fa-circle'}"></i>
+              </div>
+              <div class="flex-1 min-w-0 bg-neutral-50/90 dark:bg-neutral-800/60 p-3.5 rounded-2xl border border-black/[0.04]">
+                <div class="flex flex-wrap items-center justify-between gap-1.5">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-xs font-bold text-neutral-900 dark:text-white">${t.milestone}</span>
+                    ${badge}
+                  </div>
+                  <span class="text-[10px] font-mono text-neutral-400">${t.date}</span>
+                </div>
+                <p class="text-[11px] text-neutral-600 dark:text-neutral-300 mt-1">${t.details}</p>
+                <div class="text-[10px] text-neutral-400 mt-1.5 flex items-center space-x-1">
+                  <i class="fa-solid fa-user-circle text-[9px]"></i>
+                  <span>${t.actor}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('') : '<p class="text-xs text-neutral-400 italic">No timeline milestones logged yet.</p>';
+
         return `
-          <div class="p-5 rounded-3xl bg-white dark:bg-apple-elevatedDark border border-black/[0.06] dark:border-white/[0.08] ${borderAccent} shadow-sm flex flex-col justify-between space-y-4">
-            <div>
-              <div class="flex items-start justify-between gap-2 mb-2">
+          <div class="rounded-3xl bg-white dark:bg-apple-elevatedDark border border-black/[0.06] dark:border-white/[0.08] ${borderAccent} shadow-sm overflow-hidden transition-all duration-200">
+            
+            <!-- Single Request Line (1 Request Per Line) -->
+            <div class="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              
+              <!-- Left: Identity & Clearance Dossier -->
+              <div class="flex items-center space-x-3.5 lg:w-[320px] shrink-0">
+                <div class="w-11 h-11 rounded-2xl ${avatarBg} font-bold text-xs flex items-center justify-center shrink-0 shadow-inner">
+                  ${initials}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center space-x-2">
+                    <h4 onclick="toggleAdminTimeline('${d.dossier_id}')" class="text-sm font-bold text-neutral-900 dark:text-white hover:text-apple-blue transition cursor-pointer truncate" title="Click to toggle timeline">
+                      ${d.employee_name}
+                    </h4>
+                    <span class="text-[10px] font-mono font-bold text-apple-blue shrink-0">${d.dossier_id}</span>
+                  </div>
+                  <div class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5 truncate">
+                    ${d.department} · <span class="text-neutral-400">${d.branch}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Center: Stage & Current Turn Action -->
+              <div class="flex-1 min-w-0">
+                <div class="p-2.5 sm:px-3.5 sm:py-2 rounded-2xl bg-neutral-50/90 dark:bg-neutral-800/60 border border-black/[0.04] dark:border-white/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-wider">
+                      <span class="text-neutral-700 dark:text-neutral-300">${d.stage_name || 'Stage 1'}</span>
+                      <span class="text-neutral-300 dark:text-neutral-600">•</span>
+                      <span class="text-apple-blue font-bold">Turn: ${d.current_turn_node}</span>
+                    </div>
+                    <div class="text-neutral-700 dark:text-neutral-300 font-medium truncate text-xs mt-0.5" title="${d.current_turn_action}">
+                      ${d.current_turn_action}
+                    </div>
+                  </div>
+                  <div class="shrink-0 sm:text-right">
+                    <span class="text-[10px] text-neutral-400">EOC: <strong class="text-neutral-700 dark:text-neutral-300 font-mono">${d.eoc_date}</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Status Badge & Actions -->
+              <div class="flex items-center justify-between lg:justify-end space-x-2.5 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-black/[0.04] dark:border-white/[0.04]">
+                <div class="flex items-center space-x-1.5">
+                  ${categoryBadge}
+                  ${flagsBadge}
+                </div>
+
+                <div class="flex items-center space-x-1.5">
+                  <!-- Timeline Dropdown Button (dropdox) -->
+                  <button onclick="toggleAdminTimeline('${d.dossier_id}')" id="adminTimelineBtn_${d.dossier_id}" class="px-3 py-1.5 rounded-xl ${isExpanded ? 'bg-sky-500/20 text-sky-700 dark:text-sky-300' : 'bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400'} text-xs font-bold transition flex items-center space-x-1.5 shadow-sm active:scale-95" title="Toggle milestone timeline dropdown">
+                    <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+                    <span>Timeline</span>
+                    <i id="adminTimelineChevron_${d.dossier_id}" class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}"></i>
+                  </button>
+
+                  <!-- Review Desk CTA -->
+                  <button onclick="adminInspectInApprover('${d.dossier_id}')" class="px-3 py-1.5 rounded-xl bg-apple-blue hover:bg-apple-blueHover text-white text-xs font-bold transition flex items-center space-x-1.5 shadow-sm active:scale-95">
+                    <span>Review Desk</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- DROPDOWN BOX: TIMELINE & CURRENT STATUS INSPECTOR -->
+            <div id="adminTimelineBox_${d.dossier_id}" class="${isExpanded ? '' : 'hidden'} border-t border-black/[0.06] dark:border-white/[0.08] bg-neutral-50/70 dark:bg-black/20 p-5 sm:p-6 space-y-4">
+              
+              <!-- Stage & Current Turn Status Bar -->
+              <div class="p-3.5 rounded-2xl bg-white dark:bg-apple-surfaceDark border border-black/[0.05] dark:border-white/[0.06] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div class="flex items-center space-x-3">
-                  <div class="w-10 h-10 rounded-2xl bg-neutral-200/80 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-bold text-xs flex items-center justify-center shrink-0">
-                    ${initials}
+                  <div class="w-8 h-8 rounded-xl bg-apple-blue/10 text-apple-blue flex items-center justify-center text-sm shrink-0">
+                    <i class="fa-solid fa-diagram-project"></i>
                   </div>
                   <div>
-                    <h4 class="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">${d.employee_name}</h4>
-                    <div class="text-[10px] text-neutral-400 font-mono">${d.employee_id} · ${d.dossier_id}</div>
+                    <div class="text-[10px] uppercase font-bold text-neutral-400">Current Linear Workflow Stage</div>
+                    <div class="font-bold text-neutral-900 dark:text-white">${d.stage_name || 'Stage 1'} (Stage ${d.stage_step || 1} of 4)</div>
                   </div>
                 </div>
-                ${categoryBadge}
-              </div>
-
-              <div class="text-xs text-neutral-600 dark:text-neutral-300 font-medium">
-                ${d.department} · <span class="text-neutral-400">${d.branch}</span>
-              </div>
-
-              <div class="mt-3 p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-black/[0.04] text-[11px] space-y-1">
-                <div class="flex items-center justify-between text-neutral-400 text-[10px] font-bold uppercase">
-                  <span>${d.stage_name || 'Stage 1'}</span>
-                  <span>Turn: ${d.current_turn_node}</span>
+                <div class="flex items-center space-x-2">
+                  <span class="text-[10px] text-neutral-400 uppercase font-bold">Active Turn Holder:</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-apple-blue text-white font-bold text-xs">
+                    ${d.current_turn_name || d.current_turn_node}
+                  </span>
                 </div>
-                <div class="text-neutral-700 dark:text-neutral-200 font-medium truncate">${d.current_turn_action}</div>
               </div>
+
+              ${flagsBanner}
+              ${escrowBanner}
+
+              <!-- Milestone Spine -->
+              <div class="bg-white dark:bg-apple-surfaceDark p-5 sm:p-6 rounded-2xl border border-black/[0.05] dark:border-white/[0.06] shadow-sm space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-black/[0.04] dark:border-white/[0.04]">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">Milestone Activity & Hand-Off Timeline</span>
+                    <span class="text-[10px] px-2 py-0.2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-400 font-mono">${(d.timeline||[]).length} events</span>
+                  </div>
+                  <span class="text-[10px] text-neutral-400">Concrete turnover logs & audits</span>
+                </div>
+                <div class="relative pl-7 space-y-4 before:content-[''] before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200 dark:before:bg-neutral-700 pt-2">
+                  ${timelineHtml}
+                </div>
+              </div>
+
+              <!-- Dropdown Bottom Bar -->
+              <div class="flex flex-wrap items-center justify-between pt-1 text-xs">
+                <button onclick="adminInspectInUser('${d.dossier_id}')" class="text-sky-600 dark:text-sky-400 hover:underline font-semibold flex items-center space-x-1.5">
+                  <i class="fa-solid fa-user-circle text-xs"></i>
+                  <span>Switch to User End perspective for ${d.employee_name}</span>
+                </button>
+                <button onclick="toggleAdminTimeline('${d.dossier_id}')" class="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 text-xs font-semibold flex items-center space-x-1">
+                  <span>Close Timeline</span>
+                  <i class="fa-solid fa-chevron-up text-[10px]"></i>
+                </button>
+              </div>
+
             </div>
 
-            <div class="pt-3 border-t border-black/[0.04] flex items-center justify-between gap-2">
-              <span class="text-[10px] text-neutral-400">EOC: ${d.eoc_date}</span>
-              <div class="flex items-center space-x-1.5">
-                <button onclick="adminInspectInUser('${d.dossier_id}')" class="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 text-[10px] font-bold transition" title="View Timeline in User End">
-                  Timeline
-                </button>
-                <button onclick="adminInspectInApprover('${d.dossier_id}')" class="px-2.5 py-1 rounded-lg bg-apple-blue hover:bg-apple-blueHover text-white text-[10px] font-bold transition">
-                  Review Desk →
-                </button>
-              </div>
-            </div>
           </div>
         `;
       }).join('');
+    }
+
+    function toggleAdminTimeline(id) {
+      const box = document.getElementById(`adminTimelineBox_${id}`);
+      const chevron = document.getElementById(`adminTimelineChevron_${id}`);
+      const btn = document.getElementById(`adminTimelineBtn_${id}`);
+      if (!box) return;
+
+      const isHidden = box.classList.contains('hidden');
+      if (isHidden) {
+        box.classList.remove('hidden');
+        if (chevron) chevron.classList.add('rotate-180');
+        if (btn) {
+          btn.classList.add('bg-sky-500/20', 'text-sky-700', 'dark:text-sky-300');
+        }
+        expandedAdminTimelines.add(id);
+      } else {
+        box.classList.add('hidden');
+        if (chevron) chevron.classList.remove('rotate-180');
+        if (btn) {
+          btn.classList.remove('bg-sky-500/20', 'text-sky-700', 'dark:text-sky-300');
+        }
+        expandedAdminTimelines.delete(id);
+      }
+      updateToggleAllButtonLabel();
+    }
+
+    function toggleAllAdminTimelines() {
+      const allIds = allDossiers.map(d => d.dossier_id);
+      const shouldExpand = expandedAdminTimelines.size < allIds.length;
+      if (shouldExpand) {
+        allIds.forEach(id => expandedAdminTimelines.add(id));
+      } else {
+        expandedAdminTimelines.clear();
+      }
+      renderAdminDeck();
+    }
+
+    function updateToggleAllButtonLabel() {
+      const lbl = document.getElementById('labelToggleAllTimelines');
+      if (!lbl) return;
+      if (expandedAdminTimelines.size > 0 && expandedAdminTimelines.size >= allDossiers.length) {
+        lbl.textContent = 'Collapse All Timelines';
+      } else {
+        lbl.textContent = 'Expand All Timelines';
+      }
     }
 
     function adminInspectInUser(id) {
